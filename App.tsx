@@ -17,9 +17,11 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 
 // Admin-facing layout and pages
 import AdminLayout from './components/admin/AdminLayout';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import UserManagementPage from './pages/admin/UserManagementPage';
-import AnalyticsPage from './pages/admin/AnalyticsPage';
 import LoginDetailsPage from './pages/admin/LoginDetailsPage';
+import PlatformSettingsPage from './pages/admin/PlatformSettingsPage';
+import TaskManagementPage from './pages/admin/TaskManagementPage';
 
 
 function App() {
@@ -55,10 +57,12 @@ function App() {
           path="/admin" 
           element={user ? (user.isAdmin ? <AdminLayout /> : <Navigate to="/app/dashboard" />) : <Navigate to="/login" />}
         >
-          <Route index element={<Navigate to="users" />} />
+          <Route index element={<Navigate to="dashboard" />} />
+          <Route path="dashboard" element={<AdminDashboardPage />} />
           <Route path="users" element={<UserManagementPage />} />
-          <Route path="analytics" element={<AnalyticsPage />} />
           <Route path="logins" element={<LoginDetailsPage />} />
+          <Route path="settings" element={<PlatformSettingsPage />} />
+          <Route path="tasks" element={<TaskManagementPage />} />
         </Route>
         
         {/* === GLOBAL CATCH-ALL === */}

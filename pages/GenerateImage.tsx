@@ -4,7 +4,7 @@ import { AppContext } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import Button from '../components/common/Button';
 import Select from '../components/common/Select';
-import Spinner from '../components/common/Spinner';
+import GenerationProgress from '../components/common/GenerationProgress';
 import Card from '../components/common/Card';
 import { generateImage as apiGenerateImage } from '../services/geminiService';
 import { IMAGE_STYLES, IMAGE_RESOLUTIONS, IMAGE_ASPECT_RATIOS, CREDIT_COSTS, ImageIcon } from '../constants';
@@ -24,6 +24,9 @@ const GenerateImage = () => {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Generation | null>(null);
 
+  const [progress, setProgress] = useState(0);
+  const [loadingMessage, setLoadingMessage] = useState('');
+
   useEffect(() => {
     if (location.state) {
       const { prompt, style, resolution, aspectRatio, negativePrompt } = location.state as Generation;
@@ -38,6 +41,11 @@ const GenerateImage = () => {
 
   const creditCost = CREDIT_COSTS.image;
 
+  const handleProgressUpdate = (p: number, msg: string) => {
+    setProgress(p);
+    setLoadingMessage(msg);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (state.credits < creditCost) {
@@ -49,7 +57,7 @@ const GenerateImage = () => {
     setResult(null);
 
     try {
-      const newGeneration = await apiGenerateImage(prompt, style, resolution, aspectRatio, negativePrompt);
+      const newGeneration = await apiGenerateImage(prompt, style, resolution, aspectRatio, negativePrompt, handleProgressUpdate);
       setResult(newGeneration);
       dispatch({ type: 'ADD_GENERATION', payload: newGeneration });
       dispatch({ type: 'UPDATE_CREDITS', payload: state.credits - creditCost });
@@ -59,6 +67,18 @@ const GenerateImage = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+  
+  const AspectRatioContainer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+      const [w, h] = aspectRatio.split(' ')[0].split(':').map(Number);
+      const paddingTop = `${(h / w) * 100}%`;
+      return (
+          <div className="relative w-full" style={{ paddingTop }}>
+              <div className="absolute inset-0 flex items-center justify-center">
+                  {children}
+              </div>
+          </div>
+      );
   };
 
   return (
@@ -115,13 +135,17 @@ const GenerateImage = () => {
         </Card>
 
         <Card>
-          <div className="flex items-center justify-center w-full min-h-[300px] md:min-h-[550px] bg-slate-900 rounded-lg overflow-hidden">
-            {isLoading && <Spinner message={t('generating')} />}
-            {!isLoading && result && (
-              <img src={result.url} alt={result.prompt} className="w-full h-full object-contain" />
-            )}
-             {!isLoading && !result && (
-              <div className="text-center text-slate-500 p-4">
+          <div className="w-full bg-slate-900 rounded-lg overflow-hidden flex items-center justify-center">
+            {isLoading ? (
+              <AspectRatioContainer>
+                <div className="w-full h-full bg-slate-900/50 border-2 border-dashed border-slate-700 rounded-lg flex items-center justify-center">
+                    <GenerationProgress progress={progress} message={loadingMessage} />
+                </div>
+              </AspectRatioContainer>
+            ) : result ? (
+              <img src={result.url} alt={result.prompt} className="w-full h-auto object-contain" />
+            ) : (
+              <div className="text-center text-slate-500 p-8 min-h-[300px] flex flex-col justify-center items-center">
                 <ImageIcon className="w-16 h-16 mx-auto mb-4"/>
                 <p>Your generated image will appear here.</p>
               </div>

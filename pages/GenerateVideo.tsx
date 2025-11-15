@@ -3,7 +3,7 @@ import { AppContext } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import Button from '../components/common/Button';
 import Select from '../components/common/Select';
-import Spinner from '../components/common/Spinner';
+import GenerationProgress from '../components/common/GenerationProgress';
 import Card from '../components/common/Card';
 import { generateVideo as apiGenerateVideo } from '../services/geminiService';
 import { VIDEO_STYLES, VIDEO_DURATIONS, CREDIT_COSTS } from '../constants';
@@ -20,7 +20,15 @@ const GenerateVideo = () => {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Generation | null>(null);
 
+  const [progress, setProgress] = useState(0);
+  const [loadingMessage, setLoadingMessage] = useState('');
+
   const creditCost = CREDIT_COSTS.video;
+
+  const handleProgressUpdate = (p: number, msg: string) => {
+    setProgress(p);
+    setLoadingMessage(msg);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +41,7 @@ const GenerateVideo = () => {
     setResult(null);
 
     try {
-      const newGeneration = await apiGenerateVideo(prompt, style, duration);
+      const newGeneration = await apiGenerateVideo(prompt, style, duration, handleProgressUpdate);
       setResult(newGeneration);
       dispatch({ type: 'ADD_GENERATION', payload: newGeneration });
       dispatch({ type: 'UPDATE_CREDITS', payload: state.credits - creditCost });
@@ -47,8 +55,8 @@ const GenerateVideo = () => {
   
   const LoadingState = () => (
       <div className="text-center p-4">
-        <Spinner message={t('generating')} />
-        <p className="text-slate-400 mt-4 max-w-sm mx-auto">{t('videoGenerationNotice')}</p>
+        <GenerationProgress progress={progress} message={loadingMessage} />
+        <p className="text-slate-400 mt-4 max-w-sm mx-auto text-sm">{t('videoGenerationNotice')}</p>
       </div>
   );
 

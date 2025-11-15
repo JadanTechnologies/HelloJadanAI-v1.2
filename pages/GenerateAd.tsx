@@ -3,7 +3,7 @@ import { AppContext } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import Button from '../components/common/Button';
 import Select from '../components/common/Select';
-import Spinner from '../components/common/Spinner';
+import GenerationProgress from '../components/common/GenerationProgress';
 import Card from '../components/common/Card';
 import { generateAdCreative as apiGenerateAd } from '../services/geminiService';
 import { AD_PLATFORMS, AD_TYPES, CREDIT_COSTS } from '../constants';
@@ -20,7 +20,15 @@ const GenerateAd = () => {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Generation | null>(null);
 
+  const [progress, setProgress] = useState(0);
+  const [loadingMessage, setLoadingMessage] = useState('');
+
   const creditCost = CREDIT_COSTS.ad;
+
+  const handleProgressUpdate = (p: number, msg: string) => {
+    setProgress(p);
+    setLoadingMessage(msg);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +41,7 @@ const GenerateAd = () => {
     setResult(null);
 
     try {
-      const newGeneration = await apiGenerateAd(prompt, platform, adType);
+      const newGeneration = await apiGenerateAd(prompt, platform, adType, handleProgressUpdate);
       setResult(newGeneration);
       dispatch({ type: 'ADD_GENERATION', payload: newGeneration });
       dispatch({ type: 'UPDATE_CREDITS', payload: state.credits - creditCost });
@@ -112,7 +120,7 @@ const GenerateAd = () => {
         <Card className="h-full">
             <h3 className="text-lg font-semibold text-white mb-4">Generated Visual</h3>
             <div className="flex items-center justify-center w-full aspect-square bg-slate-900 rounded-lg overflow-hidden">
-                {isLoading && <Spinner message={t('generating')} />}
+                {isLoading && <GenerationProgress progress={progress} message={loadingMessage} />}
                 {!isLoading && result && (
                     <img src={result.url} alt={result.prompt} className="w-full h-full object-contain" />
                 )}
@@ -126,7 +134,7 @@ const GenerateAd = () => {
         </Card>
          <Card className="h-full">
             <h3 className="text-lg font-semibold text-white mb-4">Generated Copy</h3>
-            {isLoading && <Spinner />}
+            {isLoading && <GenerationProgress progress={progress} message={loadingMessage} />}
             {!isLoading && result && <AdCreativeDisplay creative={result.adCreative} />}
             {!isLoading && !result && <p className="text-slate-500">Your ad copy will appear here.</p>}
         </Card>
