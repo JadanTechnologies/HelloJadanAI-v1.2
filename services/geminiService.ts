@@ -12,12 +12,13 @@ export const generateImage = async (
   resolution: string, 
   aspectRatio: string, 
   negativePrompt: string,
+  sourceImage: File | null,
   onProgress: (progress: number, message: string) => void
 ): Promise<Generation> => {
-  console.log(`Generating image with prompt: "${prompt}", style: ${style}, resolution: ${resolution}, aspect ratio: ${aspectRatio}, negative prompt: "${negativePrompt}"`);
+  console.log(`Generating image with prompt: "${prompt}", style: ${style}, resolution: ${resolution}, aspect ratio: ${aspectRatio}, negative prompt: "${negativePrompt}"`, sourceImage ? `source image: ${sourceImage.name}` : '');
   
-  onProgress(0, "Initializing model...");
-  await delay(500);
+  onProgress(0, sourceImage ? "Analyzing source image..." : "Initializing model...");
+  await delay(sourceImage ? 1500 : 500);
   
   onProgress(20, "Analyzing prompt...");
   await delay(1000);
@@ -55,6 +56,7 @@ export const generateImage = async (
     resolution,
     aspectRatio,
     negativePrompt,
+    sourceImageUrl: sourceImage ? URL.createObjectURL(sourceImage) : undefined,
   };
 };
 
@@ -102,9 +104,10 @@ export const generateAdCreative = async (
   prompt: string, 
   platform: string, 
   adType: string,
+  sourceImage: File | null,
   onProgress: (progress: number, message: string) => void
 ): Promise<Generation> => {
-  console.log(`Generating ad for platform: ${platform}, type: ${adType} with prompt: "${prompt}"`);
+  console.log(`Generating ad for platform: ${platform}, type: ${adType} with prompt: "${prompt}"`, sourceImage ? `with user image: ${sourceImage.name}` : '');
 
   onProgress(0, "Analyzing ad requirements...");
   await delay(500);
@@ -120,13 +123,29 @@ export const generateAdCreative = async (
     targetAudience: ['Tech Enthusiasts', 'Early Adopters', 'Ages 18-35'],
   };
   
-  onProgress(50, "Generating visual asset...");
-  // Simulate image generation progress within the ad generation
-  const visualGeneration = await generateImage(
-      `A high-quality product shot for a ${adType} on ${platform}: ${prompt}`, 
-      'Product', 'HD', '1:1 (Square)', '', 
-      (p, m) => onProgress(50 + (p / 2), m) // Scale image progress to fit 50-100% range
-  );
+  let visualGeneration: Generation;
+
+  if (sourceImage) {
+      onProgress(50, "Processing uploaded visual...");
+      await delay(1000);
+      onProgress(100, "Finalizing...");
+      await delay(300);
+      visualGeneration = {
+          id: `gen-upl-${Date.now()}`,
+          type: 'image',
+          prompt: 'User uploaded image',
+          url: URL.createObjectURL(sourceImage),
+          createdAt: new Date().toISOString(),
+          isFavorite: false,
+      };
+  } else {
+    onProgress(50, "Generating visual asset...");
+    visualGeneration = await generateImage(
+        `A high-quality product shot for a ${adType} on ${platform}: ${prompt}`, 
+        'Product', 'HD', '1:1 (Square)', '', null,
+        (p, m) => onProgress(50 + (p / 2), m)
+    );
+  }
 
   return {
     ...visualGeneration,

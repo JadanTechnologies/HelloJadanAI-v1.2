@@ -25,6 +25,8 @@ export interface Generation {
   platform?: string;
   adType?: string;
   adCreative?: AdCreative;
+  // FIX: Added optional sourceImageUrl property to store the URL of the source image used for generation.
+  sourceImageUrl?: string;
 }
 
 export interface AdCreative {

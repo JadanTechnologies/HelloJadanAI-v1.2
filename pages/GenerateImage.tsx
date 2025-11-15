@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { AppContext } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
@@ -7,19 +7,24 @@ import Select from '../components/common/Select';
 import GenerationProgress from '../components/common/GenerationProgress';
 import Card from '../components/common/Card';
 import { generateImage as apiGenerateImage } from '../services/geminiService';
-import { IMAGE_STYLES, IMAGE_RESOLUTIONS, IMAGE_ASPECT_RATIOS, CREDIT_COSTS, ImageIcon } from '../constants';
+import { IMAGE_STYLES, IMAGE_RESOLUTIONS, IMAGE_ASPECT_RATIOS, CREDIT_COSTS, ImageIcon, UploadIcon } from '../constants';
 import { Generation } from '../types';
 
 const GenerateImage = () => {
   const { state, dispatch } = useContext(AppContext);
   const { t } = useTranslation();
   const location = useLocation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [prompt, setPrompt] = useState('');
   const [negativePrompt, setNegativePrompt] = useState('');
   const [style, setStyle] = useState(IMAGE_STYLES[0]);
   const [resolution, setResolution] = useState(IMAGE_RESOLUTIONS[0]);
   const [aspectRatio, setAspectRatio] = useState(IMAGE_ASPECT_RATIOS[0]);
+  
+  const [sourceImage, setSourceImage] = useState<File | null>(null);
+  const [sourceImagePreview, setSourceImagePreview] = useState<string | null>(null);
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Generation | null>(null);
@@ -29,12 +34,13 @@ const GenerateImage = () => {
 
   useEffect(() => {
     if (location.state) {
-      const { prompt, style, resolution, aspectRatio, negativePrompt } = location.state as Generation;
+      const { prompt, style, resolution, aspectRatio, negativePrompt, sourceImageUrl } = location.state as Generation;
       if (prompt) setPrompt(prompt);
       if (style) setStyle(style);
       if (resolution) setResolution(resolution);
       if (aspectRatio) setAspectRatio(aspectRatio);
       if (negativePrompt) setNegativePrompt(negativePrompt);
+      if (sourceImageUrl) setSourceImagePreview(sourceImageUrl);
     }
   }, [location.state]);
 
@@ -44,6 +50,22 @@ const GenerateImage = () => {
   const handleProgressUpdate = (p: number, msg: string) => {
     setProgress(p);
     setLoadingMessage(msg);
+  };
+
+  const handleSourceImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        setSourceImage(file);
+        setSourceImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const clearSourceImage = () => {
+      setSourceImage(null);
+      setSourceImagePreview(null);
+      if(fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,7 +79,7 @@ const GenerateImage = () => {
     setResult(null);
 
     try {
-      const newGeneration = await apiGenerateImage(prompt, style, resolution, aspectRatio, negativePrompt, handleProgressUpdate);
+      const newGeneration = await apiGenerateImage(prompt, style, resolution, aspectRatio, negativePrompt, sourceImage, handleProgressUpdate);
       setResult(newGeneration);
       dispatch({ type: 'ADD_GENERATION', payload: newGeneration });
       dispatch({ type: 'UPDATE_CREDITS', payload: state.credits - creditCost });
@@ -91,6 +113,30 @@ const GenerateImage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         <Card>
           <form onSubmit={handleSubmit} className="space-y-6">
+            
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">{t('sourceImage')} <span className="text-slate-500">(optional)</span></label>
+              {sourceImagePreview ? (
+                <div className="relative group">
+                    <img src={sourceImagePreview} alt="Source preview" className="w-full rounded-lg" />
+                    <button type="button" onClick={clearSourceImage} className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+              ) : (
+                <div 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full aspect-video bg-slate-900 border-2 border-dashed border-slate-700 rounded-lg flex flex-col items-center justify-center text-slate-500 hover:border-brand-cyan hover:text-brand-cyan transition cursor-pointer"
+                >
+                  <UploadIcon className="w-10 h-10 mb-2" />
+                  <span>{t('uploadSourceImage')}</span>
+                  <input type="file" accept="image/*" onChange={handleSourceImageChange} ref={fileInputRef} className="hidden" />
+                </div>
+              )}
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">Prompt</label>
               <textarea

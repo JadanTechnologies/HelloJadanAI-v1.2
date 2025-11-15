@@ -67,5 +67,12 @@
   "resetPasswordButton": "Sake saita Kalmar Sirri",
   "passwordsDoNotMatch": "Kalmomin sirri ba su dace ba.",
   "passwordResetSuccess": "An yi nasarar sake saita kalmar sirrinka!",
-  "useAgain": "Sake Amfani"
+  "useAgain": "Sake Amfani",
+  "imageToImage": "Hoto zuwa Hoto",
+  "sourceImage": "Hoton Tushe",
+  "uploadSourceImage": "Loda hoton tushe don canzawa",
+  "visualSource": "Madogaran Hoto",
+  "aiGenerated": "AI Ya Kirkira",
+  "userUploaded": "Mai Amfani Ya Loda",
+  "uploadAdVisual": "Loda hoton talla"
 }

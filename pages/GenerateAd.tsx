@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import { AppContext } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import Button from '../components/common/Button';
@@ -6,16 +6,23 @@ import Select from '../components/common/Select';
 import GenerationProgress from '../components/common/GenerationProgress';
 import Card from '../components/common/Card';
 import { generateAdCreative as apiGenerateAd } from '../services/geminiService';
-import { AD_PLATFORMS, AD_TYPES, CREDIT_COSTS } from '../constants';
+import { AD_PLATFORMS, AD_TYPES, CREDIT_COSTS, UploadIcon } from '../constants';
 import { Generation } from '../types';
 import { AdIcon } from '../constants';
 
 const GenerateAd = () => {
   const { state, dispatch } = useContext(AppContext);
   const { t } = useTranslation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [prompt, setPrompt] = useState('');
   const [platform, setPlatform] = useState(AD_PLATFORMS[0]);
   const [adType, setAdType] = useState(AD_TYPES[0]);
+  
+  const [visualSource, setVisualSource] = useState<'ai' | 'upload'>('ai');
+  const [uploadedImage, setUploadedImage] = useState<File | null>(null);
+  const [uploadedImagePreview, setUploadedImagePreview] = useState<string | null>(null);
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Generation | null>(null);
@@ -30,18 +37,39 @@ const GenerateAd = () => {
     setLoadingMessage(msg);
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        setUploadedImage(file);
+        setUploadedImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const clearUploadedImage = () => {
+      setUploadedImage(null);
+      setUploadedImagePreview(null);
+      if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+      }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (state.credits < creditCost) {
       setError(t('notEnoughCredits'));
       return;
     }
+    if (visualSource === 'upload' && !uploadedImage) {
+        setError('Please upload an image for the ad.');
+        return;
+    }
     setError(null);
     setIsLoading(true);
     setResult(null);
 
     try {
-      const newGeneration = await apiGenerateAd(prompt, platform, adType, handleProgressUpdate);
+      const imageToUse = visualSource === 'upload' ? uploadedImage : null;
+      const newGeneration = await apiGenerateAd(prompt, platform, adType, imageToUse, handleProgressUpdate);
       setResult(newGeneration);
       dispatch({ type: 'ADD_GENERATION', payload: newGeneration });
       dispatch({ type: 'UPDATE_CREDITS', payload: state.credits - creditCost });
@@ -87,8 +115,8 @@ const GenerateAd = () => {
       </div>
 
       <Card>
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
-          <div className="md:col-span-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">Product/Service Description</label>
             <textarea
               value={prompt}
@@ -98,21 +126,59 @@ const GenerateAd = () => {
               required
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">{t('platformLabel')}</label>
-            <Select options={AD_PLATFORMS} value={platform} onChange={(e) => setPlatform(e.target.value)} />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">{t('visualSource')}</label>
+              <div className="flex bg-slate-900 border border-slate-700 rounded-lg p-1">
+                <button type="button" onClick={() => setVisualSource('ai')} className={`w-1/2 py-2 rounded-md text-sm font-semibold transition-colors ${visualSource === 'ai' ? 'bg-brand-indigo text-white' : 'text-slate-400 hover:bg-slate-800'}`}>
+                    {t('aiGenerated')}
+                </button>
+                <button type="button" onClick={() => setVisualSource('upload')} className={`w-1/2 py-2 rounded-md text-sm font-semibold transition-colors ${visualSource === 'upload' ? 'bg-brand-indigo text-white' : 'text-slate-400 hover:bg-slate-800'}`}>
+                    {t('userUploaded')}
+                </button>
+              </div>
+            </div>
+            {visualSource === 'upload' && (
+                <div>
+                   <label className="block text-sm font-medium text-slate-300 mb-2">{t('uploadAdVisual')}</label>
+                   {uploadedImagePreview ? (
+                     <div className="relative group aspect-square">
+                        <img src={uploadedImagePreview} alt="Ad visual preview" className="w-full h-full object-cover rounded-lg" />
+                        <button type="button" onClick={clearUploadedImage} className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100">
+                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                   ) : (
+                    <div onClick={() => fileInputRef.current?.click()} className="w-full h-full min-h-[100px] bg-slate-900 border-2 border-dashed border-slate-700 rounded-lg flex flex-col items-center justify-center text-slate-500 hover:border-brand-cyan cursor-pointer">
+                        <UploadIcon className="w-8 h-8 mb-2" />
+                        <span className="text-sm">Click to upload</span>
+                        <input type="file" accept="image/*" onChange={handleImageUpload} ref={fileInputRef} className="hidden" />
+                    </div>
+                   )}
+                </div>
+            )}
           </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">{t('adTypeLabel')}</label>
-            <Select options={AD_TYPES} value={adType} onChange={(e) => setAdType(e.target.value)} />
+          
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-end">
+            <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">{t('platformLabel')}</label>
+                <Select options={AD_PLATFORMS} value={platform} onChange={(e) => setPlatform(e.target.value)} />
+            </div>
+            <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">{t('adTypeLabel')}</label>
+                <Select options={AD_TYPES} value={adType} onChange={(e) => setAdType(e.target.value)} />
+            </div>
+            <div className="flex items-center space-x-4">
+                <Button type="submit" isLoading={isLoading} disabled={!prompt || isLoading} className="w-full">
+                    {t('generateButton')}
+                </Button>
+                <p className="font-semibold whitespace-nowrap">{t('creditCost')}: <span className="text-brand-cyan">{creditCost}</span></p>
+            </div>
           </div>
-          <div className="flex items-center space-x-4">
-              <Button type="submit" isLoading={isLoading} disabled={!prompt || isLoading} className="w-full">
-                {t('generateButton')}
-              </Button>
-              <p className="font-semibold whitespace-nowrap">{t('creditCost')}: <span className="text-brand-cyan">{creditCost}</span></p>
-          </div>
-           {error && <p className="text-red-400 text-sm md:col-span-4">{error}</p>}
+           {error && <p className="text-red-400 text-sm">{error}</p>}
         </form>
       </Card>
 

@@ -67,5 +67,12 @@
   "resetPasswordButton": "Reset Password",
   "passwordsDoNotMatch": "Passwords do not match.",
   "passwordResetSuccess": "Your password has been reset successfully!",
-  "useAgain": "Use Again"
+  "useAgain": "Use Again",
+  "imageToImage": "Image to Image",
+  "sourceImage": "Source Image",
+  "uploadSourceImage": "Upload a source image to transform",
+  "visualSource": "Visual Source",
+  "aiGenerated": "AI Generated",
+  "userUploaded": "User Uploaded",
+  "uploadAdVisual": "Upload a visual for your ad"
 }
