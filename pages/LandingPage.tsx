@@ -114,6 +114,7 @@ const LandingPage: React.FC = () => {
                     <div className="relative z-10 mt-8">
                         <h2 className="text-4xl md:text-6xl font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight">Unlock Your <span className="text-brand-cyan">Creative</span> Potential</h2>
                         <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-600 dark:text-slate-400">Generate stunning AI images, videos, and ads simply by completing tasks. No payment required.</p>
+                        <p className="mt-2 max-w-2xl mx-auto text-md text-slate-500 dark:text-slate-400">We built this platform for students, startups, and content creators who don't have the budget to pay for other services.</p>
                         <Link to="/login" className="mt-8 inline-block"><Button className="text-lg px-8 py-3">Get Started for Free</Button></Link>
                     </div>
                 </section>
