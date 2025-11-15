@@ -4,7 +4,6 @@ import { AppContext } from './contexts/AppContext';
 
 import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
-import AdminLoginPage from './pages/AdminLoginPage';
 import Dashboard from './pages/Dashboard';
 import GenerateImage from './pages/GenerateImage';
 import GenerateVideo from './pages/GenerateVideo';
@@ -26,10 +25,9 @@ function App() {
         {/* === UNAUTHENTICATED ROUTES === */}
         {/* These routes are only accessible when the user is logged out. */}
         {/* If a logged-in user tries to access them, they are redirected to their dashboard. */}
-        {/* Admin login is now the default entry point for the app. */}
-        <Route path="/" element={!user ? <Navigate to="/admin/login" /> : <Navigate to="/app" />} />
+        {/* A single login page now handles both user and admin authentication. */}
+        <Route path="/" element={!user ? <Navigate to="/login" /> : <Navigate to="/app" />} />
         <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/app" />} />
-        <Route path="/admin/login" element={!user ? <AdminLoginPage /> : <Navigate to="/app" />} />
         <Route path="/forgot-password" element={!user ? <ForgotPasswordPage /> : <Navigate to="/app" />} />
         <Route path="/reset-password" element={!user ? <ResetPasswordPage /> : <Navigate to="/app" />} />
 

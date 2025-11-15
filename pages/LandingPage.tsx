@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
+import { ThemeContext } from '../contexts/ThemeContext';
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
 import { ImageIcon, VideoIcon, AdIcon, TaskIcon, CreditIcon } from '../constants';
@@ -29,7 +30,8 @@ const Hologram: React.FC<{ rotation: { x: number; y: number } }> = ({ rotation }
     )
 };
 
-const ThemeToggle: React.FC<{ theme: string; toggleTheme: () => void; }> = ({ theme, toggleTheme }) => {
+const ThemeToggle: React.FC = () => {
+    const { theme, toggleTheme } = useContext(ThemeContext);
     return (
         <button
             onClick={toggleTheme}
@@ -52,20 +54,10 @@ const ThemeToggle: React.FC<{ theme: string; toggleTheme: () => void; }> = ({ th
 
 const LandingPage: React.FC = () => {
     const { t } = useTranslation();
-    const [theme, setTheme] = useState('dark');
     const [rotation, setRotation] = useState({ x: 20, y: 0 });
     const heroRef = useRef<HTMLElement>(null);
     const howItWorksRef = useRef<HTMLElement>(null);
     const [isHowItWorksVisible, setIsHowItWorksVisible] = useState(false);
-
-    useEffect(() => {
-        const root = window.document.documentElement;
-        if (theme === 'dark') {
-            root.classList.add('dark');
-        } else {
-            root.classList.remove('dark');
-        }
-    }, [theme]);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -88,10 +80,6 @@ const LandingPage: React.FC = () => {
             }
         };
     }, []);
-
-    const toggleTheme = () => {
-        setTheme(prev => prev === 'dark' ? 'light' : 'dark');
-    };
 
     const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
         if (!heroRef.current) return;
@@ -121,7 +109,7 @@ const LandingPage: React.FC = () => {
                         Hello<span className="text-brand-cyan">Jadan</span>AI
                     </h1>
                     <div className="flex items-center space-x-2">
-                        <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
+                        <ThemeToggle />
                         <Link to="/login">
                             <Button variant="secondary">{t('loginButton')}</Button>
                         </Link>
