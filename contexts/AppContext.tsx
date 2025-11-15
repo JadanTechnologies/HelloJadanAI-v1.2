@@ -9,7 +9,9 @@ const mockAdminUser: User = {
     isAdmin: true,
     tasksCompleted: 5,
     ip: '192.168.1.1',
-    deviceInfo: 'Chrome on macOS'
+    deviceInfo: 'Chrome on macOS',
+    status: 'active',
+    credits: 9999,
 };
 
 const mockRegularUser: User = {
@@ -20,7 +22,9 @@ const mockRegularUser: User = {
     isAdmin: false,
     tasksCompleted: 15,
     ip: '198.51.100.5',
-    deviceInfo: 'Firefox on Windows'
+    deviceInfo: 'Firefox on Windows',
+    status: 'active',
+    credits: 100,
 };
 
 const initialGenerations: Generation[] = [
@@ -51,7 +55,7 @@ const initialState: AppState = {
 const appReducer = (state: AppState, action: AppAction): AppState => {
   switch (action.type) {
     case 'LOGIN':
-      return { ...state, user: action.payload };
+      return { ...state, user: action.payload, credits: action.payload.credits };
     case 'LOGOUT':
       return { ...state, user: null };
     case 'UPDATE_CREDITS':

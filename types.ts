@@ -7,6 +7,8 @@ export interface User {
   tasksCompleted: number;
   ip: string;
   deviceInfo: string;
+  status: 'active' | 'suspended' | 'banned';
+  credits: number;
 }
 
 export interface Generation {
@@ -38,7 +40,7 @@ export interface AdCreative {
 }
 
 export interface CreditTransaction {
-  id: string;
+  id:string;
   description: string;
   amount: number;
   date: string;
@@ -52,6 +54,27 @@ export interface Task {
   isCompleted: boolean;
   type: 'daily' | 'engagement' | 'profile';
 }
+
+export interface FAQItem {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+export interface BrandingSettings {
+  logoUrl: string | null;
+  faviconUrl: string | null;
+  hologramLogoUrl: string | null;
+}
+
+export interface ContentSettings {
+  aboutUs: string;
+  contactUs: string;
+  termsOfService: string;
+  privacyPolicy: string;
+  faqs: FAQItem[];
+}
+
 
 export interface AppState {
   user: User | null;

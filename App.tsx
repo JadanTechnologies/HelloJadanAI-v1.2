@@ -4,6 +4,7 @@ import { AppContext } from './contexts/AppContext';
 
 // User-facing layout and pages
 import Layout from './components/Layout';
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import GenerateImage from './pages/GenerateImage';
@@ -34,8 +35,8 @@ function App() {
   return (
     <HashRouter>
       <Routes>
-        {/* === UNAUTHENTICATED ROUTES === */}
-        <Route path="/" element={!user ? <LoginPage /> : <Navigate to={defaultAuthPath} />} />
+        {/* === PUBLIC ROUTES === */}
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={!user ? <LoginPage /> : <Navigate to={defaultAuthPath} />} />
         <Route path="/forgot-password" element={!user ? <ForgotPasswordPage /> : <Navigate to={defaultAuthPath} />} />
         <Route path="/reset-password" element={!user ? <ResetPasswordPage /> : <Navigate to={defaultAuthPath} />} />
@@ -66,7 +67,7 @@ function App() {
         </Route>
         
         {/* === GLOBAL CATCH-ALL === */}
-        <Route path="*" element={<Navigate to={user ? defaultAuthPath : '/login'} />} />
+        <Route path="*" element={<Navigate to={user ? defaultAuthPath : '/'} />} />
       </Routes>
     </HashRouter>
   );
