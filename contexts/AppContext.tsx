@@ -1,15 +1,26 @@
 import React, { createContext, useReducer, ReactNode } from 'react';
 import { AppState, AppAction, User, Generation, CreditTransaction, Task } from '../types';
 
-const mockUser: User = {
+const mockAdminUser: User = {
     id: 'user-1',
-    username: 'Jadan',
-    email: 'jadan@example.com',
-    avatar: 'https://picsum.photos/seed/jadan/100/100',
+    username: 'Admin Jadan',
+    email: 'admin@example.com',
+    avatar: 'https://picsum.photos/seed/admin/100/100',
     isAdmin: true,
     tasksCompleted: 5,
     ip: '192.168.1.1',
     deviceInfo: 'Chrome on macOS'
+};
+
+const mockRegularUser: User = {
+    id: 'user-2',
+    username: 'Jadan',
+    email: 'jadan@example.com',
+    avatar: 'https://picsum.photos/seed/jadan/100/100',
+    isAdmin: false,
+    tasksCompleted: 15,
+    ip: '198.51.100.5',
+    deviceInfo: 'Firefox on Windows'
 };
 
 const initialGenerations: Generation[] = [
@@ -74,21 +85,24 @@ export const AppContext = createContext<{
   dispatch: React.Dispatch<AppAction>;
   login: () => void;
   logout: () => void;
+  loginAsAdmin: () => void;
 }>({
   state: initialState,
   dispatch: () => null,
   login: () => {},
   logout: () => {},
+  loginAsAdmin: () => {},
 });
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
-  const login = () => dispatch({ type: 'LOGIN', payload: mockUser });
+  const login = () => dispatch({ type: 'LOGIN', payload: mockRegularUser });
+  const loginAsAdmin = () => dispatch({ type: 'LOGIN', payload: mockAdminUser });
   const logout = () => dispatch({ type: 'LOGOUT' });
 
   return (
-    <AppContext.Provider value={{ state, dispatch, login, logout }}>
+    <AppContext.Provider value={{ state, dispatch, login, logout, loginAsAdmin }}>
       {children}
     </AppContext.Provider>
   );

@@ -4,6 +4,7 @@ import { AppContext } from './contexts/AppContext';
 
 import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
+import AdminLoginPage from './pages/AdminLoginPage';
 import Dashboard from './pages/Dashboard';
 import GenerateImage from './pages/GenerateImage';
 import GenerateVideo from './pages/GenerateVideo';
@@ -21,7 +22,7 @@ const PrivateRoute: React.FC<{ children: React.ReactElement }> = ({ children }) 
 
 const AdminRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
     const { state } = useContext(AppContext);
-    return state.user && state.user.isAdmin ? children : <Navigate to="/app/dashboard" />;
+    return state.user && state.user.isAdmin ? children : <Navigate to="/admin/login" />;
 }
 
 const AuthenticatedApp = () => (
@@ -53,7 +54,11 @@ function App() {
     <HashRouter>
       <Routes>
         <Route path="/login" element={state.user ? <Navigate to="/app/dashboard" /> : <LoginPage />} />
-        <Route path="/" element={state.user ? <Navigate to="/app/dashboard" /> : <LandingPage />} />
+        <Route path="/admin/login" element={state.user && state.user.isAdmin ? <Navigate to="/app/admin" /> : <AdminLoginPage />} />
+        <Route path="/" element={
+            !state.user ? <LandingPage /> : 
+            state.user.isAdmin ? <Navigate to="/app/admin" /> : <Navigate to="/app/dashboard" />
+        } />
         <Route path="/app/*" element={
             <PrivateRoute>
               <AuthenticatedApp />
