@@ -20,8 +20,9 @@
               'spin-slow': 'spin 3s linear infinite',
               'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
               'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
-              'hologram-rotate': 'hologram-rotate 20s linear infinite',
               'pulse-subtle': 'pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'hologram-float': 'hologram-float 6s ease-in-out infinite',
+              'hologram-pulse': 'hologram-pulse 3s ease-in-out infinite',
             },
             keyframes: {
               'pulse-glow': {
@@ -32,9 +33,13 @@
                 '0%': { opacity: '0', transform: 'translateY(20px)' },
                 '100%': { opacity: '1', transform: 'translateY(0)' },
               },
-              'hologram-rotate': {
-                '0%': { transform: 'rotateX(20deg) rotateY(0deg)' },
-                '100%': { transform: 'rotateX(20deg) rotateY(360deg)' },
+              'hologram-float': {
+                '0%, 100%': { transform: 'translateY(0px)' },
+                '50%': { transform: 'translateY(-15px)' },
+              },
+              'hologram-pulse': {
+                '0%, 100%': { transform: 'scale(1)', opacity: '0.8' },
+                '50%': { transform: 'scale(1.05)', opacity: '1' },
               },
               'pulse-subtle': {
                 '0%, 100%': { transform: 'scale(1)', opacity: '0.5' },
