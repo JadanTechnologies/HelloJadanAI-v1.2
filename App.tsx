@@ -30,6 +30,7 @@ import AnnouncementPage from './pages/admin/AnnouncementPage';
 import CronJobPage from './pages/admin/CronJobPage';
 import ReferralManagementPage from './pages/admin/ReferralManagementPage';
 import FraudDetectionPage from './pages/admin/FraudDetectionPage';
+import AccessControlPage from './pages/admin/AccessControlPage';
 
 
 function App() {
@@ -78,6 +79,7 @@ function App() {
           <Route path="cron-jobs" element={<CronJobPage />} />
           <Route path="referrals" element={<ReferralManagementPage />} />
           <Route path="fraud-detection" element={<FraudDetectionPage />} />
+          <Route path="access-control" element={<AccessControlPage />} />
         </Route>
         
         {/* === GLOBAL CATCH-ALL === */}

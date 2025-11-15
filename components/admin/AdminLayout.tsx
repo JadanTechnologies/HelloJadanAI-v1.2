@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { NavLink, Link, useLocation, Outlet } from 'react-router-dom';
 import { AppContext } from '../../contexts/AppContext';
 import { useTranslation } from '../../hooks/useTranslation';
-import { AdminIcon, AnalyticsIcon, SettingsIcon, ChecklistIcon, ShieldCheckIcon, EnvelopeIcon, MegaphoneIcon, ClockIcon, ReferralIcon } from '../../constants';
+import { AdminIcon, AnalyticsIcon, SettingsIcon, ChecklistIcon, ShieldCheckIcon, EnvelopeIcon, MegaphoneIcon, ClockIcon, ReferralIcon, ShieldExclamationIcon } from '../../constants';
 
 const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
     const { state, logout } = useContext(AppContext);
@@ -93,6 +93,7 @@ const Sidebar: React.FC<{ isOpen: boolean, setIsOpen: (isOpen: boolean) => void 
                             <h3 className="px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Growth & Security</h3>
                             <NavItem to="/admin/referrals" icon={<ReferralIcon className="w-5 h-5" />} label="Referral Management" onClick={closeSidebar} />
                             <NavItem to="/admin/fraud-detection" icon={<ShieldCheckIcon className="w-5 h-5" />} label="Fraud Detection" onClick={closeSidebar} />
+                            <NavItem to="/admin/access-control" icon={<ShieldExclamationIcon className="w-5 h-5" />} label="Access Control" onClick={closeSidebar} />
                         </div>
 
                         <div className="pt-4 mt-4 border-t border-slate-800">

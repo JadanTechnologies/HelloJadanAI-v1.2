@@ -16,6 +16,11 @@ export interface User {
     creditsEarned: number;
   };
   fraudRisk: 'low' | 'medium' | 'high';
+  location?: {
+    country: string;
+    region: string;
+    city: string;
+  };
 }
 
 export interface Generation {
@@ -129,6 +134,10 @@ export interface ApiSettings {
   resend: { apiKey: string; };
   twilio: { accountSid: string; authToken: string; phoneNumber: string; };
   oneSignal: { appId: string; restApiKey: string; };
+  ipLookup: {
+    provider: string;
+    apiKey: string;
+  };
 }
 
 export interface CronJob {
@@ -150,6 +159,13 @@ export interface Referral {
     createdAt: string;
 }
 
+export interface AccessRestrictionRule {
+    id: string;
+    type: 'allow' | 'block';
+    criteria: 'country' | 'region' | 'os' | 'browser' | 'device' | 'ip';
+    value: string;
+}
+
 export interface SystemSettings {
     referralRewards: {
         signUp: number;
@@ -159,6 +175,7 @@ export interface SystemSettings {
         blockTempEmails: boolean;
         maxSignupsPerIp: number;
     };
+    accessRestrictions: AccessRestrictionRule[];
 }
 
 export interface AppState {
@@ -170,6 +187,7 @@ export interface AppState {
   notifications: Notification[];
   announcements: Announcement[];
   referrals: Referral[];
+  systemSettings: SystemSettings;
 }
 
 export type AppAction =
@@ -183,6 +201,7 @@ export type AppAction =
   | { type: 'ADD_CREDIT_TRANSACTION'; payload: CreditTransaction }
   | { type: 'SET_ANNOUNCEMENTS'; payload: Announcement[] }
   | { type: 'ADD_NOTIFICATION'; payload: Omit<Notification, 'id' | 'createdAt' | 'read'> }
-  | { type: 'MARK_NOTIFICATION_AS_READ'; payload: string };
+  | { type: 'MARK_NOTIFICATION_AS_READ'; payload: string }
+  | { type: 'UPDATE_SYSTEM_SETTINGS'; payload: SystemSettings };
 
 export type GenerationType = 'image' | 'video' | 'ad';

@@ -26,14 +26,17 @@ const LoginPage = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    const success = loginType === 'user' ? login(email, password) : loginAsAdmin(email, password);
-    if (!success) {
-      setError(t('invalidCredentials'));
+    const result = loginType === 'user' ? login(email, password) : loginAsAdmin(email, password);
+    if (!result.success) {
+      setError(result.message || t('invalidCredentials'));
     }
   };
 
   const handleGoogleLogin = () => {
-    login('jadan@example.com', 'password');
+    const result = login('jadan@example.com', 'password');
+     if (!result.success) {
+      setError(result.message || t('invalidCredentials'));
+    }
   }
 
   return (

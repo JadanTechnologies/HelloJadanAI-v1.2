@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, ReactNode } from 'react';
-import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement, Referral } from '../types';
-import { mockAnnouncements, mockReferrals } from '../pages/admin/data';
+import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement, Referral, SystemSettings, AccessRestrictionRule } from '../types';
+import { mockAnnouncements, mockReferrals, mockSystemSettings } from '../pages/admin/data';
 
 const mockAdminUser: User = {
     id: 'user-1',
@@ -65,6 +65,7 @@ const initialState: AppState = {
       return a.isActive && start <= now && (!end || end >= now);
   }),
   referrals: mockReferrals,
+  systemSettings: mockSystemSettings,
 };
 
 const appReducer = (state: AppState, action: AppAction): AppState => {
@@ -142,42 +143,114 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
         ...state,
         notifications: state.notifications.map(n => n.id === action.payload ? { ...n, read: true } : n),
       };
+    case 'UPDATE_SYSTEM_SETTINGS':
+        return { ...state, systemSettings: action.payload };
     default:
       return state;
   }
 };
 
+type LoginResult = { success: boolean; message?: string; };
+
 export const AppContext = createContext<{
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
-  login: (email: string, password: string) => boolean;
+  login: (email: string, password: string) => LoginResult;
   logout: () => void;
-  loginAsAdmin: (email: string, password: string) => boolean;
+  loginAsAdmin: (email: string, password: string) => LoginResult;
 }>({
   state: initialState,
   dispatch: () => null,
-  login: () => false,
+  login: () => ({ success: false }),
   logout: () => {},
-  loginAsAdmin: () => false,
+  loginAsAdmin: () => ({ success: false }),
 });
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
-  const login = (email: string, password: string): boolean => {
-    if (email === mockRegularUser.email && password === 'password') {
-      dispatch({ type: 'LOGIN', payload: mockRegularUser });
-      return true;
+  const checkAccess = (user: User): { allowed: boolean; message?: string } => {
+    const { accessRestrictions } = state.systemSettings;
+    if (accessRestrictions.length === 0) {
+      return { allowed: true };
     }
-    return false;
+
+    // Mock location for checking rules
+    const location = { country: 'United States', region: 'California', city: 'San Francisco' };
+    const deviceInfo = user.deviceInfo.toLowerCase();
+    
+    // Parse device info
+    const osMatch = deviceInfo.match(/windows|macos|linux|ios|android/);
+    const os = osMatch ? osMatch[0] : 'unknown';
+    
+    const browserMatch = deviceInfo.match(/chrome|firefox|safari|edge/);
+    const browser = browserMatch ? browserMatch[0] : 'unknown';
+    
+    const deviceType = (os === 'ios' || os === 'android') ? 'Mobile' : 'Desktop';
+    
+    for (const rule of accessRestrictions) {
+        let match = false;
+        const ruleValue = rule.value.toLowerCase();
+
+        switch(rule.criteria) {
+            case 'ip':
+                if (user.ip === rule.value) match = true;
+                break;
+            case 'country':
+                if (location.country.toLowerCase() === ruleValue) match = true;
+                break;
+            case 'region':
+                 if (location.region.toLowerCase() === ruleValue) match = true;
+                break;
+            case 'os':
+                if (os === ruleValue) match = true;
+                break;
+            case 'browser':
+                if (browser === ruleValue) match = true;
+                break;
+            case 'device':
+                if (deviceType.toLowerCase() === ruleValue) match = true;
+                break;
+        }
+
+        if (match && rule.type === 'block') {
+            return { allowed: false, message: `Access from your location or device is restricted.` };
+        }
+    }
+
+    return { allowed: true };
   };
 
-  const loginAsAdmin = (email: string, password: string): boolean => {
-    if (email === mockAdminUser.email && password === 'password') {
-      dispatch({ type: 'LOGIN', payload: mockAdminUser });
-      return true;
+  const login = (email: string, password: string): LoginResult => {
+    if (email === mockRegularUser.email && password === 'password') {
+      const access = checkAccess(mockRegularUser);
+      if (!access.allowed) {
+        return { success: false, message: access.message };
+      }
+      const userWithLocation: User = {
+          ...mockRegularUser,
+          location: { country: 'United States', region: 'California', city: 'San Francisco' }
+      };
+      dispatch({ type: 'LOGIN', payload: userWithLocation });
+      return { success: true };
     }
-    return false;
+    return { success: false, message: "Invalid credentials. Please try again."};
+  };
+
+  const loginAsAdmin = (email: string, password: string): LoginResult => {
+    if (email === mockAdminUser.email && password === 'password') {
+       const access = checkAccess(mockAdminUser);
+       if (!access.allowed) {
+        return { success: false, message: access.message };
+      }
+       const userWithLocation: User = {
+          ...mockAdminUser,
+          location: { country: 'United States', region: 'New York', city: 'New York City' }
+      };
+      dispatch({ type: 'LOGIN', payload: userWithLocation });
+      return { success: true };
+    }
+    return { success: false, message: "Invalid credentials. Please try again." };
   };
 
   const logout = () => dispatch({ type: 'LOGOUT' });

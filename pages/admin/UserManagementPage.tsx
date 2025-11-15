@@ -116,6 +116,7 @@ const UserManagementPage = () => {
                                 <th scope="col" className="px-6 py-3">User</th>
                                 <th scope="col" className="px-6 py-3">Status</th>
                                 <th scope="col" className="px-6 py-3">Fraud Risk</th>
+                                <th scope="col" className="px-6 py-3">Location</th>
                                 <th scope="col" className="px-6 py-3">Credits</th>
                                 <th scope="col" className="px-6 py-3">Tasks</th>
                                 <th scope="col" className="px-6 py-3 text-right">Actions</th>
@@ -133,6 +134,7 @@ const UserManagementPage = () => {
                                     </td>
                                     <td className="px-6 py-4 capitalize">{statusBadge(user.status)}</td>
                                     <td className="px-6 py-4 capitalize">{riskBadge(user.fraudRisk)}</td>
+                                    <td className="px-6 py-4">{user.location?.country || 'N/A'}</td>
                                     <td className="px-6 py-4 font-semibold text-brand-cyan">{user.credits}</td>
                                     <td className="px-6 py-4">{user.tasksCompleted}</td>
                                     <td className="px-6 py-4 text-right space-x-2">

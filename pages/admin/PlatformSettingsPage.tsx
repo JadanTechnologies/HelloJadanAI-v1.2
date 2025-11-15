@@ -11,6 +11,7 @@ type SettingsTab = 'general' | 'branding' | 'content' | 'api' | 'integrations' |
 
 const imageProviders = ['Gemini', 'DALL-E 3', 'Midjourney', 'Mock Service'];
 const videoProviders = ['Veo (Google)', 'RunwayML', 'Pika', 'Sora', 'Mock Service'];
+const ipLookupProviders = ['IPinfo', 'ip-api', 'Mock Service'];
 
 const initialProviders = {
     image: { primary: 'Gemini', fallback: 'Mock Service' },
@@ -230,6 +231,21 @@ const PlatformSettingsPage = () => {
                                 <div>
                                     <label className="text-sm font-medium text-slate-300">REST API Key</label>
                                     <Input type="password" value={apiSettings.oneSignal.restApiKey} onChange={e => setApiSettings(p => ({...p, oneSignal: {...p.oneSignal, restApiKey: e.target.value}}))} className={inputClasses}/>
+                                </div>
+                            </div>
+                        </div>
+                         <div>
+                            <h3 className="text-lg font-semibold text-slate-200 border-b border-slate-700 pb-2 mb-4">IP Geolocation Provider</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="text-sm font-medium text-slate-300">Provider</label>
+                                    <select value={apiSettings.ipLookup.provider} onChange={e => setApiSettings(p => ({...p, ipLookup: {...p.ipLookup, provider: e.target.value}}))} className={inputClasses}>
+                                        {ipLookupProviders.map(p => <option key={p} value={p}>{p}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-slate-300">API Key</label>
+                                    <Input type="password" value={apiSettings.ipLookup.apiKey} onChange={e => setApiSettings(p => ({...p, ipLookup: {...p.ipLookup, apiKey: e.target.value}}))} className={inputClasses}/>
                                 </div>
                             </div>
                         </div>
