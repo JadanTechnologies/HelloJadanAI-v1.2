@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { AppContext } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import Button from '../components/common/Button';
@@ -8,11 +8,26 @@ import Card from '../components/common/Card';
 const LoginPage = () => {
   const { login } = useContext(AppContext);
   const { t } = useTranslation();
+  const [email, setEmail] = useState('jadan@example.com');
+  const [password, setPassword] = useState('password');
+  const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    login();
+    setError('');
+    
+    // Simple mock validation
+    if (email === 'jadan@example.com' && password === 'password') {
+      login();
+    } else {
+      setError(t('invalidCredentials'));
+    }
   };
+
+  const handleGoogleLogin = () => {
+    // For demo, Google login just works
+    login();
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-brand-navy">
@@ -27,14 +42,29 @@ const LoginPage = () => {
             <h2 className="text-2xl font-bold text-white">{t('loginTitle')}</h2>
             <p className="text-slate-400 mt-1">{t('loginSubtitle')}</p>
           </div>
+
+          {error && <p className="bg-red-500/20 text-red-400 text-sm p-3 rounded-lg mb-4 text-center">{error}</p>}
+          
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-1">{t('emailLabel')}</label>
-              <Input type="email" id="email" defaultValue="jadan@example.com" required />
+              <Input 
+                type="email" 
+                id="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required 
+              />
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1">{t('passwordLabel')}</label>
-              <Input type="password" id="password" defaultValue="password" required />
+              <Input 
+                type="password" 
+                id="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required 
+              />
             </div>
             <Button type="submit" className="w-full">
               {t('loginButton')}
@@ -48,7 +78,7 @@ const LoginPage = () => {
               <span className="bg-slate-800 px-2 text-slate-500">Or continue with</span>
             </div>
           </div>
-          <Button onClick={login} variant="secondary" className="w-full">
+          <Button onClick={handleGoogleLogin} variant="secondary" className="w-full">
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
               <path d="M22.56,12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26,1.37-1.04,2.53-2.21,3.31v2.77h3.57c2.08-1.92,3.28-4.74,3.28-8.09Z" fill="#4285F4"/>
               <path d="M12,23c2.97,0,5.46-.98,7.28-2.66l-3.57-2.77c-.98.66-2.23,1.06-3.71,1.06-2.86,0-5.29-1.93-6.16-4.53H2.18v2.84C3.99,20.53,7.7,23,12,23Z" fill="#34A853"/>

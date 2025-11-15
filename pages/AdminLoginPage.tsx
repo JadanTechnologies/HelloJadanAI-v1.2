@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { AppContext } from '../contexts/AppContext';
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
@@ -8,10 +8,19 @@ import { useTranslation } from '../hooks/useTranslation';
 const AdminLoginPage = () => {
   const { loginAsAdmin } = useContext(AppContext);
   const { t } = useTranslation();
+  const [email, setEmail] = useState('admin@example.com');
+  const [password, setPassword] = useState('password');
+  const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    loginAsAdmin();
+    setError('');
+
+    if (email === 'admin@example.com' && password === 'password') {
+      loginAsAdmin();
+    } else {
+      setError(t('invalidCredentials'));
+    }
   };
 
   return (
@@ -37,15 +46,29 @@ const AdminLoginPage = () => {
                   <li>{t('passwordLabel')}: <code className="font-mono bg-slate-700 px-2 py-1 rounded text-brand-cyan">password</code></li>
               </ul>
           </div>
+          
+          {error && <p className="bg-red-500/20 text-red-400 text-sm p-3 rounded-lg mb-4 text-center">{error}</p>}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-1">{t('emailLabel')}</label>
-              <Input type="email" id="email" defaultValue="admin@example.com" required />
+              <Input 
+                type="email" 
+                id="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required 
+              />
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1">{t('passwordLabel')}</label>
-              <Input type="password" id="password" defaultValue="password" required />
+              <Input 
+                type="password" 
+                id="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required 
+              />
             </div>
             <Button type="submit" className="w-full">
               Sign In
