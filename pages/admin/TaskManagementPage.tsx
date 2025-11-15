@@ -40,12 +40,20 @@ const TaskManagementPage = () => {
         }
         setIsModalOpen(false);
     };
+    
+    const renderReward = (task: Task) => {
+        switch (task.rewardType) {
+            case 'credits': return `+${task.rewardAmount} Credits`;
+            case 'data': return `+${task.rewardAmount} MB`;
+            case 'airtime': return `+₦${task.rewardAmount}`;
+        }
+    };
 
     return (
         <div className="space-y-8">
             <div>
                 <h1 className="text-3xl font-bold text-white">Task Management</h1>
-                <p className="text-slate-400 mt-1">Create, edit, and manage tasks for users to earn credits.</p>
+                <p className="text-slate-400 mt-1">Create, edit, and manage tasks for users to earn rewards.</p>
             </div>
 
             <div className="text-right">
@@ -58,7 +66,7 @@ const TaskManagementPage = () => {
                         <thead className="text-xs text-slate-300 uppercase bg-slate-700">
                             <tr>
                                 <th scope="col" className="px-6 py-3">Title</th>
-                                <th scope="col" className="px-6 py-3">Credit Reward</th>
+                                <th scope="col" className="px-6 py-3">Reward</th>
                                 <th scope="col" className="px-6 py-3">Type</th>
                                 <th scope="col" className="px-6 py-3">Requires Proof?</th>
                                 <th scope="col" className="px-6 py-3">Actions</th>
@@ -68,7 +76,7 @@ const TaskManagementPage = () => {
                             {tasks.map(task => (
                                 <tr key={task.id} className="bg-slate-800 border-b border-slate-700">
                                     <td className="px-6 py-4 font-medium text-white">{task.title}</td>
-                                    <td className="px-6 py-4 font-bold text-brand-cyan">+{task.creditReward}</td>
+                                    <td className="px-6 py-4 font-bold text-brand-cyan">{renderReward(task)}</td>
                                     <td className="px-6 py-4 capitalize">{task.type.replace('_', ' ')}</td>
                                     <td className="px-6 py-4">{task.requiresProof ? 'Yes' : 'No'}</td>
                                     <td className="px-6 py-4 space-x-4">
@@ -103,33 +111,35 @@ interface TaskFormModalProps {
 }
 
 const taskTypes: Task['type'][] = ['daily', 'engagement', 'profile', 'youtube_subscribe', 'social_follow', 'social_share', 'app_download'];
+const rewardTypes: Task['rewardType'][] = ['credits', 'data', 'airtime'];
 
 const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, onSave, task }) => {
     const [title, setTitle] = useState(task?.title || '');
     const [description, setDescription] = useState(task?.description || '');
-    const [creditReward, setCreditReward] = useState(task?.creditReward || 10);
+    const [rewardAmount, setRewardAmount] = useState(task?.rewardAmount || 10);
+    const [rewardType, setRewardType] = useState<Task['rewardType']>(task?.rewardType || 'credits');
     const [type, setType] = useState<Task['type']>(task?.type || 'daily');
     const [targetUrl, setTargetUrl] = useState(task?.targetUrl || '');
     const [requiresProof, setRequiresProof] = useState(task?.requiresProof || false);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave({ title, description, creditReward, type, targetUrl, requiresProof });
+        onSave({ title, description, rewardAmount, rewardType, type, targetUrl, requiresProof });
     };
     
     const showTargetUrlInput = !['daily', 'profile', 'engagement'].includes(type);
+    const selectClasses = "w-full bg-slate-800 border border-slate-700 rounded-lg py-2 px-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-indigo";
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title={task ? 'Edit Task' : 'Create New Task'}>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label htmlFor="title" className="block text-sm font-medium text-slate-300 mb-1">Title</label>
-                    <Input id="title" type="text" value={title} onChange={e => setTitle(e.target.value)} required />
+                    <label className="block text-sm font-medium text-slate-300 mb-1">Title</label>
+                    <Input type="text" value={title} onChange={e => setTitle(e.target.value)} required />
                 </div>
                  <div>
-                    <label htmlFor="description" className="block text-sm font-medium text-slate-300 mb-1">Description</label>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">Description</label>
                     <textarea
-                        id="description"
                         value={description}
                         onChange={e => setDescription(e.target.value)}
                         className="w-full bg-slate-800 border border-slate-700 rounded-lg py-2 px-4 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-indigo transition duration-300"
@@ -137,32 +147,34 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, onSave, 
                         required
                     />
                 </div>
-                 <div>
-                    <label htmlFor="creditReward" className="block text-sm font-medium text-slate-300 mb-1">Credit Reward</label>
-                    <Input id="creditReward" type="number" value={creditReward} onChange={e => setCreditReward(parseInt(e.target.value, 10))} required />
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-1">Reward Type</label>
+                        <select value={rewardType} onChange={e => setRewardType(e.target.value as any)} className={selectClasses}>
+                            {rewardTypes.map(rt => <option key={rt} value={rt} className="capitalize">{rt}</option>)}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-1">Reward Amount</label>
+                        <Input type="number" value={rewardAmount} onChange={e => setRewardAmount(parseInt(e.target.value, 10))} required />
+                    </div>
                 </div>
                 <div>
-                    <label htmlFor="type" className="block text-sm font-medium text-slate-300 mb-1">Task Type</label>
-                    <select
-                        id="type"
-                        value={type}
-                        onChange={e => setType(e.target.value as any)}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg py-2 px-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-indigo"
-                    >
+                    <label className="block text-sm font-medium text-slate-300 mb-1">Task Type</label>
+                    <select value={type} onChange={e => setType(e.target.value as any)} className={selectClasses}>
                         {taskTypes.map(t => <option key={t} value={t}>{t.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</option>)}
                     </select>
                 </div>
 
                 {showTargetUrlInput && (
                     <div>
-                        <label htmlFor="targetUrl" className="block text-sm font-medium text-slate-300 mb-1">Target URL</label>
-                        <Input id="targetUrl" type="url" placeholder="https://example.com" value={targetUrl} onChange={e => setTargetUrl(e.target.value)} />
+                        <label className="block text-sm font-medium text-slate-300 mb-1">Target URL</label>
+                        <Input type="url" placeholder="https://example.com" value={targetUrl} onChange={e => setTargetUrl(e.target.value)} />
                     </div>
                 )}
                 
                 <div className="flex items-center">
                     <input
-                        id="requiresProof"
                         type="checkbox"
                         checked={requiresProof}
                         onChange={(e) => setRequiresProof(e.target.checked)}

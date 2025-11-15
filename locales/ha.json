@@ -74,5 +74,21 @@
   "visualSource": "Madogaran Hoto",
   "aiGenerated": "AI Ya Kirkira",
   "userUploaded": "Mai Amfani Ya Loda",
-  "uploadAdVisual": "Loda hoton talla"
+  "uploadAdVisual": "Loda hoton talla",
+  "navRedeem": "Karɓi Lada",
+  "dataBalance": "Sauran Data",
+  "airtimeBalance": "Sauran Katin Waya",
+  "redeemYourRewards": "Karɓi Ladanka",
+  "redeemSubtitle": "Mayar da ladan da ka samu zuwa data ko katin waya.",
+  "redemptionType": "Nau'in Karɓa",
+  "data": "Data",
+  "airtime": "Katin Waya",
+  "networkProvider": "Kamfanin Sadarwa",
+  "phoneNumber": "Lambar Waya",
+  "amountToRedeem": "Adadin da za a Karɓa",
+  "submitRequest": "Aika Buƙata",
+  "redemptionHistory": "Tarihin Karɓa",
+  "redemptionSuccessTitle": "An Yi Nasarar Turawa!",
+  "redemptionSuccessMessage": "An aiko da ladanka. Don Allah duba na'urarka.",
+  "adminRedemptions": "Buƙatun Karɓa"
 }

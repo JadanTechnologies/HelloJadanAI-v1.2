@@ -4,7 +4,8 @@ import { AppContext } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
-import { ImageIcon, VideoIcon, AdIcon } from '../constants';
+// FIX: Imported missing CreditIcon component.
+import { ImageIcon, VideoIcon, AdIcon, SignalIcon, PhoneIcon, CheckCircleIcon, CreditIcon } from '../constants';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const chartData = [
@@ -18,28 +19,50 @@ const chartData = [
 
 
 const Dashboard = () => {
-  const { state } = useContext(AppContext);
+  const { state, dispatch } = useContext(AppContext);
   const { t } = useTranslation();
 
   return (
     <div className="space-y-8">
+      {state.recentRedemption?.successful && (
+        <div className="bg-green-500/20 border border-green-400 text-green-300 px-4 py-3 rounded-lg relative flex items-start" role="alert">
+          <CheckCircleIcon className="w-6 h-6 mr-3 text-green-400"/>
+          <div>
+            <strong className="font-bold">{t('redemptionSuccessTitle')}</strong>
+            <span className="block sm:inline ml-2">{state.recentRedemption.message}</span>
+          </div>
+          <button onClick={() => dispatch({ type: 'DISMISS_REDEMPTION_BANNER' })} className="absolute top-0 bottom-0 right-0 px-4 py-3">
+            <svg className="fill-current h-6 w-6 text-green-400" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+          </button>
+        </div>
+      )}
+
       <div>
         <h1 className="text-3xl font-bold text-white mb-2">{t('dashboardTitle')}</h1>
         <p className="text-slate-400">Welcome back, {state.user?.username}!</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="flex flex-col justify-between">
-          <h3 className="text-slate-400 font-medium">{t('yourCredits')}</h3>
-          <p className="text-4xl font-bold text-brand-cyan">{state.credits}</p>
+        <Card>
+          <div className="flex items-center justify-between">
+            <h3 className="text-slate-400 font-medium">{t('yourCredits')}</h3>
+            <CreditIcon className="w-6 h-6 text-slate-500" />
+          </div>
+          <p className="text-4xl font-bold text-brand-cyan mt-2">{state.credits}</p>
         </Card>
         <Card>
-          <h3 className="text-slate-400 font-medium">{t('tasksCompleted')}</h3>
-          <p className="text-4xl font-bold text-white">{state.user?.tasksCompleted}</p>
+          <div className="flex items-center justify-between">
+            <h3 className="text-slate-400 font-medium">{t('dataBalance')}</h3>
+            <SignalIcon className="w-6 h-6 text-slate-500" />
+          </div>
+          <p className="text-4xl font-bold text-white mt-2">{state.user?.dataBalanceMB}<span className="text-lg ml-1">MB</span></p>
         </Card>
         <Card>
-          <h3 className="text-slate-400 font-medium">{t('recentGenerations')}</h3>
-          <p className="text-4xl font-bold text-white">{state.generations.length}</p>
+          <div className="flex items-center justify-between">
+            <h3 className="text-slate-400 font-medium">{t('airtimeBalance')}</h3>
+            <PhoneIcon className="w-6 h-6 text-slate-500" />
+          </div>
+          <p className="text-4xl font-bold text-white mt-2"><span className="text-lg mr-1">₦</span>{state.user?.airtimeBalanceNGN.toFixed(2)}</p>
         </Card>
       </div>
 

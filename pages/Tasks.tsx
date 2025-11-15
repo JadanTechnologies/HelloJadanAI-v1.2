@@ -60,8 +60,9 @@ const Tasks = () => {
         const campaign = state.campaigns.find(c => c.id === task.id);
         if (!campaign) return;
 
-        dispatch({ type: 'UPDATE_CREDITS', payload: state.credits + task.creditReward });
-        dispatch({ type: 'ADD_CREDIT_TRANSACTION', payload: { id: `tx-camp-${Date.now()}`, description: `Sponsored Task: ${task.title}`, amount: task.creditReward, date: new Date().toISOString() } });
+        // Sponsored tasks only give credits in this implementation
+        dispatch({ type: 'UPDATE_CREDITS', payload: state.credits + task.rewardAmount });
+        dispatch({ type: 'ADD_CREDIT_TRANSACTION', payload: { id: `tx-camp-${Date.now()}`, description: `Sponsored Task: ${task.title}`, amount: task.rewardAmount, date: new Date().toISOString() } });
         
         const updatedCampaign = { ...campaign, budget: campaign.budget - campaign.cpa };
         if (updatedCampaign.budget <= 0) {
@@ -69,10 +70,8 @@ const Tasks = () => {
         }
         dispatch({ type: 'UPDATE_CAMPAIGN', payload: updatedCampaign });
 
-        dispatch({ type: 'ADD_NOTIFICATION', payload: { message: `You earned ${task.creditReward} credits for completing a sponsored task!`, type: 'success' } });
-
-        // In a real app, you would track per-user completion. For this demo, we don't disable the button.
-        // A simple way to provide feedback is to just open the link.
+        dispatch({ type: 'ADD_NOTIFICATION', payload: { message: `You earned ${task.rewardAmount} credits for completing a sponsored task!`, type: 'success' } });
+        
         if (task.targetUrl) {
             window.open(task.targetUrl, '_blank');
         }
@@ -111,6 +110,15 @@ const Tasks = () => {
               return <Button onClick={() => handleCompleteTask(task)}>Complete</Button>;
       }
   };
+  
+  const renderReward = (task: Task) => {
+    switch (task.rewardType) {
+        case 'credits': return `+${task.rewardAmount} ${t('credits')}`;
+        case 'data': return `+${task.rewardAmount} MB Data`;
+        case 'airtime': return `+₦${task.rewardAmount} Airtime`;
+        default: return '';
+    }
+  };
 
   const renderTaskCard = (task: Task, isSponsored: boolean = false) => (
       <Card key={task.id} className="flex flex-col md:flex-row md:items-center justify-between">
@@ -125,7 +133,7 @@ const Tasks = () => {
                   </a>
               )}
               <div className="text-right">
-                  <p className="font-bold text-lg text-brand-cyan mb-2">+{task.creditReward} {t('credits')}</p>
+                  <p className="font-bold text-lg text-brand-cyan mb-2">{renderReward(task)}</p>
                   {getTaskButton(task, isSponsored)}
               </div>
           </div>
@@ -139,7 +147,8 @@ const Tasks = () => {
             id: c.id,
             title: c.productName,
             description: c.taskDescription,
-            creditReward: c.userCreditReward,
+            rewardAmount: c.userCreditReward,
+            rewardType: 'credits',
             status: 'incomplete', // Assumed for all users in this demo
             type: 'engagement',
             targetUrl: c.targetUrl,
@@ -158,7 +167,7 @@ const Tasks = () => {
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-white">{t('tasksTitle')}</h1>
-        <p className="text-slate-400 mt-1">More tasks, more credits, more creations!</p>
+        <p className="text-slate-400 mt-1">More tasks, more rewards, more creations!</p>
       </div>
 
       {Object.entries(taskCategories).map(([category, tasks]) => (

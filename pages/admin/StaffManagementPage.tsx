@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
+import Input from '../../components/common/Input';
 import { mockStaff, mockUsers } from './data';
 import { StaffMember, StaffRole, User } from '../../types';
 import { TrashIcon } from '../../constants';
+import { AppContext } from '../../contexts/AppContext';
 
 // Role Dropdown and Badge Components
 const roleOptions: StaffRole[] = ['Admin', 'Moderator', 'Support'];
@@ -21,6 +23,7 @@ const RoleBadge: React.FC<{ role: StaffRole }> = ({ role }) => {
 
 // Main Component
 const StaffManagementPage = () => {
+    const { dispatch } = useContext(AppContext);
     const [staff, setStaff] = useState<StaffMember[]>(mockStaff);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingStaff, setEditingStaff] = useState<StaffMember | null>(null);
@@ -44,20 +47,42 @@ const StaffManagementPage = () => {
         setIsDeleteModalOpen(false);
     };
 
-    const handleSave = (data: { userId?: string, role: StaffRole }) => {
+    const handleSave = (data: { username?: string, email?: string, password?: string, role: StaffRole, userId?: string }) => {
         if (editingStaff) {
             // Edit existing staff's role
             setStaff(staff.map(s => s.id === editingStaff.id ? { ...s, role: data.role } : s));
         } else {
-            // Add new staff
-            const user = mockUsers.find(u => u.id === data.userId);
-            if (!user) return;
+            // Add new staff by creating a new user
+            const userId = `user-${Date.now()}`;
+            const newUser: User = {
+                id: userId,
+                username: data.username!,
+                email: data.email!,
+                avatar: `https://picsum.photos/seed/${data.username}/100/100`,
+                isAdmin: true, // All staff are admins for panel access
+                tasksCompleted: 0,
+                ip: 'N/A',
+                deviceInfo: 'N/A',
+                status: 'active',
+                credits: 0,
+                dataBalanceMB: 0,
+                airtimeBalanceNGN: 0,
+                referralCode: data.username!.toUpperCase(),
+                referralStats: { count: 0, creditsEarned: 0 },
+                fraudRisk: 'low',
+                dailyGenerations: { image: 0, video: 0, ad: 0, lastReset: new Date().toISOString() },
+            };
+
+            // In a real app, an API call would handle this. We simulate by dispatching.
+            dispatch({ type: 'ADD_USER', payload: newUser });
+            mockUsers.push(newUser); // Add to mock data for persistence in this session
+
             const newStaff: StaffMember = {
                 id: `staff-${Date.now()}`,
-                userId: user.id,
-                username: user.username,
-                email: user.email,
-                avatar: user.avatar,
+                userId: newUser.id,
+                username: newUser.username,
+                email: newUser.email,
+                avatar: newUser.avatar,
                 role: data.role,
             };
             setStaff([newStaff, ...staff]);
@@ -71,9 +96,6 @@ const StaffManagementPage = () => {
         handleCloseModals();
     };
     
-    const staffUserIds = staff.map(s => s.userId);
-    const potentialStaff = mockUsers.filter(u => !staffUserIds.includes(u.id));
-
     return (
         <div className="space-y-8">
             <div>
@@ -125,7 +147,6 @@ const StaffManagementPage = () => {
                 onClose={handleCloseModals}
                 onSave={handleSave}
                 staff={editingStaff}
-                potentialStaff={potentialStaff}
             />
             
             {staffToDelete && (
@@ -151,59 +172,63 @@ const StaffManagementPage = () => {
 interface StaffModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (data: { userId?: string, role: StaffRole }) => void;
+    onSave: (data: { username?: string, email?: string, password?: string, role: StaffRole }) => void;
     staff: StaffMember | null;
-    potentialStaff: User[];
 }
 
-const StaffModal: React.FC<StaffModalProps> = ({ isOpen, onClose, onSave, staff, potentialStaff }) => {
-    const [userId, setUserId] = useState('');
+const StaffModal: React.FC<StaffModalProps> = ({ isOpen, onClose, onSave, staff }) => {
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [role, setRole] = useState<StaffRole>(staff?.role || 'Support');
     
     React.useEffect(() => {
         if(staff) {
-            setUserId(staff.userId);
+            setUsername(staff.username);
+            setEmail(staff.email);
             setRole(staff.role);
         } else {
-            setUserId(potentialStaff.length > 0 ? potentialStaff[0].id : '');
+            setUsername('');
+            setEmail('');
+            setPassword('');
             setRole('Support');
         }
-    }, [staff, potentialStaff, isOpen]);
+    }, [staff, isOpen]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave({ userId, role });
+        onSave({ username, email, password, role });
     };
 
     const selectClasses = "w-full bg-slate-800 border border-slate-700 rounded-lg py-2 px-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-indigo";
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={staff ? 'Edit Staff Role' : 'Add New Staff'}>
+        <Modal isOpen={isOpen} onClose={onClose} title={staff ? `Edit Role for ${staff.username}` : 'Add New Staff'}>
             <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">User</label>
-                    <select
-                        value={userId}
-                        onChange={e => setUserId(e.target.value)}
-                        className={selectClasses}
-                        disabled={!!staff}
-                        required
-                    >
-                        {staff && <option value={staff.userId}>{staff.username}</option>}
-                        {!staff && potentialStaff.map(u => (
-                            <option key={u.id} value={u.id}>{u.username} ({u.email})</option>
-                        ))}
-                         {!staff && potentialStaff.length === 0 && <option disabled>No available users to add</option>}
-                    </select>
-                </div>
+                {staff ? (
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-1">User</label>
+                        <p className="p-2 bg-slate-900 rounded-md">{staff.username} ({staff.email})</p>
+                    </div>
+                ) : (
+                    <>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-1">Username</label>
+                            <Input type="text" value={username} onChange={e => setUsername(e.target.value)} required/>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-1">Email</label>
+                            <Input type="email" value={email} onChange={e => setEmail(e.target.value)} required/>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-1">Password</label>
+                            <Input type="password" value={password} onChange={e => setPassword(e.target.value)} required/>
+                        </div>
+                    </>
+                )}
                 <div>
                     <label className="block text-sm font-medium text-slate-300 mb-1">Role</label>
-                    <select
-                        value={role}
-                        onChange={e => setRole(e.target.value as StaffRole)}
-                        className={selectClasses}
-                        required
-                    >
+                    <select value={role} onChange={e => setRole(e.target.value as StaffRole)} className={selectClasses} required>
                         {roleOptions.map(r => <option key={r} value={r}>{r}</option>)}
                     </select>
                 </div>

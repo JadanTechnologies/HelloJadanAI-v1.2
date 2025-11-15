@@ -19,6 +19,7 @@ import ReferralsPage from './pages/ReferralsPage';
 import AdvertisePage from './pages/AdvertisePage';
 import MaintenancePage from './pages/MaintenancePage';
 import PaymentPage from './pages/PaymentPage';
+import RedemptionPage from './pages/RedemptionPage';
 
 // Admin-facing layout and pages
 import AdminLayout from './components/admin/AdminLayout';
@@ -37,6 +38,7 @@ import AccessControlPage from './pages/admin/AccessControlPage';
 import StaffManagementPage from './pages/admin/StaffManagementPage';
 import CampaignManagementPage from './pages/admin/CampaignManagementPage';
 import PaymentManagementPage from './pages/admin/PaymentManagementPage';
+import RedemptionManagementPage from './pages/admin/RedemptionManagementPage';
 
 
 function App() {
@@ -80,6 +82,7 @@ function App() {
           <Route path="gallery" element={<Gallery />} />
           <Route path="credits" element={<CreditHistory />} />
           <Route path="referrals" element={<ReferralsPage />} />
+          <Route path="redeem" element={<RedemptionPage />} />
         </Route>
         
         {/* === ADMIN ROUTES === */}
@@ -97,6 +100,7 @@ function App() {
           <Route path="task-monitoring" element={<TaskMonitoringPage />} />
           <Route path="campaigns" element={<CampaignManagementPage />} />
           <Route path="payments" element={<PaymentManagementPage />} />
+          <Route path="redemptions" element={<RedemptionManagementPage />} />
           <Route path="templates" element={<TemplateManagementPage />} />
           <Route path="announcements" element={<AnnouncementPage />} />
           <Route path="cron-jobs" element={<CronJobPage />} />

@@ -4,7 +4,7 @@ import { AppContext } from '../contexts/AppContext';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTranslation } from '../hooks/useTranslation';
-import { HomeIcon, ImageIcon, VideoIcon, AdIcon, TaskIcon, GalleryIcon, CreditIcon, BellIcon, ReferralIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon } from '../constants';
+import { HomeIcon, ImageIcon, VideoIcon, AdIcon, TaskIcon, GalleryIcon, CreditIcon, BellIcon, ReferralIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, GiftIcon } from '../constants';
 
 const ThemeToggle: React.FC = () => {
     const { theme, toggleTheme } = useTheme();
@@ -146,6 +146,7 @@ const Sidebar: React.FC<{ isOpen: boolean; setIsOpen: (isOpen: boolean) => void;
                         <NavItem to="/app/gallery" icon={<GalleryIcon className="w-5 h-5"/>} label={t('navGallery')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
                         <NavItem to="/app/credits" icon={<CreditIcon className="w-5 h-5"/>} label={t('creditHistory')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
                         <NavItem to="/app/referrals" icon={<ReferralIcon className="w-5 h-5"/>} label="Referrals" onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                        <NavItem to="/app/redeem" icon={<GiftIcon className="w-5 h-5"/>} label={t('navRedeem')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
                     </nav>
                      <div className="hidden lg:flex items-center justify-center p-4 border-t border-slate-200 dark:border-slate-800 shrink-0">
                         <button onClick={toggleCollapse} className="p-2 rounded-full text-slate-400 hover:bg-slate-700 hover:text-white">

@@ -74,5 +74,21 @@
   "visualSource": "Visual Source",
   "aiGenerated": "AI Generated",
   "userUploaded": "User Uploaded",
-  "uploadAdVisual": "Upload a visual for your ad"
+  "uploadAdVisual": "Upload a visual for your ad",
+  "navRedeem": "Redeem Rewards",
+  "dataBalance": "Data Balance",
+  "airtimeBalance": "Airtime Balance",
+  "redeemYourRewards": "Redeem Your Rewards",
+  "redeemSubtitle": "Convert your earned rewards into data or airtime.",
+  "redemptionType": "Redemption Type",
+  "data": "Data",
+  "airtime": "Airtime",
+  "networkProvider": "Network Provider",
+  "phoneNumber": "Phone Number",
+  "amountToRedeem": "Amount to Redeem",
+  "submitRequest": "Submit Request",
+  "redemptionHistory": "Redemption History",
+  "redemptionSuccessTitle": "Transfer Successful!",
+  "redemptionSuccessMessage": "Your reward has been sent. Please check your device.",
+  "adminRedemptions": "Redemption Requests"
 }

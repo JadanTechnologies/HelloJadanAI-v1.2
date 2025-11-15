@@ -9,6 +9,8 @@ export interface User {
   deviceInfo: string;
   status: 'active' | 'suspended' | 'banned';
   credits: number;
+  dataBalanceMB: number; // in Megabytes
+  airtimeBalanceNGN: number; // in Nigerian Naira
   referralCode: string;
   referredBy?: string;
   referralStats: {
@@ -68,7 +70,8 @@ export interface Task {
   id: string;
   title: string;
   description: string;
-  creditReward: number;
+  rewardAmount: number;
+  rewardType: 'credits' | 'data' | 'airtime';
   status: 'incomplete' | 'pending' | 'completed';
   type: 'daily' | 'engagement' | 'profile' | 'youtube_subscribe' | 'social_follow' | 'social_share' | 'app_download';
   targetUrl?: string;
@@ -84,6 +87,20 @@ export interface TaskSubmission {
   taskTitle: string;
   proof: string;
   submittedAt: string;
+}
+
+export interface RedemptionRequest {
+  id:string;
+  userId: string;
+  username: string;
+  avatar: string;
+  type: 'data' | 'airtime';
+  amount: number;
+  networkProvider: string;
+  phoneNumber: string;
+  status: 'pending' | 'completed' | 'rejected';
+  requestedAt: string;
+  processedAt?: string;
 }
 
 export interface FAQItem {
@@ -270,11 +287,14 @@ export interface AppState {
   contentSettings: ContentSettings;
   campaigns: Campaign[];
   payments: Payment[];
+  redemptionRequests: RedemptionRequest[];
+  recentRedemption: { successful: boolean; message: string } | null;
 }
 
 export type AppAction =
   | { type: 'LOGIN'; payload: User }
   | { type: 'LOGOUT' }
+  | { type: 'ADD_USER'; payload: User }
   | { type: 'UPDATE_CREDITS'; payload: number }
   | { type: 'ADD_GENERATION'; payload: Generation }
   | { type: 'UPDATE_TASK_STATUS'; payload: { taskId: string; userId: string; status: 'incomplete' | 'pending' | 'completed' } }
@@ -290,6 +310,10 @@ export type AppAction =
   | { type: 'UPDATE_CAMPAIGN'; payload: Campaign }
   | { type: 'ADD_PAYMENT'; payload: Payment }
   | { type: 'UPDATE_PAYMENT'; payload: Payment }
-  | { type: 'INCREMENT_DAILY_GENERATION'; payload: { type: GenerationType } };
+  | { type: 'INCREMENT_DAILY_GENERATION'; payload: { type: GenerationType } }
+  | { type: 'CREATE_REDEMPTION_REQUEST'; payload: RedemptionRequest }
+  | { type: 'UPDATE_REDEMPTION_STATUS'; payload: { requestId: string; status: 'completed' | 'rejected' } }
+  | { type: 'DISMISS_REDEMPTION_BANNER' };
+
 
 export type GenerationType = 'image' | 'video' | 'ad';
