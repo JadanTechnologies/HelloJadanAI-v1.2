@@ -110,7 +110,8 @@ export const mockCampaigns: Campaign[] = [
         status: 'active',
         submittedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
         imageUrl: 'https://picsum.photos/seed/innovate/200/200',
-        paymentId: 'pay-1'
+        paymentId: 'pay-1',
+        completedActions: 150,
     },
     {
         id: 'camp-2',
@@ -126,7 +127,8 @@ export const mockCampaigns: Campaign[] = [
         status: 'pending_payment',
         submittedAt: new Date(Date.now() - 86400000).toISOString(),
         imageUrl: 'https://picsum.photos/seed/gamerz/200/200',
-        paymentId: 'pay-2'
+        paymentId: 'pay-2',
+        completedActions: 0,
     },
      {
         id: 'camp-3',
@@ -141,6 +143,8 @@ export const mockCampaigns: Campaign[] = [
         userCreditReward: 50,
         status: 'completed',
         submittedAt: new Date(Date.now() - 86400000 * 10).toISOString(),
+        completedActions: 200,
+        paymentId: 'pay-4'
     },
     {
         id: 'camp-4',
@@ -156,6 +160,7 @@ export const mockCampaigns: Campaign[] = [
         status: 'pending_review',
         submittedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
         paymentId: 'pay-3',
+        completedActions: 0,
     }
 ];
 
@@ -163,6 +168,7 @@ export const mockPayments: Payment[] = [
     { id: 'pay-1', campaignId: 'camp-1', campaignName: 'Synth AI Assistant', companyName: 'Innovate Inc.', amount: 500, currency: 'USD', gateway: 'paystack', status: 'completed', transactionId: 'ps_123abc', createdAt: new Date(Date.now() - 86400000 * 3).toISOString() },
     { id: 'pay-2', campaignId: 'camp-2', campaignName: 'CyberRonin 2088', companyName: 'Gamerz United', amount: 250, currency: 'USD', gateway: 'flutterwave', status: 'failed', transactionId: 'fw_456def', createdAt: new Date(Date.now() - 86400000).toISOString() },
     { id: 'pay-3', campaignId: 'camp-4', campaignName: 'CodeSphere IDE', companyName: 'DevTools Co.', amount: 1000, currency: 'USD', gateway: 'manual', status: 'pending', paymentProofUrl: 'https://picsum.photos/seed/proof/400/300', createdAt: new Date(Date.now() - 3600000 * 2).toISOString() },
+    { id: 'pay-4', campaignId: 'camp-3', campaignName: 'Sustainable Sneakers', companyName: 'EcoWear', amount: 200, currency: 'USD', gateway: 'monnify', status: 'completed', transactionId: 'mn_xyz', createdAt: new Date(Date.now() - 86400000 * 10).toISOString() },
 ];
 
 const mockAccessRules: AccessRestrictionRule[] = [

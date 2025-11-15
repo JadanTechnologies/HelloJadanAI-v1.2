@@ -64,7 +64,11 @@ const Tasks = () => {
         dispatch({ type: 'UPDATE_CREDITS', payload: state.credits + task.rewardAmount });
         dispatch({ type: 'ADD_CREDIT_TRANSACTION', payload: { id: `tx-camp-${Date.now()}`, description: `Sponsored Task: ${task.title}`, amount: task.rewardAmount, date: new Date().toISOString() } });
         
-        const updatedCampaign = { ...campaign, budget: campaign.budget - campaign.cpa };
+        const updatedCampaign = { 
+            ...campaign, 
+            budget: campaign.budget - campaign.cpa,
+            completedActions: (campaign.completedActions || 0) + 1,
+        };
         if (updatedCampaign.budget <= 0) {
             updatedCampaign.status = 'completed';
         }

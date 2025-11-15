@@ -221,6 +221,7 @@ export interface Campaign {
   submittedAt: string;
   imageUrl?: string;
   paymentId?: string;
+  completedActions?: number;
 }
 
 export type PaymentGateway = 'paystack' | 'flutterwave' | 'monnify' | 'manual';
