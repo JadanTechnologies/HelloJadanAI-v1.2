@@ -200,9 +200,39 @@ export interface Campaign {
   budget: number; // total budget in USD
   cpa: number; // cost per action in USD
   userCreditReward: number; // credits given to user, set by admin
-  status: 'pending_review' | 'active' | 'paused' | 'completed' | 'rejected';
+  status: 'pending_payment' | 'pending_review' | 'active' | 'paused' | 'completed' | 'rejected';
   submittedAt: string;
   imageUrl?: string;
+  paymentId?: string;
+}
+
+export type PaymentGateway = 'paystack' | 'flutterwave' | 'monnify' | 'manual';
+
+export interface Payment {
+  id: string;
+  campaignId: string;
+  campaignName: string;
+  companyName: string;
+  amount: number;
+  currency: 'USD' | 'NGN';
+  gateway: PaymentGateway;
+  status: 'pending' | 'completed' | 'failed';
+  transactionId?: string;
+  paymentProofUrl?: string; // for manual payments
+  createdAt: string;
+}
+
+export interface PaymentGatewaySettings {
+  paystack: { enabled: boolean; publicKey: string; secretKey: string; };
+  flutterwave: { enabled: boolean; publicKey: string; secretKey: string; };
+  monnify: { enabled: boolean; apiKey: string; contractCode: string; };
+  manual: {
+    enabled: boolean;
+    accountName: string;
+    accountNumber: string;
+    bankName: string;
+    instructions: string;
+  };
 }
 
 export interface SystemSettings {
@@ -223,6 +253,7 @@ export interface SystemSettings {
     };
     maintenanceMode: boolean;
     maintenanceMessage: string;
+    paymentGateways: PaymentGatewaySettings;
 }
 
 export interface AppState {
@@ -238,6 +269,7 @@ export interface AppState {
   brandingSettings: BrandingSettings;
   contentSettings: ContentSettings;
   campaigns: Campaign[];
+  payments: Payment[];
 }
 
 export type AppAction =
@@ -256,6 +288,8 @@ export type AppAction =
   | { type: 'UPDATE_PLATFORM_SETTINGS'; payload: { brandingSettings: BrandingSettings; contentSettings: ContentSettings } }
   | { type: 'ADD_CAMPAIGN'; payload: Campaign }
   | { type: 'UPDATE_CAMPAIGN'; payload: Campaign }
+  | { type: 'ADD_PAYMENT'; payload: Payment }
+  | { type: 'UPDATE_PAYMENT'; payload: Payment }
   | { type: 'INCREMENT_DAILY_GENERATION'; payload: { type: GenerationType } };
 
 export type GenerationType = 'image' | 'video' | 'ad';

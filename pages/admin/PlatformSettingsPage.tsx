@@ -8,7 +8,7 @@ import { CREDIT_COSTS, TrashIcon, UploadIcon } from '../../constants';
 import { mockApiSettings } from './data';
 import { BrandingSettings, ContentSettings, FAQItem, ApiSettings, SystemSettings } from '../../types';
 
-type SettingsTab = 'general' | 'branding' | 'content' | 'models_limits' | 'integrations' | 'referrals_fraud';
+type SettingsTab = 'general' | 'branding' | 'content' | 'models_limits' | 'integrations' | 'referrals_fraud' | 'payments';
 
 const imageProviders = ['Gemini', 'DALL-E 3', 'Midjourney', 'Mock Service'];
 const videoProviders = ['Veo (Google)', 'RunwayML', 'Pika', 'Sora', 'Mock Service'];
@@ -98,6 +98,19 @@ const PlatformSettingsPage = () => {
         {label}
       </button>
     );
+    
+    const ToggleSwitch: React.FC<{checked: boolean; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; label: string; description: string;}> = ({ checked, onChange, label, description }) => (
+         <div className="flex items-center justify-between p-3 bg-slate-900 rounded-lg">
+            <div>
+                <p className="font-medium text-slate-200">{label}</p>
+                <p className="text-xs text-slate-400">{description}</p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" className="sr-only peer" checked={checked} onChange={onChange} />
+                <div className="w-11 h-6 bg-slate-700 rounded-full peer peer-focus:ring-4 peer-focus:ring-brand-indigo/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-indigo"></div>
+            </label>
+        </div>
+    );
 
     return (
         <div className="space-y-8 max-w-5xl">
@@ -108,6 +121,7 @@ const PlatformSettingsPage = () => {
 
             <div className="flex flex-wrap gap-2 p-1 bg-slate-800 rounded-lg">
                 <TabButton tab="general" label="General"/>
+                <TabButton tab="payments" label="Payment Gateways"/>
                 <TabButton tab="branding" label="Branding"/>
                 <TabButton tab="content" label="Content"/>
                 <TabButton tab="models_limits" label="Models & Limits"/>
@@ -132,22 +146,12 @@ const PlatformSettingsPage = () => {
                     <Card>
                         <h2 className="text-xl font-bold text-white mb-4">Maintenance Mode</h2>
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between p-3 bg-slate-900 rounded-lg">
-                                <div>
-                                    <p className="font-medium text-slate-200">Enable Maintenance Mode</p>
-                                    <p className="text-xs text-slate-400">When enabled, only administrators can access the site.</p>
-                                </div>
-                                <label htmlFor="toggle-maintenance" className="relative inline-flex items-center cursor-pointer">
-                                    <input 
-                                        type="checkbox" 
-                                        id="toggle-maintenance" 
-                                        className="sr-only peer" 
-                                        checked={systemSettings.maintenanceMode} 
-                                        onChange={e => setSystemSettings(p => ({...p, maintenanceMode: e.target.checked}))} 
-                                    />
-                                    <div className="w-11 h-6 bg-slate-700 rounded-full peer peer-focus:ring-4 peer-focus:ring-brand-indigo/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-indigo"></div>
-                                </label>
-                            </div>
+                            <ToggleSwitch
+                                label="Enable Maintenance Mode"
+                                description="When enabled, only administrators can access the site."
+                                checked={systemSettings.maintenanceMode}
+                                onChange={e => setSystemSettings(p => ({...p, maintenanceMode: e.target.checked}))}
+                            />
                             <div>
                                 <label className="block text-sm font-medium text-slate-300">Maintenance Message</label>
                                 <textarea 
@@ -162,6 +166,64 @@ const PlatformSettingsPage = () => {
                     </Card>
                 </div>
             )}
+
+            {activeTab === 'payments' && (
+                <div className="space-y-8">
+                    <Card>
+                        <h2 className="text-xl font-bold text-white mb-4">Paystack Settings</h2>
+                         <ToggleSwitch
+                            label="Enable Paystack"
+                            description="Allow advertisers to pay via Paystack."
+                            checked={systemSettings.paymentGateways.paystack.enabled}
+                            onChange={e => setSystemSettings(p => ({...p, paymentGateways: {...p.paymentGateways, paystack: {...p.paymentGateways.paystack, enabled: e.target.checked}} }))}
+                        />
+                        {systemSettings.paymentGateways.paystack.enabled && (
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                <div><label className="text-sm font-medium text-slate-300">Public Key</label><Input type="text" value={systemSettings.paymentGateways.paystack.publicKey} onChange={e => setSystemSettings(p => ({...p, paymentGateways: {...p.paymentGateways, paystack: {...p.paymentGateways.paystack, publicKey: e.target.value}}}))} /></div>
+                                <div><label className="text-sm font-medium text-slate-300">Secret Key</label><Input type="password" value={systemSettings.paymentGateways.paystack.secretKey} onChange={e => setSystemSettings(p => ({...p, paymentGateways: {...p.paymentGateways, paystack: {...p.paymentGateways.paystack, secretKey: e.target.value}}}))} /></div>
+                            </div>
+                        )}
+                    </Card>
+                     <Card>
+                        <h2 className="text-xl font-bold text-white mb-4">Flutterwave Settings</h2>
+                        <ToggleSwitch
+                            label="Enable Flutterwave"
+                            description="Allow advertisers to pay via Flutterwave."
+                            checked={systemSettings.paymentGateways.flutterwave.enabled}
+                            onChange={e => setSystemSettings(p => ({...p, paymentGateways: {...p.paymentGateways, flutterwave: {...p.paymentGateways.flutterwave, enabled: e.target.checked}} }))}
+                        />
+                         {systemSettings.paymentGateways.flutterwave.enabled && (
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                <div><label className="text-sm font-medium text-slate-300">Public Key</label><Input type="text" value={systemSettings.paymentGateways.flutterwave.publicKey} onChange={e => setSystemSettings(p => ({...p, paymentGateways: {...p.paymentGateways, flutterwave: {...p.paymentGateways.flutterwave, publicKey: e.target.value}}}))} /></div>
+                                <div><label className="text-sm font-medium text-slate-300">Secret Key</label><Input type="password" value={systemSettings.paymentGateways.flutterwave.secretKey} onChange={e => setSystemSettings(p => ({...p, paymentGateways: {...p.paymentGateways, flutterwave: {...p.paymentGateways.flutterwave, secretKey: e.target.value}}}))} /></div>
+                            </div>
+                        )}
+                    </Card>
+                    <Card>
+                        <h2 className="text-xl font-bold text-white mb-4">Manual Payment Gateway</h2>
+                         <ToggleSwitch
+                            label="Enable Manual Bank Transfer"
+                            description="Allow advertisers to pay via manual bank deposit."
+                            checked={systemSettings.paymentGateways.manual.enabled}
+                            onChange={e => setSystemSettings(p => ({...p, paymentGateways: {...p.paymentGateways, manual: {...p.paymentGateways.manual, enabled: e.target.checked}} }))}
+                        />
+                         {systemSettings.paymentGateways.manual.enabled && (
+                            <div className="space-y-4 mt-4">
+                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div><label className="text-sm font-medium text-slate-300">Bank Name</label><Input type="text" value={systemSettings.paymentGateways.manual.bankName} onChange={e => setSystemSettings(p => ({...p, paymentGateways: {...p.paymentGateways, manual: {...p.paymentGateways.manual, bankName: e.target.value}}}))} /></div>
+                                    <div><label className="text-sm font-medium text-slate-300">Account Name</label><Input type="text" value={systemSettings.paymentGateways.manual.accountName} onChange={e => setSystemSettings(p => ({...p, paymentGateways: {...p.paymentGateways, manual: {...p.paymentGateways.manual, accountName: e.target.value}}}))} /></div>
+                                    <div><label className="text-sm font-medium text-slate-300">Account Number</label><Input type="text" value={systemSettings.paymentGateways.manual.accountNumber} onChange={e => setSystemSettings(p => ({...p, paymentGateways: {...p.paymentGateways, manual: {...p.paymentGateways.manual, accountNumber: e.target.value}}}))} /></div>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-slate-300">Payment Instructions</label>
+                                    <textarea value={systemSettings.paymentGateways.manual.instructions} onChange={e => setSystemSettings(p => ({...p, paymentGateways: {...p.paymentGateways, manual: {...p.paymentGateways.manual, instructions: e.target.value}}}))} className={textareaClasses} rows={3}></textarea>
+                                </div>
+                            </div>
+                         )}
+                    </Card>
+                </div>
+            )}
+
 
             {activeTab === 'branding' && (
                 <Card>
@@ -342,16 +404,12 @@ const PlatformSettingsPage = () => {
                     <Card>
                         <h2 className="text-xl font-bold text-white mb-4">Fraud & Security</h2>
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between p-3 bg-slate-900 rounded-lg">
-                                <div>
-                                    <p className="font-medium text-slate-200">Block Temporary Emails</p>
-                                    <p className="text-xs text-slate-400">Prevent users from signing up with disposable email addresses.</p>
-                                </div>
-                                <label htmlFor="toggle-temp-email" className="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" id="toggle-temp-email" className="sr-only peer" checked={systemSettings.fraudDetection.blockTempEmails} onChange={e => setSystemSettings(p => ({...p, fraudDetection: {...p.fraudDetection, blockTempEmails: e.target.checked}}))} />
-                                    <div className="w-11 h-6 bg-slate-700 rounded-full peer peer-focus:ring-4 peer-focus:ring-brand-indigo/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-indigo"></div>
-                                </label>
-                            </div>
+                           <ToggleSwitch
+                                label="Block Temporary Emails"
+                                description="Prevent users from signing up with disposable email addresses."
+                                checked={systemSettings.fraudDetection.blockTempEmails} 
+                                onChange={e => setSystemSettings(p => ({...p, fraudDetection: {...p.fraudDetection, blockTempEmails: e.target.checked}}))} 
+                            />
                             <div>
                                 <label className="block text-sm font-medium text-slate-300">Max Sign-ups per IP (in 24h)</label>
                                 <Input type="number" value={systemSettings.fraudDetection.maxSignupsPerIp} onChange={e => setSystemSettings(p => ({...p, fraudDetection: {...p.fraudDetection, maxSignupsPerIp: parseInt(e.target.value) || 0}}))} />

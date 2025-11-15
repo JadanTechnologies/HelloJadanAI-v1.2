@@ -18,6 +18,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import ReferralsPage from './pages/ReferralsPage';
 import AdvertisePage from './pages/AdvertisePage';
 import MaintenancePage from './pages/MaintenancePage';
+import PaymentPage from './pages/PaymentPage';
 
 // Admin-facing layout and pages
 import AdminLayout from './components/admin/AdminLayout';
@@ -35,6 +36,7 @@ import FraudDetectionPage from './pages/admin/FraudDetectionPage';
 import AccessControlPage from './pages/admin/AccessControlPage';
 import StaffManagementPage from './pages/admin/StaffManagementPage';
 import CampaignManagementPage from './pages/admin/CampaignManagementPage';
+import PaymentManagementPage from './pages/admin/PaymentManagementPage';
 
 
 function App() {
@@ -62,6 +64,7 @@ function App() {
         {/* === PUBLIC ROUTES === */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/advertise" element={<AdvertisePage />} />
+        <Route path="/advertise/:campaignId/pay" element={<PaymentPage />} />
         <Route path="/login" element={!user ? <LoginPage /> : <Navigate to={defaultAuthPath} />} />
         <Route path="/forgot-password" element={!user ? <ForgotPasswordPage /> : <Navigate to={defaultAuthPath} />} />
         <Route path="/reset-password" element={!user ? <ResetPasswordPage /> : <Navigate to={defaultAuthPath} />} />
@@ -93,6 +96,7 @@ function App() {
           <Route path="tasks" element={<TaskManagementPage />} />
           <Route path="task-monitoring" element={<TaskMonitoringPage />} />
           <Route path="campaigns" element={<CampaignManagementPage />} />
+          <Route path="payments" element={<PaymentManagementPage />} />
           <Route path="templates" element={<TemplateManagementPage />} />
           <Route path="announcements" element={<AnnouncementPage />} />
           <Route path="cron-jobs" element={<CronJobPage />} />

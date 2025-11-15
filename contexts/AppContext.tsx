@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, ReactNode } from 'react';
-import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement, Referral, SystemSettings, AccessRestrictionRule, GenerationType, BrandingSettings, ContentSettings, Campaign } from '../types';
-import { mockAnnouncements, mockReferrals, mockSystemSettings, mockBrandingSettings, mockContentSettings, mockCampaigns } from '../pages/admin/data';
+import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement, Referral, SystemSettings, AccessRestrictionRule, GenerationType, BrandingSettings, ContentSettings, Campaign, Payment } from '../types';
+import { mockAnnouncements, mockReferrals, mockSystemSettings, mockBrandingSettings, mockContentSettings, mockCampaigns, mockPayments } from '../pages/admin/data';
 
 const mockAdminUser: User = {
     id: 'user-1',
@@ -71,6 +71,7 @@ const initialState: AppState = {
   brandingSettings: mockBrandingSettings,
   contentSettings: mockContentSettings,
   campaigns: mockCampaigns,
+  payments: mockPayments,
 };
 
 const appReducer = (state: AppState, action: AppAction): AppState => {
@@ -164,6 +165,13 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
           campaigns: state.campaigns.map(c => 
               c.id === action.payload.id ? action.payload : c
           ) 
+      };
+    case 'ADD_PAYMENT':
+      return { ...state, payments: [action.payload, ...state.payments] };
+    case 'UPDATE_PAYMENT':
+      return {
+        ...state,
+        payments: state.payments.map(p => p.id === action.payload.id ? action.payload : p),
       };
     case 'INCREMENT_DAILY_GENERATION':
         if (!state.user) return state;

@@ -1,4 +1,4 @@
-import { User, Task, BrandingSettings, ContentSettings, TaskSubmission, ApiSettings, EmailTemplate, SmsTemplate, Announcement, CronJob, Referral, SystemSettings, AccessRestrictionRule, StaffMember, Campaign } from '../../types';
+import { User, Task, BrandingSettings, ContentSettings, TaskSubmission, ApiSettings, EmailTemplate, SmsTemplate, Announcement, CronJob, Referral, SystemSettings, AccessRestrictionRule, StaffMember, Campaign, Payment } from '../../types';
 import { LOGO_DATA_URL } from '../../constants';
 
 export const mockUsers: User[] = [
@@ -104,7 +104,8 @@ export const mockCampaigns: Campaign[] = [
         userCreditReward: 100,
         status: 'active',
         submittedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-        imageUrl: 'https://picsum.photos/seed/innovate/200/200'
+        imageUrl: 'https://picsum.photos/seed/innovate/200/200',
+        paymentId: 'pay-1'
     },
     {
         id: 'camp-2',
@@ -114,12 +115,13 @@ export const mockCampaigns: Campaign[] = [
         taskDescription: 'Visit the official website for our upcoming game CyberRonin 2088.',
         targetUrl: 'https://cyberronin2088.com',
         taskType: 'visit_website',
-        budget: 200,
-        cpa: 0.5,
-        userCreditReward: 25,
-        status: 'pending_review',
+        budget: 0,
+        cpa: 0,
+        userCreditReward: 0,
+        status: 'pending_payment',
         submittedAt: new Date(Date.now() - 86400000).toISOString(),
-        imageUrl: 'https://picsum.photos/seed/gamerz/200/200'
+        imageUrl: 'https://picsum.photos/seed/gamerz/200/200',
+        paymentId: 'pay-2'
     },
      {
         id: 'camp-3',
@@ -134,7 +136,28 @@ export const mockCampaigns: Campaign[] = [
         userCreditReward: 50,
         status: 'completed',
         submittedAt: new Date(Date.now() - 86400000 * 10).toISOString(),
+    },
+    {
+        id: 'camp-4',
+        companyName: 'DevTools Co.',
+        contactEmail: 'info@devtools.com',
+        productName: 'CodeSphere IDE',
+        taskDescription: 'Pay and submit proof for our new CodeSphere IDE campaign.',
+        targetUrl: 'https://codesphere.com',
+        taskType: 'signup',
+        budget: 0,
+        cpa: 0,
+        userCreditReward: 0,
+        status: 'pending_review',
+        submittedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+        paymentId: 'pay-3',
     }
+];
+
+export const mockPayments: Payment[] = [
+    { id: 'pay-1', campaignId: 'camp-1', campaignName: 'Synth AI Assistant', companyName: 'Innovate Inc.', amount: 500, currency: 'USD', gateway: 'paystack', status: 'completed', transactionId: 'ps_123abc', createdAt: new Date(Date.now() - 86400000 * 3).toISOString() },
+    { id: 'pay-2', campaignId: 'camp-2', campaignName: 'CyberRonin 2088', companyName: 'Gamerz United', amount: 250, currency: 'USD', gateway: 'flutterwave', status: 'failed', transactionId: 'fw_456def', createdAt: new Date(Date.now() - 86400000).toISOString() },
+    { id: 'pay-3', campaignId: 'camp-4', campaignName: 'CodeSphere IDE', companyName: 'DevTools Co.', amount: 1000, currency: 'USD', gateway: 'manual', status: 'pending', paymentProofUrl: 'https://picsum.photos/seed/proof/400/300', createdAt: new Date(Date.now() - 3600000 * 2).toISOString() },
 ];
 
 const mockAccessRules: AccessRestrictionRule[] = [
@@ -160,6 +183,18 @@ export const mockSystemSettings: SystemSettings = {
     },
     maintenanceMode: false,
     maintenanceMessage: 'We are currently performing scheduled maintenance. We should be back online shortly. Thank you for your patience!',
+    paymentGateways: {
+        paystack: { enabled: true, publicKey: '', secretKey: '' },
+        flutterwave: { enabled: true, publicKey: '', secretKey: '' },
+        monnify: { enabled: false, apiKey: '', contractCode: '' },
+        manual: {
+            enabled: true,
+            accountName: 'HelloJadan AI Inc.',
+            accountNumber: '1234567890',
+            bankName: 'Creative Bank',
+            instructions: 'Please include your company name in the payment reference. After payment, upload your receipt.'
+        }
+    }
 };
 
 export const analyticsData = {

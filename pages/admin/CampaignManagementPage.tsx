@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
@@ -31,6 +32,7 @@ const CampaignManagementPage = () => {
 
     const statusBadge = (status: Campaign['status']) => {
         const styles = {
+            pending_payment: 'bg-orange-500/20 text-orange-400',
             pending_review: 'bg-yellow-500/20 text-yellow-400',
             active: 'bg-green-500/20 text-green-400',
             paused: 'bg-slate-500/20 text-slate-400',
@@ -49,7 +51,7 @@ const CampaignManagementPage = () => {
 
             <Card>
                 <div className="flex flex-wrap gap-2">
-                    {['all', 'pending_review', 'active', 'paused', 'completed', 'rejected'].map(f => (
+                    {['all', 'pending_payment', 'pending_review', 'active', 'paused', 'completed', 'rejected'].map(f => (
                         <button key={f} onClick={() => setFilter(f)} className={`px-4 py-2 rounded-lg text-sm font-semibold transition capitalize ${filter === f ? 'bg-brand-indigo text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}>
                             {f.replace('_', ' ')}
                         </button>
@@ -127,6 +129,7 @@ const ReviewCampaignModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, camp
                 <div><h4 className="font-semibold text-slate-400">Company</h4><p className="text-white">{campaign.companyName} ({campaign.contactEmail})</p></div>
                 <div><h4 className="font-semibold text-slate-400">Target URL</h4><a href={campaign.targetUrl} target="_blank" rel="noopener noreferrer" className="text-brand-cyan hover:underline">{campaign.targetUrl}</a></div>
                 <div><h4 className="font-semibold text-slate-400">Task Description</h4><p className="p-2 bg-slate-800 rounded-md text-white">{campaign.taskDescription}</p></div>
+                {campaign.paymentId && <div><h4 className="font-semibold text-slate-400">Payment Info</h4><Link to="/admin/payments" state={{ paymentId: campaign.paymentId }} className="text-brand-cyan hover:underline">View Payment Details</Link></div>}
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-700">
                     <div>

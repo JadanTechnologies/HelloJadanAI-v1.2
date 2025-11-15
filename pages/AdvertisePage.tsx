@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
@@ -8,30 +8,33 @@ import { Campaign } from '../types';
 
 const AdvertisePage = () => {
     const { state, dispatch } = useContext(AppContext);
+    const navigate = useNavigate();
     const [submitted, setSubmitted] = useState(false);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
+        const campaignId = `camp-${Date.now()}`;
         const newCampaign: Campaign = {
-            id: `camp-${Date.now()}`,
+            id: campaignId,
             companyName: formData.get('companyName') as string,
             contactEmail: formData.get('contactEmail') as string,
             productName: formData.get('productName') as string,
             taskDescription: formData.get('taskDescription') as string,
             targetUrl: formData.get('targetUrl') as string,
             taskType: 'visit_website', // Default
-            budget: 0,
-            cpa: 0,
-            userCreditReward: 0,
-            status: 'pending_review',
+            budget: 0, // Admin will set this after payment
+            cpa: 0, // Admin will set this
+            userCreditReward: 0, // Admin will set this
+            status: 'pending_payment',
             submittedAt: new Date().toISOString(),
         };
         
         // In a real app, this would be an API call. Here we dispatch to context.
         dispatch({ type: 'ADD_CAMPAIGN', payload: newCampaign });
         
-        setSubmitted(true);
+        // Redirect to payment page
+        navigate(`/advertise/${campaignId}/pay`);
     };
 
 
@@ -85,7 +88,7 @@ const AdvertisePage = () => {
                                     ></textarea>
                                 </div>
                                 <div className="pt-2">
-                                    <Button type="submit" className="w-full">Submit for Review</Button>
+                                    <Button type="submit" className="w-full">Proceed to Payment</Button>
                                 </div>
                             </form>
                         </>
