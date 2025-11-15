@@ -49,8 +49,9 @@ const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
                             </svg>
                         </button>
-                        <Link to="/app/dashboard" className="text-xl font-bold text-slate-900 dark:text-white">
-                            Hello<span className="text-brand-cyan">Jadan</span>AI
+                        <Link to="/app/dashboard" className="flex items-center space-x-2 text-xl font-bold text-slate-900 dark:text-white">
+                            {state.brandingSettings.logoUrl && <img src={state.brandingSettings.logoUrl} alt="Logo" className="h-8 w-auto" />}
+                            <span>Hello<span className="text-brand-cyan">Jadan</span>AI</span>
                         </Link>
                     </div>
                     <div className="flex items-center space-x-4">

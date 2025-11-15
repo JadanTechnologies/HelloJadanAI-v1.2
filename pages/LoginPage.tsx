@@ -9,7 +9,7 @@ import Card from '../components/common/Card';
 type LoginType = 'user' | 'admin';
 
 const LoginPage = () => {
-  const { login, loginAsAdmin } = useContext(AppContext);
+  const { login, loginAsAdmin, state } = useContext(AppContext);
   const { t } = useTranslation();
   
   const [loginType, setLoginType] = useState<LoginType>('user');
@@ -42,7 +42,10 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-brand-navy">
       <div className="w-full max-w-md">
-        <Link to="/" className="text-center mb-8 block">
+        <Link to="/" className="flex items-center justify-center space-x-3 text-center mb-8">
+            {state.brandingSettings.logoUrl && (
+                <img src={state.brandingSettings.logoUrl} alt="Logo" className="h-10 w-auto" />
+            )}
             <h1 className="text-4xl font-bold text-white">
                 Hello<span className="text-brand-cyan">Jadan</span>AI
             </h1>

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
@@ -40,13 +40,6 @@ const PlatformSettingsPage = () => {
     // FAQ Modal State
     const [isFaqModalOpen, setIsFaqModalOpen] = useState(false);
     const [editingFaq, setEditingFaq] = useState<FAQItem | null>(null);
-
-    // Sync local state if global context changes
-    useEffect(() => {
-        setBranding(state.brandingSettings);
-        setContent(state.contentSettings);
-        setSystemSettings(state.systemSettings);
-    }, [state.brandingSettings, state.contentSettings, state.systemSettings]);
 
     const handleSave = () => {
         setIsSaving(true);

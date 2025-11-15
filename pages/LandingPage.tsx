@@ -95,6 +95,9 @@ const LandingPage: React.FC = () => {
             <header className="absolute top-0 left-0 right-0 z-10 p-4">
                 <div className="container mx-auto flex justify-between items-center">
                     <Link to="/" className="flex items-center space-x-2 text-xl font-bold text-slate-900 dark:text-white">
+                        {brandingSettings.logoUrl && (
+                            <img src={brandingSettings.logoUrl} alt="Logo" className="h-8 w-auto" />
+                        )}
                         <span>Hello<span className="text-brand-cyan">Jadan</span>AI</span>
                     </Link>
                     <div className="flex items-center space-x-2">
