@@ -21,6 +21,7 @@
               'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
               'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
               'hologram-rotate': 'hologram-rotate 20s linear infinite',
+              'pulse-subtle': 'pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
             },
             keyframes: {
               'pulse-glow': {
@@ -34,6 +35,10 @@
               'hologram-rotate': {
                 '0%': { transform: 'rotateX(20deg) rotateY(0deg)' },
                 '100%': { transform: 'rotateX(20deg) rotateY(360deg)' },
+              },
+              'pulse-subtle': {
+                '0%, 100%': { transform: 'scale(1)', opacity: '0.5' },
+                '50%': { transform: 'scale(1.05)', opacity: '1' },
               }
             }
           }

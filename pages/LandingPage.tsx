@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
 import { ImageIcon, VideoIcon, AdIcon, TaskIcon, CreditIcon } from '../constants';
 
-const Hologram: React.FC = () => {
+const Hologram: React.FC<{ rotation: { x: number; y: number } }> = ({ rotation }) => {
     const Face: React.FC<{ children: React.ReactNode, className?: string }> = ({ children, className }) => (
         <div className={`absolute w-[200px] h-[200px] bg-brand-cyan/10 border border-brand-cyan/50 flex items-center justify-center text-brand-cyan ${className}`}>
             {children}
@@ -14,7 +14,10 @@ const Hologram: React.FC = () => {
 
     return (
         <div className="relative w-[200px] h-[200px] perspective-[1000px] group">
-            <div className="w-full h-full relative transform-style-3d animate-hologram-rotate">
+            <div
+                className="w-full h-full relative transform-style-3d transition-transform duration-300 ease-out"
+                style={{ transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)` }}
+            >
                 <Face className="transform rotate-y-0 translate-z-[100px]"><ImageIcon className="w-16 h-16" /></Face>
                 <Face className="transform rotate-y-90 translate-z-[100px]"><VideoIcon className="w-16 h-16" /></Face>
                 <Face className="transform rotate-y-180 translate-z-[100px]"><AdIcon className="w-16 h-16" /></Face>
@@ -50,6 +53,10 @@ const ThemeToggle: React.FC<{ theme: string; toggleTheme: () => void; }> = ({ th
 const LandingPage: React.FC = () => {
     const { t } = useTranslation();
     const [theme, setTheme] = useState('dark');
+    const [rotation, setRotation] = useState({ x: 20, y: 0 });
+    const heroRef = useRef<HTMLElement>(null);
+    const howItWorksRef = useRef<HTMLElement>(null);
+    const [isHowItWorksVisible, setIsHowItWorksVisible] = useState(false);
 
     useEffect(() => {
         const root = window.document.documentElement;
@@ -60,8 +67,50 @@ const LandingPage: React.FC = () => {
         }
     }, [theme]);
 
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsHowItWorksVisible(true);
+                    observer.unobserve(entry.target);
+                }
+            },
+            { threshold: 0.1 }
+        );
+
+        if (howItWorksRef.current) {
+            observer.observe(howItWorksRef.current);
+        }
+
+        return () => {
+            if (howItWorksRef.current) {
+                observer.unobserve(howItWorksRef.current);
+            }
+        };
+    }, []);
+
     const toggleTheme = () => {
         setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+    };
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+        if (!heroRef.current) return;
+        const rect = heroRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const deltaX = (x - centerX) / centerX;
+        const deltaY = (y - centerY) / centerY;
+
+        setRotation({
+            x: 20 - (deltaY * 15),
+            y: deltaX * -25,
+        });
+    };
+
+    const handleMouseLeave = () => {
+        setRotation({ x: 20, y: 0 });
     };
 
     return (
@@ -82,12 +131,17 @@ const LandingPage: React.FC = () => {
 
             <main>
                 {/* Hero Section */}
-                <section className="relative flex flex-col items-center justify-center h-screen text-center px-4">
+                <section
+                    ref={heroRef}
+                    onMouseMove={handleMouseMove}
+                    onMouseLeave={handleMouseLeave}
+                    className="relative flex flex-col items-center justify-center h-screen text-center px-4"
+                >
                     <div className="absolute inset-0 bg-slate-50 dark:bg-slate-900/50 [mask-image:linear-gradient(0deg,transparent,black)]"></div>
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-brand-indigo/10 dark:bg-brand-indigo/20 rounded-full blur-3xl animate-pulse-glow"></div>
                     
                     <div className="z-10">
-                        <Hologram />
+                        <Hologram rotation={rotation} />
                     </div>
 
                     <div className="relative z-10 mt-8">
@@ -131,32 +185,32 @@ const LandingPage: React.FC = () => {
                 </section>
 
                  {/* How it Works Section */}
-                 <section className="py-20 px-4">
+                 <section ref={howItWorksRef} className="py-20 px-4">
                      <div className="container mx-auto text-center">
                          <h3 className="text-3xl font-bold text-slate-900 dark:text-white">Simple, Fun, and Free</h3>
                          <p className="text-slate-600 dark:text-slate-400 mt-2 max-w-xl mx-auto">Our unique Task-to-Earn system puts creative power in your hands without the cost.</p>
-                        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 md:items-center">
-                            <div className="flex flex-col items-center">
+                        <div className="mt-12 grid grid-cols-1 md:grid-cols-5 gap-8 md:items-center">
+                            <div className={`flex flex-col items-center transition-all duration-500 ease-out ${isHowItWorksVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
                                 <div className="flex items-center justify-center w-24 h-24 bg-slate-100 dark:bg-slate-800 border-2 border-brand-cyan rounded-full text-brand-cyan text-4xl font-bold">1</div>
                                 <h4 className="text-xl font-semibold mt-4 text-slate-900 dark:text-white">Complete Tasks</h4>
                                 <p className="text-slate-600 dark:text-slate-400 mt-2">Engage in simple tasks like daily logins or sharing content.</p>
                             </div>
-                             <div className="text-brand-cyan/50 hidden md:block">
+                             <div className={`text-brand-cyan/50 hidden md:block transition-opacity duration-500 delay-200 ${isHowItWorksVisible ? 'opacity-100 animate-pulse-subtle' : 'opacity-0'}`}>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12 mx-auto">
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
                                 </svg>
                             </div>
-                            <div className="flex flex-col items-center">
+                            <div className={`flex flex-col items-center transition-all duration-500 ease-out delay-200 ${isHowItWorksVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
                                 <div className="flex items-center justify-center w-24 h-24 bg-slate-100 dark:bg-slate-800 border-2 border-brand-cyan rounded-full text-brand-cyan text-4xl font-bold">2</div>
                                 <h4 className="text-xl font-semibold mt-4 text-slate-900 dark:text-white">Earn Credits</h4>
                                 <p className="text-slate-600 dark:text-slate-400 mt-2">Watch your credit balance grow with every task you complete.</p>
                             </div>
-                             <div className="text-brand-cyan/50 hidden md:block">
+                             <div className={`text-brand-cyan/50 hidden md:block transition-opacity duration-500 delay-400 ${isHowItWorksVisible ? 'opacity-100 animate-pulse-subtle' : 'opacity-0'}`}>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12 mx-auto">
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
                                 </svg>
                             </div>
-                             <div className="flex flex-col items-center">
+                             <div className={`flex flex-col items-center transition-all duration-500 ease-out delay-400 ${isHowItWorksVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
                                 <div className="flex items-center justify-center w-24 h-24 bg-slate-100 dark:bg-slate-800 border-2 border-brand-cyan rounded-full text-brand-cyan text-4xl font-bold">3</div>
                                 <h4 className="text-xl font-semibold mt-4 text-slate-900 dark:text-white">Create & Innovate</h4>
                                 <p className="text-slate-600 dark:text-slate-400 mt-2">Use your credits to generate unlimited AI content.</p>
