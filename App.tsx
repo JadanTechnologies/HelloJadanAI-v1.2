@@ -13,18 +13,8 @@ import Tasks from './pages/Tasks';
 import Gallery from './pages/Gallery';
 import Admin from './pages/Admin';
 import CreditHistory from './pages/CreditHistory';
-import LandingPage from './pages/LandingPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
-
-/**
- * A component that renders child routes (via Outlet in Layout) only if the user is authenticated.
- * Otherwise, it redirects to the login page.
- */
-const ProtectedRoutes: React.FC = () => {
-  const { state } = useContext(AppContext);
-  return state.user ? <Layout /> : <Navigate to="/login" />;
-};
 
 function App() {
   const { state } = useContext(AppContext);
@@ -36,7 +26,8 @@ function App() {
         {/* === UNAUTHENTICATED ROUTES === */}
         {/* These routes are only accessible when the user is logged out. */}
         {/* If a logged-in user tries to access them, they are redirected to their dashboard. */}
-        <Route path="/" element={!user ? <LandingPage /> : <Navigate to="/app" />} />
+        {/* Admin login is now the default entry point for the app. */}
+        <Route path="/" element={!user ? <Navigate to="/admin/login" /> : <Navigate to="/app" />} />
         <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/app" />} />
         <Route path="/admin/login" element={!user ? <AdminLoginPage /> : <Navigate to="/app" />} />
         <Route path="/forgot-password" element={!user ? <ForgotPasswordPage /> : <Navigate to="/app" />} />
@@ -44,7 +35,7 @@ function App() {
 
         {/* === AUTHENTICATED ROUTES === */}
         {/* All routes under "/app" are protected. The Layout is rendered here for all child routes. */}
-        <Route path="/app" element={<ProtectedRoutes />}>
+        <Route path="/app" element={user ? <Layout /> : <Navigate to="/login" />}>
           {/* Default authenticated route: directs to admin panel or user dashboard */}
           <Route index element={<Navigate to={user?.isAdmin ? 'admin' : 'dashboard'} />} />
           
