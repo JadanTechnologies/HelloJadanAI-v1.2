@@ -50,5 +50,7 @@
   "loginDetails": "Bayanin Shiga",
   "loginHistory": "Tarihin Shiga",
   "notEnoughCredits": "Babu isassun kiredit don yin wannan aikin.",
-  "generationFailed": "Kirkira ya gaza. Don Allah a sake gwadawa."
+  "generationFailed": "Kirkira ya gaza. Don Allah a sake gwadawa.",
+  "adminLoginInfoTitle": "Bayanin Shiga na Gwaji",
+  "adminLoginInfoText": "Yi amfani da waɗannan bayanan don shiga a matsayin mai gudanarwa:"
 }

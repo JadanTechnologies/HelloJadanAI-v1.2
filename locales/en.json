@@ -50,5 +50,7 @@
   "loginDetails": "Login Details",
   "loginHistory": "Login History",
   "notEnoughCredits": "Not enough credits to perform this action.",
-  "generationFailed": "Generation Failed. Please try again."
+  "generationFailed": "Generation Failed. Please try again.",
+  "adminLoginInfoTitle": "Demo Credentials",
+  "adminLoginInfoText": "Use the following credentials to log in as an administrator:"
 }
