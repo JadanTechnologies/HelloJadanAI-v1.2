@@ -53,6 +53,11 @@ export const mockApiSettings: ApiSettings = {
   twilio: { accountSid: '', authToken: '', phoneNumber: '' },
   oneSignal: { appId: '', restApiKey: '' },
   ipLookup: { provider: 'Mock Service', apiKey: '' },
+  aiProviders: {
+    gemini: { apiKey: '' },
+    dalle: { apiKey: '' },
+    runway: { apiKey: '' },
+  },
 };
 
 export const mockEmailTemplates: EmailTemplate[] = [

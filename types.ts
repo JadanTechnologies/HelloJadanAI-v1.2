@@ -144,6 +144,11 @@ export interface ApiSettings {
     provider: string;
     apiKey: string;
   };
+  aiProviders: {
+    gemini: { apiKey: string };
+    dalle: { apiKey: string };
+    runway: { apiKey: string };
+  };
 }
 
 export interface CronJob {

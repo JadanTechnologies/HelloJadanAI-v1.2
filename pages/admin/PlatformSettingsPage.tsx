@@ -263,6 +263,23 @@ const PlatformSettingsPage = () => {
                                 </div>
                             </div>
                         </div>
+                        <div>
+                            <h3 className="text-lg font-semibold text-slate-200 border-b border-slate-700 pb-2 mb-4">AI Provider API Keys</h3>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-sm font-medium text-slate-300">Google Gemini API Key</label>
+                                    <Input type="password" value={apiSettings.aiProviders.gemini.apiKey} onChange={e => setApiSettings(p => ({...p, aiProviders: {...p.aiProviders, gemini: { apiKey: e.target.value }}}))} className={inputClasses} />
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-slate-300">OpenAI DALL-E 3 API Key</label>
+                                    <Input type="password" value={apiSettings.aiProviders.dalle.apiKey} onChange={e => setApiSettings(p => ({...p, aiProviders: {...p.aiProviders, dalle: { apiKey: e.target.value }}}))} className={inputClasses} />
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-slate-300">RunwayML API Key</label>
+                                    <Input type="password" value={apiSettings.aiProviders.runway.apiKey} onChange={e => setApiSettings(p => ({...p, aiProviders: {...p.aiProviders, runway: { apiKey: e.target.value }}}))} className={inputClasses} />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                  </Card>
             )}
