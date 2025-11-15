@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { NavLink, Link, useLocation, Outlet } from 'react-router-dom';
 import { AppContext } from '../../contexts/AppContext';
 import { useTranslation } from '../../hooks/useTranslation';
-import { AdminIcon, AnalyticsIcon, SettingsIcon, ChecklistIcon, ShieldCheckIcon, EnvelopeIcon, MegaphoneIcon, ClockIcon, ReferralIcon, ShieldExclamationIcon } from '../../constants';
+import { AdminIcon, AnalyticsIcon, SettingsIcon, ChecklistIcon, ShieldCheckIcon, EnvelopeIcon, MegaphoneIcon, ClockIcon, ReferralIcon, ShieldExclamationIcon, IdentificationIcon } from '../../constants';
 
 const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
     const { state, logout } = useContext(AppContext);
@@ -85,6 +85,7 @@ const Sidebar: React.FC<{ isOpen: boolean, setIsOpen: (isOpen: boolean) => void 
                         <div className="pt-4 mt-4 border-t border-slate-800">
                             <h3 className="px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Management</h3>
                             <NavItem to="/admin/users" icon={<AdminIcon className="w-5 h-5"/>} label={t('userManagement')} onClick={closeSidebar}/>
+                            <NavItem to="/admin/staff" icon={<IdentificationIcon className="w-5 h-5" />} label="Staff Management" onClick={closeSidebar} />
                             <NavItem to="/admin/tasks" icon={<ChecklistIcon className="w-5 h-5" />} label="Task Management" onClick={closeSidebar} />
                             <NavItem to="/admin/task-monitoring" icon={<ShieldCheckIcon className="w-5 h-5" />} label="Task Monitoring" onClick={closeSidebar} />
                         </div>

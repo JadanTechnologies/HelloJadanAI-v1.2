@@ -31,6 +31,7 @@ import CronJobPage from './pages/admin/CronJobPage';
 import ReferralManagementPage from './pages/admin/ReferralManagementPage';
 import FraudDetectionPage from './pages/admin/FraudDetectionPage';
 import AccessControlPage from './pages/admin/AccessControlPage';
+import StaffManagementPage from './pages/admin/StaffManagementPage';
 
 
 function App() {
@@ -70,6 +71,7 @@ function App() {
           <Route index element={<Navigate to="dashboard" />} />
           <Route path="dashboard" element={<AdminDashboardPage />} />
           <Route path="users" element={<UserManagementPage />} />
+          <Route path="staff" element={<StaffManagementPage />} />
           <Route path="logins" element={<LoginDetailsPage />} />
           <Route path="settings" element={<PlatformSettingsPage />} />
           <Route path="tasks" element={<TaskManagementPage />} />

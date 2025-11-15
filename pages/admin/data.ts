@@ -1,4 +1,4 @@
-import { User, Task, BrandingSettings, ContentSettings, TaskSubmission, ApiSettings, EmailTemplate, SmsTemplate, Announcement, CronJob, Referral, SystemSettings, AccessRestrictionRule } from '../../types';
+import { User, Task, BrandingSettings, ContentSettings, TaskSubmission, ApiSettings, EmailTemplate, SmsTemplate, Announcement, CronJob, Referral, SystemSettings, AccessRestrictionRule, StaffMember } from '../../types';
 import { LOGO_DATA_URL } from '../../constants';
 
 export const mockUsers: User[] = [
@@ -78,6 +78,11 @@ export const mockCronJobs: CronJob[] = [
   { id: 'cron-1', name: 'Daily Credit Reset', schedule: '0 0 * * *', status: 'idle', lastRun: new Date(Date.now() - 86400000).toISOString(), nextRun: new Date(Date.now() + 86400000).toISOString() },
   { id: 'cron-2', name: 'Weekly Inactive User Cleanup', schedule: '0 2 * * 0', status: 'idle', lastRun: new Date(Date.now() - 86400000 * 7).toISOString(), nextRun: new Date(Date.now() + 86400000 * 7).toISOString() },
   { id: 'cron-3', name: 'Sync Analytics Data', schedule: '*/30 * * * *', status: 'running', lastRun: new Date(Date.now() - 1800000).toISOString(), nextRun: new Date(Date.now() + 1800000).toISOString() },
+];
+
+export const mockStaff: StaffMember[] = [
+    { id: 'staff-1', userId: 'user-1', username: 'Jadan', email: 'jadan@example.com', avatar: 'https://picsum.photos/seed/jadan/100/100', role: 'Admin' },
+    { id: 'staff-2', userId: 'user-2', username: 'Alex', email: 'alex@example.com', avatar: 'https://picsum.photos/seed/alex/100/100', role: 'Moderator' },
 ];
 
 export const mockReferrals: Referral[] = [

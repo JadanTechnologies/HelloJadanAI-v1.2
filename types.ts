@@ -160,6 +160,17 @@ export interface CronJob {
   nextRun: string;
 }
 
+export type StaffRole = 'Admin' | 'Moderator' | 'Support';
+
+export interface StaffMember {
+  id: string;
+  userId: string;
+  username: string;
+  email: string;
+  avatar: string;
+  role: StaffRole;
+}
+
 export interface Referral {
     id: string;
     referrerId: string;
