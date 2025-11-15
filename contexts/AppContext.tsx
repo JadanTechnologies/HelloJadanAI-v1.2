@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, ReactNode } from 'react';
-import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement, Referral, SystemSettings, AccessRestrictionRule, GenerationType, BrandingSettings, ContentSettings } from '../types';
-import { mockAnnouncements, mockReferrals, mockSystemSettings, mockBrandingSettings, mockContentSettings } from '../pages/admin/data';
+import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement, Referral, SystemSettings, AccessRestrictionRule, GenerationType, BrandingSettings, ContentSettings, Campaign } from '../types';
+import { mockAnnouncements, mockReferrals, mockSystemSettings, mockBrandingSettings, mockContentSettings, mockCampaigns } from '../pages/admin/data';
 
 const mockAdminUser: User = {
     id: 'user-1',
@@ -70,6 +70,7 @@ const initialState: AppState = {
   systemSettings: mockSystemSettings,
   brandingSettings: mockBrandingSettings,
   contentSettings: mockContentSettings,
+  campaigns: mockCampaigns,
 };
 
 const appReducer = (state: AppState, action: AppAction): AppState => {
@@ -155,6 +156,15 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
             brandingSettings: action.payload.brandingSettings,
             contentSettings: action.payload.contentSettings,
         };
+    case 'ADD_CAMPAIGN':
+      return { ...state, campaigns: [action.payload, ...state.campaigns] };
+    case 'UPDATE_CAMPAIGN':
+      return { 
+          ...state, 
+          campaigns: state.campaigns.map(c => 
+              c.id === action.payload.id ? action.payload : c
+          ) 
+      };
     case 'INCREMENT_DAILY_GENERATION':
         if (!state.user) return state;
         const { type } = action.payload;

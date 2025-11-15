@@ -120,6 +120,18 @@ const LandingPage: React.FC = () => {
                     </div>
                 </section>
                 
+                <section id="advertise" className="py-20 px-4 bg-slate-100 dark:bg-brand-navy">
+                    <div className="container mx-auto text-center max-w-3xl">
+                        <h3 className="text-3xl font-bold text-slate-900 dark:text-white">Promote Your Product</h3>
+                        <p className="text-slate-600 dark:text-slate-400 mt-4 leading-relaxed">
+                            Reach thousands of creative users by sponsoring tasks on our platform. Drive traffic, generate leads, and boost sign-ups for your product or service.
+                        </p>
+                        <Link to="/advertise" className="mt-8 inline-block">
+                            <Button variant="secondary" className="text-lg px-8 py-3">Learn More & Get Started</Button>
+                        </Link>
+                    </div>
+                </section>
+
                 <section id="about" className="py-20 px-4 bg-slate-50 dark:bg-slate-900/50">
                     <div className="container mx-auto text-center max-w-3xl">
                         <h3 className="text-3xl font-bold text-slate-900 dark:text-white">About Us</h3>
@@ -146,6 +158,7 @@ const LandingPage: React.FC = () => {
             
             <footer className="bg-slate-100 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 p-8 text-center text-slate-500">
                 <div className="space-x-4 mb-4">
+                    <Link to="/advertise" className="hover:text-brand-cyan transition">Advertise With Us</Link>
                     <button onClick={() => setModalContent({title: "Terms of Service", content: contentSettings.termsOfService})} className="hover:text-brand-cyan transition">Terms of Service</button>
                     <button onClick={() => setModalContent({title: "Privacy Policy", content: contentSettings.privacyPolicy})} className="hover:text-brand-cyan transition">Privacy Policy</button>
                 </div>

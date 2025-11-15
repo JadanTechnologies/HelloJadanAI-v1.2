@@ -1,4 +1,4 @@
-import { User, Task, BrandingSettings, ContentSettings, TaskSubmission, ApiSettings, EmailTemplate, SmsTemplate, Announcement, CronJob, Referral, SystemSettings, AccessRestrictionRule, StaffMember } from '../../types';
+import { User, Task, BrandingSettings, ContentSettings, TaskSubmission, ApiSettings, EmailTemplate, SmsTemplate, Announcement, CronJob, Referral, SystemSettings, AccessRestrictionRule, StaffMember, Campaign } from '../../types';
 import { LOGO_DATA_URL } from '../../constants';
 
 export const mockUsers: User[] = [
@@ -90,6 +90,53 @@ export const mockReferrals: Referral[] = [
     { id: 'ref-2', referrerId: 'user-1', referrerUsername: 'Jadan', refereeId: 'user-3', refereeUsername: 'Sam', status: 'signed_up', createdAt: new Date(Date.now() - 86400000).toISOString() },
 ];
 
+export const mockCampaigns: Campaign[] = [
+    {
+        id: 'camp-1',
+        companyName: 'Innovate Inc.',
+        contactEmail: 'contact@innovate.com',
+        productName: 'Synth AI Assistant',
+        taskDescription: 'Sign up for early access to our new AI assistant and get a free trial.',
+        targetUrl: 'https://innovate.com/signup',
+        taskType: 'signup',
+        budget: 500,
+        cpa: 2.0,
+        userCreditReward: 100,
+        status: 'active',
+        submittedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+        imageUrl: 'https://picsum.photos/seed/innovate/200/200'
+    },
+    {
+        id: 'camp-2',
+        companyName: 'Gamerz United',
+        contactEmail: 'ads@gamerzu.com',
+        productName: 'CyberRonin 2088',
+        taskDescription: 'Visit the official website for our upcoming game CyberRonin 2088.',
+        targetUrl: 'https://cyberronin2088.com',
+        taskType: 'visit_website',
+        budget: 200,
+        cpa: 0.5,
+        userCreditReward: 25,
+        status: 'pending_review',
+        submittedAt: new Date(Date.now() - 86400000).toISOString(),
+        imageUrl: 'https://picsum.photos/seed/gamerz/200/200'
+    },
+     {
+        id: 'camp-3',
+        companyName: 'EcoWear',
+        contactEmail: 'partner@ecowear.com',
+        productName: 'Sustainable Sneakers',
+        taskDescription: 'Check out our new line of eco-friendly sneakers.',
+        targetUrl: 'https://ecowear.com',
+        taskType: 'visit_website',
+        budget: 0,
+        cpa: 1.0,
+        userCreditReward: 50,
+        status: 'completed',
+        submittedAt: new Date(Date.now() - 86400000 * 10).toISOString(),
+    }
+];
+
 const mockAccessRules: AccessRestrictionRule[] = [
     { id: 'rule-1', type: 'block', criteria: 'country', value: 'Nigeria' },
     { id: 'rule-2', type: 'block', criteria: 'ip', value: '203.0.113.40' },
@@ -105,6 +152,7 @@ export const mockSystemSettings: SystemSettings = {
         maxSignupsPerIp: 3,
     },
     accessRestrictions: mockAccessRules,
+    sponsoredTasksEnabled: true,
     dailyGenerationLimits: {
         image: 10,
         video: 2,

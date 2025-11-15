@@ -1,13 +1,79 @@
 import React, { useState, useContext } from 'react';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
+import Modal from '../../components/common/Modal';
 import { mockTaskSubmissions } from './data';
 import { TaskSubmission } from '../../types';
 import { AppContext } from '../../contexts/AppContext';
 
+// New Modal component for reviewing proof
+interface ProofReviewModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onApprove: (submissionId: string) => void;
+    onReject: (submissionId: string) => void;
+    submission: TaskSubmission | null;
+}
+
+const ProofReviewModal: React.FC<ProofReviewModalProps> = ({ isOpen, onClose, onApprove, onReject, submission }) => {
+    if (!isOpen || !submission) return null;
+
+    const isUrl = (text: string) => {
+        try {
+            const url = new URL(text);
+            return url.protocol === "http:" || url.protocol === "https:";
+        } catch (_) {
+            return false;
+        }
+    };
+
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} title={`Review Submission: ${submission.taskTitle}`}>
+            <div className="space-y-4">
+                <div>
+                    <h4 className="font-semibold text-slate-300">User</h4>
+                    <div className="flex items-center space-x-2 mt-1">
+                        <img src={submission.avatar} alt={submission.username} className="w-8 h-8 rounded-full" />
+                        <span className="text-white">{submission.username}</span>
+                    </div>
+                </div>
+                 <div>
+                    <h4 className="font-semibold text-slate-300">Submitted Proof</h4>
+                    <div className="mt-1 p-3 bg-slate-800 border border-slate-700 rounded-lg max-h-48 overflow-y-auto">
+                        {isUrl(submission.proof) ? (
+                            <a href={submission.proof} target="_blank" rel="noopener noreferrer" className="text-brand-cyan hover:underline break-all">{submission.proof}</a>
+                        ) : (
+                            <p className="text-white whitespace-pre-wrap break-words">{submission.proof}</p>
+                        )}
+                    </div>
+                </div>
+            </div>
+            <div className="mt-6 pt-4 border-t border-slate-700 flex justify-end space-x-2">
+                <Button variant="secondary" onClick={onClose}>Cancel</Button>
+                <Button onClick={() => onReject(submission.id)} className="!bg-red-600/50 hover:!bg-red-600">Reject</Button>
+                <Button onClick={() => onApprove(submission.id)} className="!bg-green-600/50 hover:!bg-green-600">Approve</Button>
+            </div>
+        </Modal>
+    );
+};
+
+
 const TaskMonitoringPage = () => {
     const { dispatch } = useContext(AppContext);
     const [submissions, setSubmissions] = useState<TaskSubmission[]>(mockTaskSubmissions);
+    const [isProofModalOpen, setIsProofModalOpen] = useState(false);
+    const [selectedSubmission, setSelectedSubmission] = useState<TaskSubmission | null>(null);
+
+    const handleOpenProofModal = (submission: TaskSubmission) => {
+        setSelectedSubmission(submission);
+        setIsProofModalOpen(true);
+    };
+
+    const handleCloseProofModal = () => {
+        setSelectedSubmission(null);
+        setIsProofModalOpen(false);
+    };
+
 
     const handleApprove = (submissionId: string) => {
         const submission = submissions.find(s => s.id === submissionId);
@@ -20,8 +86,11 @@ const TaskMonitoringPage = () => {
                     type: 'success',
                 }
             });
+            // NOTE: This assumes the reducer logic correctly handles status transition from 'pending' to 'completed' and awards credits.
+            dispatch({ type: 'UPDATE_TASK_STATUS', payload: { taskId: submission.taskId, userId: submission.userId, status: 'completed' } });
         }
         setSubmissions(current => current.filter(s => s.id !== submissionId));
+        handleCloseProofModal();
     };
     
     const handleReject = (submissionId: string) => {
@@ -35,8 +104,11 @@ const TaskMonitoringPage = () => {
                     type: 'warning',
                 }
             });
+            // NOTE: This assumes the reducer logic can handle this transition to allow user to re-submit.
+            dispatch({ type: 'UPDATE_TASK_STATUS', payload: { taskId: submission.taskId, userId: submission.userId, status: 'incomplete' } });
          }
         setSubmissions(current => current.filter(s => s.id !== submissionId));
+        handleCloseProofModal();
     };
 
     return (
@@ -66,11 +138,10 @@ const TaskMonitoringPage = () => {
                                             <span>{sub.username}</span>
                                         </td>
                                         <td className="px-6 py-4">{sub.taskTitle}</td>
-                                        <td className="px-6 py-4 font-mono text-xs bg-slate-900 rounded-md p-2">{sub.proof}</td>
+                                        <td className="px-6 py-4 font-mono text-xs bg-slate-900 rounded-md p-2 max-w-xs truncate">{sub.proof}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{new Date(sub.submittedAt).toLocaleString()}</td>
                                         <td className="px-6 py-4 text-right space-x-2">
-                                            <Button onClick={() => handleApprove(sub.id)} className="!bg-green-600/50 hover:!bg-green-600 py-1 px-2 text-xs">Approve</Button>
-                                            <Button onClick={() => handleReject(sub.id)} className="!bg-red-600/50 hover:!bg-red-600 py-1 px-2 text-xs">Reject</Button>
+                                            <Button onClick={() => handleOpenProofModal(sub)} className="py-1 px-2 text-xs">Review Proof</Button>
                                         </td>
                                     </tr>
                                 ))}
@@ -84,6 +155,14 @@ const TaskMonitoringPage = () => {
                     </div>
                 )}
             </Card>
+
+            <ProofReviewModal
+                isOpen={isProofModalOpen}
+                onClose={handleCloseProofModal}
+                onApprove={handleApprove}
+                onReject={handleReject}
+                submission={selectedSubmission}
+            />
         </div>
     );
 };

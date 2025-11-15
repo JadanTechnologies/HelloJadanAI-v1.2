@@ -189,6 +189,22 @@ export interface AccessRestrictionRule {
     value: string;
 }
 
+export interface Campaign {
+  id: string;
+  companyName: string;
+  contactEmail: string;
+  productName: string;
+  taskDescription: string;
+  targetUrl: string;
+  taskType: 'visit_website' | 'signup';
+  budget: number; // total budget in USD
+  cpa: number; // cost per action in USD
+  userCreditReward: number; // credits given to user, set by admin
+  status: 'pending_review' | 'active' | 'paused' | 'completed' | 'rejected';
+  submittedAt: string;
+  imageUrl?: string;
+}
+
 export interface SystemSettings {
     referralRewards: {
         signUp: number;
@@ -199,6 +215,7 @@ export interface SystemSettings {
         maxSignupsPerIp: number;
     };
     accessRestrictions: AccessRestrictionRule[];
+    sponsoredTasksEnabled: boolean;
     dailyGenerationLimits: {
         image: number;
         video: number;
@@ -218,6 +235,7 @@ export interface AppState {
   systemSettings: SystemSettings;
   brandingSettings: BrandingSettings;
   contentSettings: ContentSettings;
+  campaigns: Campaign[];
 }
 
 export type AppAction =
@@ -234,6 +252,8 @@ export type AppAction =
   | { type: 'MARK_NOTIFICATION_AS_READ'; payload: string }
   | { type: 'UPDATE_SYSTEM_SETTINGS'; payload: SystemSettings }
   | { type: 'UPDATE_PLATFORM_SETTINGS'; payload: { brandingSettings: BrandingSettings; contentSettings: ContentSettings } }
+  | { type: 'ADD_CAMPAIGN'; payload: Campaign }
+  | { type: 'UPDATE_CAMPAIGN'; payload: Campaign }
   | { type: 'INCREMENT_DAILY_GENERATION'; payload: { type: GenerationType } };
 
 export type GenerationType = 'image' | 'video' | 'ad';

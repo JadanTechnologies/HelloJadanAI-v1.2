@@ -53,14 +53,37 @@ const Tasks = () => {
   const [isProofModalOpen, setIsProofModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
-  const handleCompleteTask = (task: Task) => {
+  const handleCompleteTask = (task: Task, isSponsored: boolean = false) => {
     if (task.status !== 'incomplete' || !state.user) return;
     
-    if (task.requiresProof) {
-        setSelectedTask(task);
-        setIsProofModalOpen(true);
+     if (isSponsored) {
+        const campaign = state.campaigns.find(c => c.id === task.id);
+        if (!campaign) return;
+
+        dispatch({ type: 'UPDATE_CREDITS', payload: state.credits + task.creditReward });
+        dispatch({ type: 'ADD_CREDIT_TRANSACTION', payload: { id: `tx-camp-${Date.now()}`, description: `Sponsored Task: ${task.title}`, amount: task.creditReward, date: new Date().toISOString() } });
+        
+        const updatedCampaign = { ...campaign, budget: campaign.budget - campaign.cpa };
+        if (updatedCampaign.budget <= 0) {
+            updatedCampaign.status = 'completed';
+        }
+        dispatch({ type: 'UPDATE_CAMPAIGN', payload: updatedCampaign });
+
+        dispatch({ type: 'ADD_NOTIFICATION', payload: { message: `You earned ${task.creditReward} credits for completing a sponsored task!`, type: 'success' } });
+
+        // In a real app, you would track per-user completion. For this demo, we don't disable the button.
+        // A simple way to provide feedback is to just open the link.
+        if (task.targetUrl) {
+            window.open(task.targetUrl, '_blank');
+        }
+
     } else {
-        dispatch({ type: 'UPDATE_TASK_STATUS', payload: { taskId: task.id, userId: state.user.id, status: 'completed' } });
+        if (task.requiresProof) {
+            setSelectedTask(task);
+            setIsProofModalOpen(true);
+        } else {
+            dispatch({ type: 'UPDATE_TASK_STATUS', payload: { taskId: task.id, userId: state.user.id, status: 'completed' } });
+        }
     }
   };
   
@@ -73,7 +96,12 @@ const Tasks = () => {
     setSelectedTask(null);
   };
 
-  const getTaskButton = (task: Task) => {
+  const getTaskButton = (task: Task, isSponsored: boolean = false) => {
+      // For sponsored tasks, we assume they are always completable for this demo.
+      if (isSponsored) {
+          return <Button onClick={() => handleCompleteTask(task, true)}>Complete Task</Button>
+      }
+
       switch (task.status) {
           case 'completed':
               return <Button disabled>Completed</Button>;
@@ -84,7 +112,7 @@ const Tasks = () => {
       }
   };
 
-  const renderTaskCard = (task: Task) => (
+  const renderTaskCard = (task: Task, isSponsored: boolean = false) => (
       <Card key={task.id} className="flex flex-col md:flex-row md:items-center justify-between">
           <div className="flex-1 mb-4 md:mb-0">
               <h3 className="font-semibold text-lg text-white">{task.title}</h3>
@@ -98,13 +126,29 @@ const Tasks = () => {
               )}
               <div className="text-right">
                   <p className="font-bold text-lg text-brand-cyan mb-2">+{task.creditReward} {t('credits')}</p>
-                  {getTaskButton(task)}
+                  {getTaskButton(task, isSponsored)}
               </div>
           </div>
       </Card>
   );
 
+  const sponsoredTasks: Task[] = state.systemSettings.sponsoredTasksEnabled
+    ? state.campaigns
+        .filter(c => c.status === 'active')
+        .map(c => ({
+            id: c.id,
+            title: c.productName,
+            description: c.taskDescription,
+            creditReward: c.userCreditReward,
+            status: 'incomplete', // Assumed for all users in this demo
+            type: 'engagement',
+            targetUrl: c.targetUrl,
+            requiresProof: c.taskType === 'signup',
+        }))
+    : [];
+
   const taskCategories = {
+      'Sponsored': sponsoredTasks,
       'Daily': state.tasks.filter(t => t.type === 'daily'),
       'Engagement': state.tasks.filter(t => ['engagement', 'social_follow', 'social_share', 'youtube_subscribe'].includes(t.type)),
       'Special': state.tasks.filter(t => ['profile', 'app_download'].includes(t.type)),
@@ -121,7 +165,7 @@ const Tasks = () => {
         tasks.length > 0 && (
           <div className="space-y-6" key={category}>
             <h2 className="text-xl font-semibold text-white border-l-4 border-brand-cyan pl-4">{category} Tasks</h2>
-            {tasks.map(renderTaskCard)}
+            {tasks.map(task => renderTaskCard(task, category === 'Sponsored'))}
           </div>
         )
       ))}
