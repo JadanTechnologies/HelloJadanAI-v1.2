@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { NavLink, Link, useLocation, Outlet } from 'react-router-dom';
 import { AppContext } from '../../contexts/AppContext';
 import { useTranslation } from '../../hooks/useTranslation';
-import { AdminIcon, AnalyticsIcon, SettingsIcon, ChecklistIcon, ShieldCheckIcon, EnvelopeIcon, MegaphoneIcon, ClockIcon, ReferralIcon, ShieldExclamationIcon, IdentificationIcon } from '../../constants';
+import { AdminIcon, AnalyticsIcon, SettingsIcon, ChecklistIcon, ShieldCheckIcon, EnvelopeIcon, MegaphoneIcon, ClockIcon, ReferralIcon, ShieldExclamationIcon, IdentificationIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon } from '../../constants';
 
 const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
     const { state, logout } = useContext(AppContext);
@@ -47,20 +47,21 @@ const navLinkClasses = "flex items-center px-4 py-2.5 text-sm font-medium rounde
 const activeLinkClasses = "bg-brand-indigo text-white shadow-lg";
 const inactiveLinkClasses = "text-slate-400 hover:bg-slate-700 hover:text-white";
 
-const NavItem: React.FC<{ to: string, icon: React.ReactNode, label: string, onClick?: () => void }> = ({ to, icon, label, onClick }) => (
+const NavItem: React.FC<{ to: string, icon: React.ReactNode, label: string, onClick?: () => void, isCollapsed: boolean }> = ({ to, icon, label, onClick, isCollapsed }) => (
     <NavLink
         to={to}
         end
         onClick={onClick}
-        className={({ isActive }) => `${navLinkClasses} ${isActive ? activeLinkClasses : inactiveLinkClasses}`}
+        className={({ isActive }) => `${navLinkClasses} ${isActive ? activeLinkClasses : inactiveLinkClasses} ${isCollapsed ? 'justify-center' : ''}`}
+        title={isCollapsed ? label : undefined}
     >
-        {icon}
-        <span className="ml-3">{label}</span>
+        <div className="flex-shrink-0">{icon}</div>
+        <span className={`whitespace-nowrap transition-all duration-200 ${isCollapsed ? 'w-0 opacity-0 ml-0 hidden' : 'w-auto opacity-100 ml-3'}`}>{label}</span>
     </NavLink>
 );
 
 
-const Sidebar: React.FC<{ isOpen: boolean, setIsOpen: (isOpen: boolean) => void }> = ({ isOpen, setIsOpen }) => {
+const Sidebar: React.FC<{ isOpen: boolean; setIsOpen: (isOpen: boolean) => void; isCollapsed: boolean; toggleCollapse: () => void; }> = ({ isOpen, setIsOpen, isCollapsed, toggleCollapse }) => {
     const { t } = useTranslation();
     const closeSidebar = () => setIsOpen(false);
 
@@ -72,44 +73,58 @@ const Sidebar: React.FC<{ isOpen: boolean, setIsOpen: (isOpen: boolean) => void 
 
     return (
         <>
-            <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-transform duration-300 ease-in-out`}>
-                <div className="flex items-center h-16 px-4 border-b border-slate-800">
-                     <Link to="/admin" className="text-xl font-bold text-white">
-                        Hello<span className="text-brand-cyan">Jadan</span>AI
-                    </Link>
-                </div>
-                <div className="flex flex-col h-full p-4">
-                    <nav className="flex-1 space-y-1">
-                        <NavItem to="/admin/dashboard" icon={<AnalyticsIcon className="w-5 h-5"/>} label="Dashboard" onClick={closeSidebar}/>
-                        
-                        <div className="pt-4 mt-4 border-t border-slate-800">
-                            <h3 className="px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Management</h3>
-                            <NavItem to="/admin/users" icon={<AdminIcon className="w-5 h-5"/>} label={t('userManagement')} onClick={closeSidebar}/>
-                            <NavItem to="/admin/staff" icon={<IdentificationIcon className="w-5 h-5" />} label="Staff Management" onClick={closeSidebar} />
-                            <NavItem to="/admin/tasks" icon={<ChecklistIcon className="w-5 h-5" />} label="Task Management" onClick={closeSidebar} />
-                            <NavItem to="/admin/task-monitoring" icon={<ShieldCheckIcon className="w-5 h-5" />} label="Task Monitoring" onClick={closeSidebar} />
-                        </div>
+            <aside className={`fixed inset-y-0 left-0 z-40 bg-slate-900 border-r border-slate-800 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'}`}>
+                <div className="flex flex-col h-full">
+                    <div className={`flex items-center h-16 px-4 border-b border-slate-800 shrink-0 ${isCollapsed ? 'justify-center' : 'justify-start'}`}>
+                        <Link to="/admin" className={`text-xl font-bold text-white transition-opacity duration-200 whitespace-nowrap ${isCollapsed ? 'opacity-0 absolute' : 'opacity-100'}`}>
+                            Hello<span className="text-brand-cyan">Jadan</span>AI
+                        </Link>
+                        {isCollapsed && (
+                            <Link to="/admin" className="text-xl font-bold text-white">
+                                H<span className="text-brand-cyan">J</span>
+                            </Link>
+                        )}
+                    </div>
+                    
+                    <div className="flex-1 flex flex-col overflow-y-auto">
+                        <nav className="flex-1 space-y-1 p-4">
+                            <NavItem to="/admin/dashboard" icon={<AnalyticsIcon className="w-5 h-5"/>} label="Dashboard" onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                            
+                            <div className={`pt-4 mt-4 border-t border-slate-800 ${isCollapsed ? 'border-none' : ''}`}>
+                                <h3 className={`px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider transition-opacity ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>Management</h3>
+                                <NavItem to="/admin/users" icon={<AdminIcon className="w-5 h-5"/>} label={t('userManagement')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                                <NavItem to="/admin/staff" icon={<IdentificationIcon className="w-5 h-5" />} label="Staff Management" onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                                <NavItem to="/admin/tasks" icon={<ChecklistIcon className="w-5 h-5" />} label="Task Management" onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                                <NavItem to="/admin/task-monitoring" icon={<ShieldCheckIcon className="w-5 h-5" />} label="Task Monitoring" onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                            </div>
 
-                         <div className="pt-4 mt-4 border-t border-slate-800">
-                            <h3 className="px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Growth & Security</h3>
-                            <NavItem to="/admin/referrals" icon={<ReferralIcon className="w-5 h-5" />} label="Referral Management" onClick={closeSidebar} />
-                            <NavItem to="/admin/fraud-detection" icon={<ShieldCheckIcon className="w-5 h-5" />} label="Fraud Detection" onClick={closeSidebar} />
-                            <NavItem to="/admin/access-control" icon={<ShieldExclamationIcon className="w-5 h-5" />} label="Access Control" onClick={closeSidebar} />
-                        </div>
+                             <div className={`pt-4 mt-4 border-t border-slate-800 ${isCollapsed ? 'border-none' : ''}`}>
+                                <h3 className={`px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider transition-opacity ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>Growth & Security</h3>
+                                <NavItem to="/admin/referrals" icon={<ReferralIcon className="w-5 h-5" />} label="Referral Management" onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                                <NavItem to="/admin/fraud-detection" icon={<ShieldCheckIcon className="w-5 h-5" />} label="Fraud Detection" onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                                <NavItem to="/admin/access-control" icon={<ShieldExclamationIcon className="w-5 h-5" />} label="Access Control" onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                            </div>
 
-                        <div className="pt-4 mt-4 border-t border-slate-800">
-                            <h3 className="px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Communication</h3>
-                             <NavItem to="/admin/announcements" icon={<MegaphoneIcon className="w-5 h-5"/>} label="Announcements" onClick={closeSidebar}/>
-                             <NavItem to="/admin/templates" icon={<EnvelopeIcon className="w-5 h-5"/>} label="Templates" onClick={closeSidebar}/>
-                        </div>
+                            <div className={`pt-4 mt-4 border-t border-slate-800 ${isCollapsed ? 'border-none' : ''}`}>
+                                <h3 className={`px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider transition-opacity ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>Communication</h3>
+                                 <NavItem to="/admin/announcements" icon={<MegaphoneIcon className="w-5 h-5"/>} label="Announcements" onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                                 <NavItem to="/admin/templates" icon={<EnvelopeIcon className="w-5 h-5"/>} label="Templates" onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                            </div>
 
-                        <div className="pt-4 mt-4 border-t border-slate-800">
-                            <h3 className="px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">System</h3>
-                            <NavItem to="/admin/settings" icon={<SettingsIcon className="w-5 h-5" />} label="Platform Settings" onClick={closeSidebar} />
-                            <NavItem to="/admin/cron-jobs" icon={<ClockIcon className="w-5 h-5"/>} label="Cron Jobs" onClick={closeSidebar}/>
-                            <NavItem to="/admin/logins" icon={<LoginIcon className="w-5 h-5"/>} label={t('loginDetails')} onClick={closeSidebar}/>
-                        </div>
-                    </nav>
+                            <div className={`pt-4 mt-4 border-t border-slate-800 ${isCollapsed ? 'border-none' : ''}`}>
+                                <h3 className={`px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider transition-opacity ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>System</h3>
+                                <NavItem to="/admin/settings" icon={<SettingsIcon className="w-5 h-5" />} label="Platform Settings" onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                                <NavItem to="/admin/cron-jobs" icon={<ClockIcon className="w-5 h-5"/>} label="Cron Jobs" onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                                <NavItem to="/admin/logins" icon={<LoginIcon className="w-5 h-5"/>} label={t('loginDetails')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                            </div>
+                        </nav>
+                    </div>
+
+                    <div className="hidden lg:flex items-center justify-center p-4 border-t border-slate-800 shrink-0">
+                        <button onClick={toggleCollapse} className="p-2 rounded-full text-slate-400 hover:bg-white/10">
+                            {isCollapsed ? <ChevronDoubleRightIcon className="w-6 h-6"/> : <ChevronDoubleLeftIcon className="w-6 h-6"/>}
+                        </button>
+                    </div>
                 </div>
             </aside>
             {isOpen && <div onClick={closeSidebar} className="fixed inset-0 bg-black/50 z-30 lg:hidden"></div>}
@@ -119,12 +134,20 @@ const Sidebar: React.FC<{ isOpen: boolean, setIsOpen: (isOpen: boolean) => void 
 
 const AdminLayout: React.FC = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const location = useLocation();
+
+    const toggleSidebarCollapse = () => setIsSidebarCollapsed(prev => !prev);
 
     return (
         <div className="min-h-screen bg-brand-navy text-slate-200">
-            <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
-            <div className="lg:pl-64 flex flex-col flex-1">
+            <Sidebar 
+                isOpen={sidebarOpen} 
+                setIsOpen={setSidebarOpen} 
+                isCollapsed={isSidebarCollapsed}
+                toggleCollapse={toggleSidebarCollapse} 
+            />
+            <div className={`flex flex-col flex-1 transition-all duration-300 ${isSidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
                 <Header onMenuClick={() => setSidebarOpen(true)} />
                 <main key={location.pathname} className="flex-1 p-4 sm:p-6 lg:p-8 animate-fade-in-up">
                     <Outlet />

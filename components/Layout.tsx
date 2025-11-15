@@ -4,7 +4,7 @@ import { AppContext } from '../contexts/AppContext';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTranslation } from '../hooks/useTranslation';
-import { HomeIcon, ImageIcon, VideoIcon, AdIcon, TaskIcon, GalleryIcon, CreditIcon, BellIcon, ReferralIcon } from '../constants';
+import { HomeIcon, ImageIcon, VideoIcon, AdIcon, TaskIcon, GalleryIcon, CreditIcon, BellIcon, ReferralIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon } from '../constants';
 
 const ThemeToggle: React.FC = () => {
     const { theme, toggleTheme } = useTheme();
@@ -113,38 +113,44 @@ const navLinkClasses = "flex items-center px-4 py-2.5 text-sm font-medium rounde
 const activeLinkClasses = "bg-brand-indigo text-white shadow-lg";
 const inactiveLinkClasses = "text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white";
 
-const NavItem: React.FC<{ to: string, icon: React.ReactNode, label: string, onClick?: () => void }> = ({ to, icon, label, onClick }) => (
+const NavItem: React.FC<{ to: string, icon: React.ReactNode, label: string, onClick?: () => void, isCollapsed: boolean }> = ({ to, icon, label, onClick, isCollapsed }) => (
     <NavLink
         to={to}
         end
         onClick={onClick}
-        className={({ isActive }) => `${navLinkClasses} ${isActive ? activeLinkClasses : inactiveLinkClasses}`}
+        className={({ isActive }) => `${navLinkClasses} ${isActive ? activeLinkClasses : inactiveLinkClasses} ${isCollapsed ? 'justify-center' : ''}`}
+        title={isCollapsed ? label : undefined}
     >
-        {icon}
-        <span className="ml-3">{label}</span>
+        <div className="flex-shrink-0">{icon}</div>
+        <span className={`transition-all duration-200 whitespace-nowrap ${isCollapsed ? 'w-0 opacity-0 ml-0 hidden' : 'w-auto opacity-100 ml-3'}`}>{label}</span>
     </NavLink>
 );
 
 
-const Sidebar: React.FC<{ isOpen: boolean, setIsOpen: (isOpen: boolean) => void }> = ({ isOpen, setIsOpen }) => {
+const Sidebar: React.FC<{ isOpen: boolean; setIsOpen: (isOpen: boolean) => void; isCollapsed: boolean; toggleCollapse: () => void; }> = ({ isOpen, setIsOpen, isCollapsed, toggleCollapse }) => {
     const { t } = useTranslation();
     
     const closeSidebar = () => setIsOpen(false);
 
     return (
         <>
-            <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-transform duration-300 ease-in-out`}>
-                <div className="flex flex-col h-full p-4">
-                    <nav className="flex-1 space-y-2">
-                        <NavItem to="/app/dashboard" icon={<HomeIcon className="w-5 h-5"/>} label={t('navDashboard')} onClick={closeSidebar}/>
-                        <NavItem to="/app/generate-image" icon={<ImageIcon className="w-5 h-5"/>} label={t('navGenerateImage')} onClick={closeSidebar}/>
-                        <NavItem to="/app/generate-video" icon={<VideoIcon className="w-5 h-5"/>} label={t('navGenerateVideo')} onClick={closeSidebar}/>
-                        <NavItem to="/app/generate-ad" icon={<AdIcon className="w-5 h-5"/>} label={t('navGenerateAd')} onClick={closeSidebar}/>
-                        <NavItem to="/app/tasks" icon={<TaskIcon className="w-5 h-5"/>} label={t('navTasks')} onClick={closeSidebar}/>
-                        <NavItem to="/app/gallery" icon={<GalleryIcon className="w-5 h-5"/>} label={t('navGallery')} onClick={closeSidebar}/>
-                        <NavItem to="/app/credits" icon={<CreditIcon className="w-5 h-5"/>} label={t('creditHistory')} onClick={closeSidebar}/>
-                        <NavItem to="/app/referrals" icon={<ReferralIcon className="w-5 h-5"/>} label="Referrals" onClick={closeSidebar}/>
+            <aside className={`fixed inset-y-0 left-0 z-40 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'}`}>
+                <div className="flex flex-col h-full">
+                    <nav className="flex-1 space-y-2 p-4 overflow-y-auto">
+                        <NavItem to="/app/dashboard" icon={<HomeIcon className="w-5 h-5"/>} label={t('navDashboard')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                        <NavItem to="/app/generate-image" icon={<ImageIcon className="w-5 h-5"/>} label={t('navGenerateImage')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                        <NavItem to="/app/generate-video" icon={<VideoIcon className="w-5 h-5"/>} label={t('navGenerateVideo')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                        <NavItem to="/app/generate-ad" icon={<AdIcon className="w-5 h-5"/>} label={t('navGenerateAd')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                        <NavItem to="/app/tasks" icon={<TaskIcon className="w-5 h-5"/>} label={t('navTasks')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                        <NavItem to="/app/gallery" icon={<GalleryIcon className="w-5 h-5"/>} label={t('navGallery')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                        <NavItem to="/app/credits" icon={<CreditIcon className="w-5 h-5"/>} label={t('creditHistory')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                        <NavItem to="/app/referrals" icon={<ReferralIcon className="w-5 h-5"/>} label="Referrals" onClick={closeSidebar} isCollapsed={isCollapsed}/>
                     </nav>
+                     <div className="hidden lg:flex items-center justify-center p-4 border-t border-slate-200 dark:border-slate-800 shrink-0">
+                        <button onClick={toggleCollapse} className="p-2 rounded-full text-slate-400 hover:bg-slate-700 hover:text-white">
+                            {isCollapsed ? <ChevronDoubleRightIcon className="w-6 h-6"/> : <ChevronDoubleLeftIcon className="w-6 h-6"/>}
+                        </button>
+                    </div>
                 </div>
             </aside>
             {isOpen && <div onClick={closeSidebar} className="fixed inset-0 bg-black/50 z-30 lg:hidden"></div>}
@@ -154,10 +160,13 @@ const Sidebar: React.FC<{ isOpen: boolean, setIsOpen: (isOpen: boolean) => void 
 
 const Layout: React.FC = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const location = useLocation();
     const { state } = useContext(AppContext);
     const [showAnnouncement, setShowAnnouncement] = useState(true);
     const activeAnnouncement = state.announcements.length > 0 ? state.announcements[0] : null;
+
+    const toggleSidebarCollapse = () => setIsSidebarCollapsed(prev => !prev);
 
     return (
         <div className="min-h-screen bg-slate-100 dark:bg-brand-navy text-slate-800 dark:text-slate-200">
@@ -167,8 +176,8 @@ const Layout: React.FC = () => {
                     <button onClick={() => setShowAnnouncement(false)} className="absolute top-1/2 right-4 -translate-y-1/2 font-bold text-lg">×</button>
                 </div>
             )}
-            <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
-            <div className="lg:pl-64 flex flex-col flex-1">
+            <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} isCollapsed={isSidebarCollapsed} toggleCollapse={toggleSidebarCollapse} />
+            <div className={`flex flex-col flex-1 transition-all duration-300 ${isSidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
                 <Header onMenuClick={() => setSidebarOpen(true)} />
                 <main key={location.pathname} className="flex-1 p-4 sm:p-6 lg:p-8 animate-fade-in-up">
                     <Outlet />
