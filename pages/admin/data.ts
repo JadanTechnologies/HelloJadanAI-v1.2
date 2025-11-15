@@ -158,6 +158,8 @@ export const mockSystemSettings: SystemSettings = {
         video: 2,
         ad: 5,
     },
+    maintenanceMode: false,
+    maintenanceMessage: 'We are currently performing scheduled maintenance. We should be back online shortly. Thank you for your patience!',
 };
 
 export const analyticsData = {

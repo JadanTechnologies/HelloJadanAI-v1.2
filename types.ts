@@ -221,6 +221,8 @@ export interface SystemSettings {
         video: number;
         ad: number;
     };
+    maintenanceMode: boolean;
+    maintenanceMessage: string;
 }
 
 export interface AppState {

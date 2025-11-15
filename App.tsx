@@ -17,6 +17,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import ReferralsPage from './pages/ReferralsPage';
 import AdvertisePage from './pages/AdvertisePage';
+import MaintenancePage from './pages/MaintenancePage';
 
 // Admin-facing layout and pages
 import AdminLayout from './components/admin/AdminLayout';
@@ -38,8 +39,20 @@ import CampaignManagementPage from './pages/admin/CampaignManagementPage';
 
 function App() {
   const { state } = useContext(AppContext);
-  const user = state.user;
+  const { user, systemSettings } = state;
 
+  // If in maintenance mode and user is not an admin, show maintenance page
+  if (systemSettings.maintenanceMode && !user?.isAdmin) {
+    return (
+      <HashRouter>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="*" element={<MaintenancePage />} />
+        </Routes>
+      </HashRouter>
+    );
+  }
+  
   // Determine the default authenticated path
   const defaultAuthPath = user?.isAdmin ? '/admin' : '/app';
 

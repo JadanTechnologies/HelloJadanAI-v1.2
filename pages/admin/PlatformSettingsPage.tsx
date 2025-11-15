@@ -116,18 +116,51 @@ const PlatformSettingsPage = () => {
             </div>
 
             {activeTab === 'general' && (
-                <Card>
-                    <h2 className="text-xl font-bold text-white mb-4">Credit Costs Management</h2>
-                    <p className="text-slate-400 mb-6">Adjust the credits required for each generation type.</p>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {Object.keys(costs).map(key => (
-                            <div key={key}>
-                                <label htmlFor={`${key}-cost`} className="block text-sm font-medium text-slate-300 capitalize">{key} Generation Cost</label>
-                                <input id={`${key}-cost`} type="number" value={costs[key as keyof typeof costs]} onChange={(e) => setCosts(p => ({...p, [key]: parseInt(e.target.value) || 0}))} className={inputClasses}/>
+                <div className="space-y-8">
+                    <Card>
+                        <h2 className="text-xl font-bold text-white mb-4">Credit Costs Management</h2>
+                        <p className="text-slate-400 mb-6">Adjust the credits required for each generation type.</p>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {Object.keys(costs).map(key => (
+                                <div key={key}>
+                                    <label htmlFor={`${key}-cost`} className="block text-sm font-medium text-slate-300 capitalize">{key} Generation Cost</label>
+                                    <input id={`${key}-cost`} type="number" value={costs[key as keyof typeof costs]} onChange={(e) => setCosts(p => ({...p, [key]: parseInt(e.target.value) || 0}))} className={inputClasses}/>
+                                </div>
+                            ))}
+                        </div>
+                    </Card>
+                    <Card>
+                        <h2 className="text-xl font-bold text-white mb-4">Maintenance Mode</h2>
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between p-3 bg-slate-900 rounded-lg">
+                                <div>
+                                    <p className="font-medium text-slate-200">Enable Maintenance Mode</p>
+                                    <p className="text-xs text-slate-400">When enabled, only administrators can access the site.</p>
+                                </div>
+                                <label htmlFor="toggle-maintenance" className="relative inline-flex items-center cursor-pointer">
+                                    <input 
+                                        type="checkbox" 
+                                        id="toggle-maintenance" 
+                                        className="sr-only peer" 
+                                        checked={systemSettings.maintenanceMode} 
+                                        onChange={e => setSystemSettings(p => ({...p, maintenanceMode: e.target.checked}))} 
+                                    />
+                                    <div className="w-11 h-6 bg-slate-700 rounded-full peer peer-focus:ring-4 peer-focus:ring-brand-indigo/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-indigo"></div>
+                                </label>
                             </div>
-                        ))}
-                    </div>
-                </Card>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300">Maintenance Message</label>
+                                <textarea 
+                                    value={systemSettings.maintenanceMessage} 
+                                    onChange={e => setSystemSettings(p => ({...p, maintenanceMessage: e.target.value}))} 
+                                    className={textareaClasses}
+                                    rows={3}
+                                    placeholder="e.g., We'll be back soon!"
+                                />
+                            </div>
+                        </div>
+                    </Card>
+                </div>
             )}
 
             {activeTab === 'branding' && (
