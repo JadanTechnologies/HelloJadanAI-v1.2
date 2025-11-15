@@ -219,10 +219,16 @@ const PlatformSettingsPage = () => {
                             </div>
                         </div>
                         <div>
-                            <h3 className="text-lg font-semibold text-slate-200 border-b border-slate-700 pb-2 mb-4">Push Notifications (VAPID Keys)</h3>
+                            <h3 className="text-lg font-semibold text-slate-200 border-b border-slate-700 pb-2 mb-4">Push Notifications (OneSignal)</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div><label className="text-sm font-medium text-slate-300">Public Key</label><textarea value={apiSettings.push.vapidPublicKey} onChange={e => setApiSettings(p => ({...p, push: {...p.push, vapidPublicKey: e.target.value}}))} className={textareaClasses + " !min-h-[80px]"}/></div>
-                                <div><label className="text-sm font-medium text-slate-300">Private Key</label><textarea value={apiSettings.push.vapidPrivateKey} onChange={e => setApiSettings(p => ({...p, push: {...p.push, vapidPrivateKey: e.target.value}}))} className={textareaClasses + " !min-h-[80px]"}/></div>
+                                <div>
+                                    <label className="text-sm font-medium text-slate-300">OneSignal App ID</label>
+                                    <Input type="text" value={apiSettings.oneSignal.appId} onChange={e => setApiSettings(p => ({...p, oneSignal: {...p.oneSignal, appId: e.target.value}}))} className={inputClasses}/>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-slate-300">REST API Key</label>
+                                    <Input type="password" value={apiSettings.oneSignal.restApiKey} onChange={e => setApiSettings(p => ({...p, oneSignal: {...p.oneSignal, restApiKey: e.target.value}}))} className={inputClasses}/>
+                                </div>
                             </div>
                         </div>
                     </div>

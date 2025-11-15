@@ -121,7 +121,7 @@ export interface SmsTemplate {
 export interface ApiSettings {
   resend: { apiKey: string; };
   twilio: { accountSid: string; authToken: string; phoneNumber: string; };
-  push: { vapidPublicKey: string; vapidPrivateKey: string; };
+  oneSignal: { appId: string; restApiKey: string; };
 }
 
 export interface CronJob {

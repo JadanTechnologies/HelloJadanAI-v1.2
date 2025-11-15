@@ -49,7 +49,7 @@ export const mockContentSettings: ContentSettings = {
 export const mockApiSettings: ApiSettings = {
   resend: { apiKey: '' },
   twilio: { accountSid: '', authToken: '', phoneNumber: '' },
-  push: { vapidPublicKey: '', vapidPrivateKey: '' },
+  oneSignal: { appId: '', restApiKey: '' },
 };
 
 export const mockEmailTemplates: EmailTemplate[] = [
