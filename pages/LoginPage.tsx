@@ -13,14 +13,15 @@ const LoginPage = () => {
   const { t } = useTranslation();
   
   const [loginType, setLoginType] = useState<LoginType>('user');
-  const [email, setEmail] = useState(loginType === 'user' ? 'jadan@example.com' : 'admin@example.com');
+  // From data.ts, alex@example.com is a regular user, jadan@example.com is an admin.
+  const [email, setEmail] = useState('alex@example.com');
   const [password, setPassword] = useState('password');
   const [error, setError] = useState('');
 
   const handleTypeChange = (type: LoginType) => {
     setLoginType(type);
     setError('');
-    setEmail(type === 'admin' ? 'admin@example.com' : 'jadan@example.com');
+    setEmail(type === 'admin' ? 'jadan@example.com' : 'alex@example.com');
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -33,7 +34,8 @@ const LoginPage = () => {
   };
 
   const handleGoogleLogin = () => {
-    const result = login('jadan@example.com', 'password');
+    // Use the correct mock regular user for this demo login
+    const result = login('alex@example.com', 'password');
      if (!result.success) {
       setError(result.message || t('invalidCredentials'));
     }

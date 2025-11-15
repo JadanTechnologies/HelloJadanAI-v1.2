@@ -2,10 +2,6 @@ import React, { createContext, useReducer, ReactNode } from 'react';
 import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement, Referral, SystemSettings, AccessRestrictionRule, GenerationType, BrandingSettings, ContentSettings, Campaign, Payment, RedemptionRequest } from '../types';
 import { mockAnnouncements, mockReferrals, mockSystemSettings, mockBrandingSettings, mockContentSettings, mockCampaigns, mockPayments, mockRedemptionRequests, mockUsers } from '../pages/admin/data';
 
-const mockAdminUser: User = mockUsers.find(u => u.isAdmin)!;
-const mockRegularUser: User = mockUsers.find(u => !u.isAdmin)!;
-
-
 const initialGenerations: Generation[] = [
     { id: 'gen-1', type: 'image', prompt: 'A futuristic city skyline', url: 'https://picsum.photos/seed/futuristic/512/512', createdAt: new Date().toISOString(), isFavorite: false, style: 'Realistic', resolution: 'HD' },
     { id: 'gen-2', type: 'video', prompt: 'A robot dancing in the rain', url: 'https://www.w3schools.com/html/mov_bbb.mp4', createdAt: new Date().toISOString(), isFavorite: true, style: 'Cinematic', duration: '10s' },
@@ -333,13 +329,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const login = (email: string, password: string): LoginResult => {
-    if (email === mockRegularUser.email && password === 'password') {
-      const access = checkAccess(mockRegularUser);
+    const user = mockUsers.find(u => u.email === email && !u.isAdmin);
+    if (user && password === 'password') {
+      const access = checkAccess(user);
       if (!access.allowed) {
         return { success: false, message: access.message };
       }
       const userWithLocation: User = {
-          ...mockRegularUser,
+          ...user,
           location: { country: 'United States', region: 'California', city: 'San Francisco' }
       };
       dispatch({ type: 'LOGIN', payload: userWithLocation });
@@ -349,13 +346,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const loginAsAdmin = (email: string, password: string): LoginResult => {
-    if (email === mockAdminUser.email && password === 'password') {
-       const access = checkAccess(mockAdminUser);
+    const user = mockUsers.find(u => u.email === email && u.isAdmin);
+    if (user && password === 'password') {
+       const access = checkAccess(user);
        if (!access.allowed) {
         return { success: false, message: access.message };
       }
        const userWithLocation: User = {
-          ...mockAdminUser,
+          ...user,
           location: { country: 'United States', region: 'New York', city: 'New York City' }
       };
       dispatch({ type: 'LOGIN', payload: userWithLocation });
