@@ -7,7 +7,7 @@ import { CREDIT_COSTS, TrashIcon, UploadIcon } from '../../constants';
 import { mockBrandingSettings, mockContentSettings, mockApiSettings, mockSystemSettings } from './data';
 import { BrandingSettings, ContentSettings, FAQItem, ApiSettings, SystemSettings } from '../../types';
 
-type SettingsTab = 'general' | 'branding' | 'content' | 'api' | 'integrations' | 'referrals_fraud';
+type SettingsTab = 'general' | 'branding' | 'content' | 'models_limits' | 'integrations' | 'referrals_fraud';
 
 const imageProviders = ['Gemini', 'DALL-E 3', 'Midjourney', 'Mock Service'];
 const videoProviders = ['Veo (Google)', 'RunwayML', 'Pika', 'Sora', 'Mock Service'];
@@ -103,7 +103,7 @@ const PlatformSettingsPage = () => {
                 <TabButton tab="general" label="General"/>
                 <TabButton tab="branding" label="Branding"/>
                 <TabButton tab="content" label="Content"/>
-                <TabButton tab="api" label="API Providers"/>
+                <TabButton tab="models_limits" label="Models & Limits"/>
                 <TabButton tab="integrations" label="Integrations"/>
                 <TabButton tab="referrals_fraud" label="Referrals & Fraud"/>
             </div>
@@ -178,27 +178,41 @@ const PlatformSettingsPage = () => {
                 </div>
             )}
             
-            {activeTab === 'api' && (
-                 <Card>
-                    <h2 className="text-xl font-bold text-white mb-4">AI Provider Management</h2>
-                    <p className="text-slate-400 mb-6">Configure the primary and fallback AI services.</p>
-                     <div className="space-y-6">
-                         <div>
-                            <h3 className="text-lg font-semibold text-slate-200 border-b border-slate-700 pb-2 mb-4">Image & Ad Generation</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div><label className="text-sm font-medium text-slate-300">Primary Provider</label><select value={providers.image.primary} onChange={e => setProviders(p => ({...p, image: {...p.image, primary: e.target.value}}))} className={inputClasses}>{imageProviders.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
-                                <div><label className="text-sm font-medium text-slate-300">Fallback Provider</label><select value={providers.image.fallback} onChange={e => setProviders(p => ({...p, image: {...p.image, fallback: e.target.value}}))} className={inputClasses}>{imageProviders.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
+            {activeTab === 'models_limits' && (
+                <div className="space-y-8">
+                    <Card>
+                        <h2 className="text-xl font-bold text-white mb-4">Daily Generation Limits</h2>
+                        <p className="text-slate-400 mb-6">Set the maximum number of generations a user can perform daily.</p>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {(['image', 'video', 'ad'] as const).map(type => (
+                                <div key={type}>
+                                    <label className="block text-sm font-medium text-slate-300 capitalize">{type} Daily Limit</label>
+                                    <Input type="number" value={systemSettings.dailyGenerationLimits[type]} onChange={e => setSystemSettings(p => ({...p, dailyGenerationLimits: {...p.dailyGenerationLimits, [type]: parseInt(e.target.value) || 0}}))} />
+                                </div>
+                            ))}
+                        </div>
+                    </Card>
+                    <Card>
+                        <h2 className="text-xl font-bold text-white mb-4">AI Model Management</h2>
+                        <p className="text-slate-400 mb-6">Configure the primary and fallback AI services for generation.</p>
+                        <div className="space-y-6">
+                            <div>
+                                <h3 className="text-lg font-semibold text-slate-200 border-b border-slate-700 pb-2 mb-4">Image & Ad Generation</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div><label className="text-sm font-medium text-slate-300">Primary Provider</label><select value={providers.image.primary} onChange={e => setProviders(p => ({...p, image: {...p.image, primary: e.target.value}}))} className={inputClasses}>{imageProviders.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
+                                    <div><label className="text-sm font-medium text-slate-300">Fallback Provider</label><select value={providers.image.fallback} onChange={e => setProviders(p => ({...p, image: {...p.image, fallback: e.target.value}}))} className={inputClasses}>{imageProviders.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold text-slate-200 border-b border-slate-700 pb-2 mb-4">Video Generation</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div><label className="text-sm font-medium text-slate-300">Primary Provider</label><select value={providers.video.primary} onChange={e => setProviders(p => ({...p, video: {...p.video, primary: e.target.value}}))} className={inputClasses}>{videoProviders.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
+                                    <div><label className="text-sm font-medium text-slate-300">Fallback Provider</label><select value={providers.video.fallback} onChange={e => setProviders(p => ({...p, video: {...p.video, fallback: e.target.value}}))} className={inputClasses}>{videoProviders.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
+                                </div>
                             </div>
                         </div>
-                        <div>
-                            <h3 className="text-lg font-semibold text-slate-200 border-b border-slate-700 pb-2 mb-4">Video Generation</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div><label className="text-sm font-medium text-slate-300">Primary Provider</label><select value={providers.video.primary} onChange={e => setProviders(p => ({...p, video: {...p.video, primary: e.target.value}}))} className={inputClasses}>{videoProviders.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
-                                <div><label className="text-sm font-medium text-slate-300">Fallback Provider</label><select value={providers.video.fallback} onChange={e => setProviders(p => ({...p, video: {...p.video, fallback: e.target.value}}))} className={inputClasses}>{videoProviders.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
-                            </div>
-                        </div>
-                    </div>
-                 </Card>
+                    </Card>
+                </div>
             )}
 
             {activeTab === 'integrations' && (

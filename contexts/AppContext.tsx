@@ -1,5 +1,5 @@
 import React, { createContext, useReducer, ReactNode } from 'react';
-import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement, Referral, SystemSettings, AccessRestrictionRule } from '../types';
+import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement, Referral, SystemSettings, AccessRestrictionRule, GenerationType } from '../types';
 import { mockAnnouncements, mockReferrals, mockSystemSettings } from '../pages/admin/data';
 
 const mockAdminUser: User = {
@@ -16,6 +16,7 @@ const mockAdminUser: User = {
     referralCode: 'ADMINJADAN',
     referralStats: { count: 0, creditsEarned: 0 },
     fraudRisk: 'low',
+    dailyGenerations: { image: 0, video: 0, ad: 0, lastReset: new Date().toISOString() },
 };
 
 const mockRegularUser: User = {
@@ -32,6 +33,7 @@ const mockRegularUser: User = {
     referralCode: 'JADAN123',
     referralStats: { count: 2, creditsEarned: 35 },
     fraudRisk: 'low',
+    dailyGenerations: { image: 2, video: 1, ad: 4, lastReset: new Date().toISOString() },
 };
 
 const initialGenerations: Generation[] = [
@@ -145,6 +147,35 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
       };
     case 'UPDATE_SYSTEM_SETTINGS':
         return { ...state, systemSettings: action.payload };
+    case 'INCREMENT_DAILY_GENERATION':
+        if (!state.user) return state;
+        const { type } = action.payload;
+        
+        const today = new Date().toISOString().split('T')[0];
+        const lastResetDate = state.user.dailyGenerations.lastReset.split('T')[0];
+        
+        let currentDailyGenerations = state.user.dailyGenerations;
+
+        // If last reset was before today, reset the counts
+        if (lastResetDate !== today) {
+            currentDailyGenerations = {
+                image: 0,
+                video: 0,
+                ad: 0,
+                lastReset: new Date().toISOString()
+            };
+        }
+        
+        // Now increment the count for the current generation
+        const updatedUser = {
+            ...state.user,
+            dailyGenerations: {
+            ...currentDailyGenerations,
+            [type]: currentDailyGenerations[type as GenerationType] + 1,
+            }
+        };
+      
+        return { ...state, user: updatedUser };
     default:
       return state;
   }

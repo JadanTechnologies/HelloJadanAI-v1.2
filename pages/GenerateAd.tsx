@@ -7,7 +7,7 @@ import GenerationProgress from '../components/common/GenerationProgress';
 import Card from '../components/common/Card';
 import { generateAdCreative as apiGenerateAd } from '../services/geminiService';
 import { AD_PLATFORMS, AD_TYPES, CREDIT_COSTS, UploadIcon } from '../constants';
-import { Generation } from '../types';
+import { Generation, GenerationType } from '../types';
 import { AdIcon } from '../constants';
 
 const GenerateAd = () => {
@@ -29,6 +29,15 @@ const GenerateAd = () => {
 
   const [progress, setProgress] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState('');
+
+  // Daily Limit Logic
+  const generationType: GenerationType = 'ad';
+  const dailyLimit = state.systemSettings.dailyGenerationLimits[generationType];
+  const today = new Date().toISOString().split('T')[0];
+  const lastResetDate = state.user?.dailyGenerations.lastReset.split('T')[0];
+  const dailyCount = lastResetDate === today ? state.user?.dailyGenerations[generationType] ?? 0 : 0;
+  const remainingToday = dailyLimit - dailyCount;
+  const hasExceededDailyLimit = remainingToday <= 0;
 
   const creditCost = CREDIT_COSTS.ad;
 
@@ -55,6 +64,7 @@ const GenerateAd = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     if (state.credits < creditCost) {
       setError(t('notEnoughCredits'));
       return;
@@ -63,7 +73,11 @@ const GenerateAd = () => {
         setError('Please upload an image for the ad.');
         return;
     }
-    setError(null);
+    if (hasExceededDailyLimit) {
+      setError(`You have reached your daily limit of ${dailyLimit} ad generations.`);
+      return;
+    }
+
     setIsLoading(true);
     setResult(null);
 
@@ -74,6 +88,7 @@ const GenerateAd = () => {
       dispatch({ type: 'ADD_GENERATION', payload: newGeneration });
       dispatch({ type: 'UPDATE_CREDITS', payload: state.credits - creditCost });
       dispatch({ type: 'ADD_CREDIT_TRANSACTION', payload: { id: `tx-ad-${Date.now()}`, description: 'Generated Ad', amount: -creditCost, date: new Date().toISOString() } });
+      dispatch({ type: 'INCREMENT_DAILY_GENERATION', payload: { type: generationType } });
     } catch (err) {
       setError(t('generationFailed'));
     } finally {
@@ -162,7 +177,7 @@ const GenerateAd = () => {
             )}
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-end">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">{t('platformLabel')}</label>
                 <Select options={AD_PLATFORMS} value={platform} onChange={(e) => setPlatform(e.target.value)} />
@@ -171,14 +186,17 @@ const GenerateAd = () => {
                 <label className="block text-sm font-medium text-slate-300 mb-2">{t('adTypeLabel')}</label>
                 <Select options={AD_TYPES} value={adType} onChange={(e) => setAdType(e.target.value)} />
             </div>
-            <div className="flex items-center space-x-4">
-                <Button type="submit" isLoading={isLoading} disabled={!prompt || isLoading} className="w-full">
+          </div>
+           {error && <p className="text-red-400 text-sm text-center bg-red-500/10 p-2 rounded-lg">{error}</p>}
+            <div className="flex items-center justify-between">
+                <Button type="submit" isLoading={isLoading} disabled={!prompt || isLoading || hasExceededDailyLimit}>
                     {t('generateButton')}
                 </Button>
-                <p className="font-semibold whitespace-nowrap">{t('creditCost')}: <span className="text-brand-cyan">{creditCost}</span></p>
+                <div className="text-right">
+                    <p className="font-semibold whitespace-nowrap">{t('creditCost')}: <span className="text-brand-cyan">{creditCost}</span></p>
+                    <p className="text-xs text-slate-400">Daily uses left: {remainingToday} / {dailyLimit}</p>
+                </div>
             </div>
-          </div>
-           {error && <p className="text-red-400 text-sm">{error}</p>}
         </form>
       </Card>
 

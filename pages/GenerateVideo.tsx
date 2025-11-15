@@ -7,7 +7,7 @@ import GenerationProgress from '../components/common/GenerationProgress';
 import Card from '../components/common/Card';
 import { generateVideo as apiGenerateVideo } from '../services/geminiService';
 import { VIDEO_STYLES, VIDEO_DURATIONS, CREDIT_COSTS } from '../constants';
-import { Generation } from '../types';
+import { Generation, GenerationType } from '../types';
 import { VideoIcon } from '../constants';
 
 const GenerateVideo = () => {
@@ -23,6 +23,15 @@ const GenerateVideo = () => {
   const [progress, setProgress] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState('');
 
+  // Daily Limit Logic
+  const generationType: GenerationType = 'video';
+  const dailyLimit = state.systemSettings.dailyGenerationLimits[generationType];
+  const today = new Date().toISOString().split('T')[0];
+  const lastResetDate = state.user?.dailyGenerations.lastReset.split('T')[0];
+  const dailyCount = lastResetDate === today ? state.user?.dailyGenerations[generationType] ?? 0 : 0;
+  const remainingToday = dailyLimit - dailyCount;
+  const hasExceededDailyLimit = remainingToday <= 0;
+
   const creditCost = CREDIT_COSTS.video;
 
   const handleProgressUpdate = (p: number, msg: string) => {
@@ -32,11 +41,16 @@ const GenerateVideo = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     if (state.credits < creditCost) {
       setError(t('notEnoughCredits'));
       return;
     }
-    setError(null);
+    if (hasExceededDailyLimit) {
+      setError(`You have reached your daily limit of ${dailyLimit} video generations.`);
+      return;
+    }
+
     setIsLoading(true);
     setResult(null);
 
@@ -45,7 +59,8 @@ const GenerateVideo = () => {
       setResult(newGeneration);
       dispatch({ type: 'ADD_GENERATION', payload: newGeneration });
       dispatch({ type: 'UPDATE_CREDITS', payload: state.credits - creditCost });
-       dispatch({ type: 'ADD_CREDIT_TRANSACTION', payload: { id: `tx-vid-${Date.now()}`, description: 'Generated Video', amount: -creditCost, date: new Date().toISOString() } });
+      dispatch({ type: 'ADD_CREDIT_TRANSACTION', payload: { id: `tx-vid-${Date.now()}`, description: 'Generated Video', amount: -creditCost, date: new Date().toISOString() } });
+      dispatch({ type: 'INCREMENT_DAILY_GENERATION', payload: { type: generationType } });
     } catch (err) {
       setError(t('generationFailed'));
     } finally {
@@ -88,12 +103,15 @@ const GenerateVideo = () => {
               <label className="block text-sm font-medium text-slate-300 mb-2">{t('durationLabel')}</label>
               <Select options={VIDEO_DURATIONS} value={duration} onChange={(e) => setDuration(e.target.value)} />
             </div>
-            {error && <p className="text-red-400 text-sm">{error}</p>}
+            {error && <p className="text-red-400 text-sm text-center bg-red-500/10 p-2 rounded-lg">{error}</p>}
             <div className="flex items-center justify-between">
-              <Button type="submit" isLoading={isLoading} disabled={!prompt || isLoading}>
+              <Button type="submit" isLoading={isLoading} disabled={!prompt || isLoading || hasExceededDailyLimit}>
                 {t('generateButton')}
               </Button>
-              <p className="font-semibold">{t('creditCost')}: <span className="text-brand-cyan">{creditCost}</span></p>
+               <div className="text-right">
+                  <p className="font-semibold">{t('creditCost')}: <span className="text-brand-cyan">{creditCost}</span></p>
+                  <p className="text-xs text-slate-400">Daily uses left: {remainingToday} / {dailyLimit}</p>
+              </div>
             </div>
           </form>
         </Card>

@@ -21,6 +21,12 @@ export interface User {
     region: string;
     city: string;
   };
+  dailyGenerations: {
+    image: number;
+    video: number;
+    ad: number;
+    lastReset: string; // ISO Date string
+  };
 }
 
 export interface Generation {
@@ -176,6 +182,11 @@ export interface SystemSettings {
         maxSignupsPerIp: number;
     };
     accessRestrictions: AccessRestrictionRule[];
+    dailyGenerationLimits: {
+        image: number;
+        video: number;
+        ad: number;
+    };
 }
 
 export interface AppState {
@@ -202,6 +213,7 @@ export type AppAction =
   | { type: 'SET_ANNOUNCEMENTS'; payload: Announcement[] }
   | { type: 'ADD_NOTIFICATION'; payload: Omit<Notification, 'id' | 'createdAt' | 'read'> }
   | { type: 'MARK_NOTIFICATION_AS_READ'; payload: string }
-  | { type: 'UPDATE_SYSTEM_SETTINGS'; payload: SystemSettings };
+  | { type: 'UPDATE_SYSTEM_SETTINGS'; payload: SystemSettings }
+  | { type: 'INCREMENT_DAILY_GENERATION'; payload: { type: GenerationType } };
 
 export type GenerationType = 'image' | 'video' | 'ad';

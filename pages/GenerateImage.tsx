@@ -8,7 +8,7 @@ import GenerationProgress from '../components/common/GenerationProgress';
 import Card from '../components/common/Card';
 import { generateImage as apiGenerateImage } from '../services/geminiService';
 import { IMAGE_STYLES, IMAGE_RESOLUTIONS, IMAGE_ASPECT_RATIOS, CREDIT_COSTS, ImageIcon, UploadIcon } from '../constants';
-import { Generation } from '../types';
+import { Generation, GenerationType } from '../types';
 
 const GenerateImage = () => {
   const { state, dispatch } = useContext(AppContext);
@@ -31,6 +31,15 @@ const GenerateImage = () => {
 
   const [progress, setProgress] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState('');
+
+  // Daily Limit Logic
+  const generationType: GenerationType = 'image';
+  const dailyLimit = state.systemSettings.dailyGenerationLimits[generationType];
+  const today = new Date().toISOString().split('T')[0];
+  const lastResetDate = state.user?.dailyGenerations.lastReset.split('T')[0];
+  const dailyCount = lastResetDate === today ? state.user?.dailyGenerations[generationType] ?? 0 : 0;
+  const remainingToday = dailyLimit - dailyCount;
+  const hasExceededDailyLimit = remainingToday <= 0;
 
   useEffect(() => {
     if (location.state) {
@@ -70,11 +79,17 @@ const GenerateImage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
     if (state.credits < creditCost) {
       setError(t('notEnoughCredits'));
       return;
     }
-    setError(null);
+     if (hasExceededDailyLimit) {
+      setError(`You have reached your daily limit of ${dailyLimit} image generations.`);
+      return;
+    }
+
     setIsLoading(true);
     setResult(null);
 
@@ -84,6 +99,7 @@ const GenerateImage = () => {
       dispatch({ type: 'ADD_GENERATION', payload: newGeneration });
       dispatch({ type: 'UPDATE_CREDITS', payload: state.credits - creditCost });
       dispatch({ type: 'ADD_CREDIT_TRANSACTION', payload: { id: `tx-img-${Date.now()}`, description: 'Generated Image', amount: -creditCost, date: new Date().toISOString() } });
+      dispatch({ type: 'INCREMENT_DAILY_GENERATION', payload: { type: generationType } });
     } catch (err) {
       setError(t('generationFailed'));
     } finally {
@@ -106,7 +122,7 @@ const GenerateImage = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-white">{t('imageGeneratorTitle')}</h1>
+        <h1 className="text-3xl font.bold text-white">{t('imageGeneratorTitle')}</h1>
         <p className="text-slate-400 mt-1">Unleash your imagination and create stunning visuals.</p>
       </div>
 
@@ -170,12 +186,15 @@ const GenerateImage = () => {
               <label className="block text-sm font-medium text-slate-300 mb-2">Aspect Ratio</label>
               <Select options={IMAGE_ASPECT_RATIOS} value={aspectRatio} onChange={(e) => setAspectRatio(e.target.value)} />
             </div>
-            {error && <p className="text-red-400 text-sm">{error}</p>}
+            {error && <p className="text-red-400 text-sm text-center bg-red-500/10 p-2 rounded-lg">{error}</p>}
             <div className="flex items-center justify-between">
-              <Button type="submit" isLoading={isLoading} disabled={!prompt || isLoading}>
+              <Button type="submit" isLoading={isLoading} disabled={!prompt || isLoading || hasExceededDailyLimit}>
                 {t('generateButton')}
               </Button>
-              <p className="font-semibold">{t('creditCost')}: <span className="text-brand-cyan">{creditCost}</span></p>
+              <div className="text-right">
+                  <p className="font-semibold">{t('creditCost')}: <span className="text-brand-cyan">{creditCost}</span></p>
+                  <p className="text-xs text-slate-400">Daily uses left: {remainingToday} / {dailyLimit}</p>
+              </div>
             </div>
           </form>
         </Card>
