@@ -1,4 +1,5 @@
 import { User, Task, BrandingSettings, ContentSettings, TaskSubmission, ApiSettings, EmailTemplate, SmsTemplate, Announcement, CronJob, Referral, SystemSettings, AccessRestrictionRule } from '../../types';
+import { LOGO_DATA_URL } from '../../constants';
 
 export const mockUsers: User[] = [
     { id: 'user-1', username: 'Jadan', email: 'jadan@example.com', avatar: 'https://picsum.photos/seed/jadan/100/100', isAdmin: true, tasksCompleted: 5, ip: '192.168.1.1', deviceInfo: 'Chrome on macOS', status: 'active', credits: 150, referralCode: 'JADAN123', referredBy: undefined, referralStats: { count: 2, creditsEarned: 35 }, fraudRisk: 'low', location: { country: 'United States', region: 'New York', city: 'New York City' } },
@@ -30,9 +31,9 @@ export const mockTaskSubmissions: TaskSubmission[] = [
 ];
 
 export const mockBrandingSettings: BrandingSettings = {
-    logoUrl: null,
+    logoUrl: LOGO_DATA_URL,
     faviconUrl: null,
-    hologramLogoUrl: null,
+    hologramLogoUrl: LOGO_DATA_URL,
 };
 
 export const mockContentSettings: ContentSettings = {

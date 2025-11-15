@@ -22,7 +22,7 @@ const Hologram: React.FC<{ rotation: { x: number; y: number }, logoUrl: string |
                 className="w-full h-full relative transform-style-3d transition-transform duration-300 ease-out"
                 style={{ transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)` }}
             >
-                <Face className="transform rotate-y-0 translate-z-[100px]">{logoUrl ? <img src={logoUrl} alt="Brand Logo" className="p-4" /> : <ImageIcon className="w-16 h-16" />}</Face>
+                <Face className="transform rotate-y-0 translate-z-[100px]">{logoUrl ? <img src={logoUrl} alt="Brand Logo" className="p-4 rounded-lg" /> : <ImageIcon className="w-16 h-16" />}</Face>
                 <Face className="transform rotate-y-90 translate-z-[100px]"><VideoIcon className="w-16 h-16" /></Face>
                 <Face className="transform rotate-y-180 translate-z-[100px]"><AdIcon className="w-16 h-16" /></Face>
                 <Face className="transform rotate-y-[-90deg] translate-z-[100px]"><TaskIcon className="w-16 h-16" /></Face>
@@ -96,8 +96,11 @@ const LandingPage: React.FC = () => {
             <header className="absolute top-0 left-0 right-0 z-10 p-4">
                 <div className="container mx-auto flex justify-between items-center">
                     <Link to="/" className="flex items-center space-x-2 text-xl font-bold text-slate-900 dark:text-white">
-                        {branding.logoUrl && <img src={branding.logoUrl} alt="Logo" className="h-8 w-8"/>}
-                        <span>Hello<span className="text-brand-cyan">Jadan</span>AI</span>
+                        {branding.logoUrl ? (
+                            <img src={branding.logoUrl} alt="HelloJadanAI Logo" className="h-10" />
+                        ) : (
+                            <span>Hello<span className="text-brand-cyan">Jadan</span>AI</span>
+                        )}
                     </Link>
                     <div className="flex items-center space-x-2">
                         <ThemeToggle />
