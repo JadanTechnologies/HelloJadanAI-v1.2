@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { NavLink, Link, useLocation, Outlet } from 'react-router-dom';
 import { AppContext } from '../../contexts/AppContext';
 import { useTranslation } from '../../hooks/useTranslation';
-import { AdminIcon, AnalyticsIcon, SettingsIcon, ChecklistIcon } from '../../constants';
+import { AdminIcon, AnalyticsIcon, SettingsIcon, ChecklistIcon, ShieldCheckIcon } from '../../constants';
 
 const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
     const { state, logout } = useContext(AppContext);
@@ -83,6 +83,7 @@ const Sidebar: React.FC<{ isOpen: boolean, setIsOpen: (isOpen: boolean) => void 
                         <NavItem to="/admin/dashboard" icon={<AnalyticsIcon className="w-5 h-5"/>} label="Dashboard" onClick={closeSidebar}/>
                         <NavItem to="/admin/users" icon={<AdminIcon className="w-5 h-5"/>} label={t('userManagement')} onClick={closeSidebar}/>
                         <NavItem to="/admin/tasks" icon={<ChecklistIcon className="w-5 h-5" />} label="Task Management" onClick={closeSidebar} />
+                        <NavItem to="/admin/task-monitoring" icon={<ShieldCheckIcon className="w-5 h-5" />} label="Task Monitoring" onClick={closeSidebar} />
                         <NavItem to="/admin/settings" icon={<SettingsIcon className="w-5 h-5" />} label="Platform Settings" onClick={closeSidebar} />
                         <NavItem to="/admin/logins" icon={<LoginIcon className="w-5 h-5"/>} label={t('loginDetails')} onClick={closeSidebar}/>
                     </nav>

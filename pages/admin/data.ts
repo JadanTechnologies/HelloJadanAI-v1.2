@@ -1,4 +1,4 @@
-import { User, Task, BrandingSettings, ContentSettings } from '../../types';
+import { User, Task, BrandingSettings, ContentSettings, TaskSubmission } from '../../types';
 
 export const mockUsers: User[] = [
     { id: 'user-1', username: 'Jadan', email: 'jadan@example.com', avatar: 'https://picsum.photos/seed/jadan/100/100', isAdmin: true, tasksCompleted: 5, ip: '192.168.1.1', deviceInfo: 'Chrome on macOS', status: 'active', credits: 150 },
@@ -15,10 +15,17 @@ export const mockLoginDetails = [
 ];
 
 export const mockTasks: Task[] = [
-    { id: 'task-1', title: 'Daily Login', description: 'Log in every day to earn credits.', creditReward: 10, isCompleted: false, type: 'daily' },
-    { id: 'task-2', title: 'Generate 1 Image', description: 'Create your first masterpiece.', creditReward: 5, isCompleted: false, type: 'daily' },
-    { id: 'task-3', title: 'Share on Social Media', description: 'Share your creation with friends.', creditReward: 15, isCompleted: false, type: 'engagement' },
-    { id: 'task-4', title: 'Complete Profile', description: 'Upload an avatar and set a username.', creditReward: 20, isCompleted: false, type: 'profile' },
+    { id: 'task-1', title: 'Daily Login', description: 'Log in every day to earn credits.', creditReward: 10, status: 'incomplete', type: 'daily' },
+    { id: 'task-2', title: 'Generate 1 Image', description: 'Create your first masterpiece.', creditReward: 5, status: 'incomplete', type: 'daily' },
+    { id: 'task-3', title: 'Share on Social Media', description: 'Share your creation with friends on X.', creditReward: 15, status: 'incomplete', type: 'social_share', targetUrl: 'https://x.com', requiresProof: true },
+    { id: 'task-4', title: 'Complete Profile', description: 'Upload an avatar and set a username.', creditReward: 20, status: 'incomplete', type: 'profile' },
+    { id: 'task-5', title: 'Subscribe to our YouTube', description: 'Get the latest news and tutorials.', creditReward: 25, status: 'incomplete', type: 'youtube_subscribe', targetUrl: 'https://youtube.com', requiresProof: true },
+    { id: 'task-6', title: 'Download our Mobile App', description: 'Generate on the go!', creditReward: 50, status: 'incomplete', type: 'app_download', targetUrl: 'https://play.google.com', requiresProof: false }
+];
+
+export const mockTaskSubmissions: TaskSubmission[] = [
+    { id: 'sub-1', userId: 'user-2', username: 'Alex', avatar: 'https://picsum.photos/seed/alex/100/100', taskId: 'task-3', taskTitle: 'Share on Social Media', proof: 'My username is @alex_shares', submittedAt: new Date().toISOString() },
+    { id: 'sub-2', userId: 'user-3', username: 'Sam', avatar: 'https://picsum.photos/seed/sam/100/100', taskId: 'task-5', taskTitle: 'Subscribe to our YouTube', proof: 'My YouTube handle is SamStreams', submittedAt: new Date(Date.now() - 3600 * 1000).toISOString() },
 ];
 
 export const mockBrandingSettings: BrandingSettings = {

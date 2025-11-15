@@ -23,6 +23,7 @@ import UserManagementPage from './pages/admin/UserManagementPage';
 import LoginDetailsPage from './pages/admin/LoginDetailsPage';
 import PlatformSettingsPage from './pages/admin/PlatformSettingsPage';
 import TaskManagementPage from './pages/admin/TaskManagementPage';
+import TaskMonitoringPage from './pages/admin/TaskMonitoringPage';
 
 
 function App() {
@@ -64,6 +65,7 @@ function App() {
           <Route path="logins" element={<LoginDetailsPage />} />
           <Route path="settings" element={<PlatformSettingsPage />} />
           <Route path="tasks" element={<TaskManagementPage />} />
+          <Route path="task-monitoring" element={<TaskMonitoringPage />} />
         </Route>
         
         {/* === GLOBAL CATCH-ALL === */}

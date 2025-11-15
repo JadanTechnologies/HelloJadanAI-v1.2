@@ -33,10 +33,10 @@ const initialGenerations: Generation[] = [
 ];
 
 const initialTasks: Task[] = [
-    { id: 'task-1', title: 'Daily Login', description: 'Log in every day to earn credits.', creditReward: 10, isCompleted: true, type: 'daily' },
-    { id: 'task-2', title: 'Generate 1 Image', description: 'Create your first masterpiece.', creditReward: 5, isCompleted: false, type: 'daily' },
-    { id: 'task-3', title: 'Share on Social Media', description: 'Share your creation with friends.', creditReward: 15, isCompleted: false, type: 'engagement' },
-    { id: 'task-4', title: 'Complete Profile', description: 'Upload an avatar and set a username.', creditReward: 20, isCompleted: true, type: 'profile' },
+    { id: 'task-1', title: 'Daily Login', description: 'Log in every day to earn credits.', creditReward: 10, status: 'completed', type: 'daily' },
+    { id: 'task-2', title: 'Generate 1 Image', description: 'Create your first masterpiece.', creditReward: 5, status: 'incomplete', type: 'daily' },
+    { id: 'task-3', title: 'Share on Social Media', description: 'Share your creation with friends.', creditReward: 15, status: 'incomplete', type: 'engagement', requiresProof: true, targetUrl: 'https://x.com' },
+    { id: 'task-4', title: 'Complete Profile', description: 'Upload an avatar and set a username.', creditReward: 20, status: 'completed', type: 'profile' },
 ];
 
 const initialCreditHistory: CreditTransaction[] = [
@@ -62,16 +62,21 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
       return { ...state, credits: action.payload };
     case 'ADD_GENERATION':
       return { ...state, generations: [action.payload, ...state.generations] };
-    case 'COMPLETE_TASK':
-        const taskToComplete = state.tasks.find(t => t.id === action.payload);
-        if (!taskToComplete || taskToComplete.isCompleted) return state;
+    case 'UPDATE_TASK_STATUS':
+        const { taskId, status } = action.payload;
+        const taskToUpdate = state.tasks.find(t => t.id === taskId);
+        if (!taskToUpdate || taskToUpdate.status !== 'incomplete') return state;
         
+        const isCompleting = status === 'completed';
+
         return {
             ...state,
-            credits: state.credits + taskToComplete.creditReward,
-            tasks: state.tasks.map(t => t.id === action.payload ? { ...t, isCompleted: true } : t),
-            user: state.user ? { ...state.user, tasksCompleted: state.user.tasksCompleted + 1 } : null,
-            creditHistory: [{ id: `tx-${Date.now()}`, description: `Task: ${taskToComplete.title}`, amount: taskToComplete.creditReward, date: new Date().toISOString()}, ...state.creditHistory]
+            credits: isCompleting ? state.credits + taskToUpdate.creditReward : state.credits,
+            tasks: state.tasks.map(t => t.id === taskId ? { ...t, status } : t),
+            user: state.user && isCompleting ? { ...state.user, tasksCompleted: state.user.tasksCompleted + 1 } : state.user,
+            creditHistory: isCompleting 
+                ? [{ id: `tx-${Date.now()}`, description: `Task: ${taskToUpdate.title}`, amount: taskToUpdate.creditReward, date: new Date().toISOString()}, ...state.creditHistory]
+                : state.creditHistory
         };
     case 'TOGGLE_FAVORITE':
       return { ...state, generations: state.generations.map(g => g.id === action.payload ? { ...g, isFavorite: !g.isFavorite } : g) };

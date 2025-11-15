@@ -51,8 +51,21 @@ export interface Task {
   title: string;
   description: string;
   creditReward: number;
-  isCompleted: boolean;
-  type: 'daily' | 'engagement' | 'profile';
+  status: 'incomplete' | 'pending' | 'completed';
+  type: 'daily' | 'engagement' | 'profile' | 'youtube_subscribe' | 'social_follow' | 'social_share' | 'app_download';
+  targetUrl?: string;
+  requiresProof?: boolean;
+}
+
+export interface TaskSubmission {
+  id: string;
+  userId: string;
+  username: string;
+  avatar: string;
+  taskId: string;
+  taskTitle: string;
+  proof: string;
+  submittedAt: string;
 }
 
 export interface FAQItem {
@@ -89,7 +102,7 @@ export type AppAction =
   | { type: 'LOGOUT' }
   | { type: 'UPDATE_CREDITS'; payload: number }
   | { type: 'ADD_GENERATION'; payload: Generation }
-  | { type: 'COMPLETE_TASK'; payload: string }
+  | { type: 'UPDATE_TASK_STATUS'; payload: { taskId: string; status: 'incomplete' | 'pending' | 'completed' } }
   | { type: 'TOGGLE_FAVORITE'; payload: string }
   | { type: 'DELETE_GENERATION'; payload: string }
   | { type: 'ADD_CREDIT_TRANSACTION'; payload: CreditTransaction };

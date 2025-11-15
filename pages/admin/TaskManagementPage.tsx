@@ -25,7 +25,7 @@ const TaskManagementPage = () => {
         setTasks(currentTasks => currentTasks.filter(t => t.id !== taskId));
     };
 
-    const handleSaveTask = (taskData: Omit<Task, 'id' | 'isCompleted'>) => {
+    const handleSaveTask = (taskData: Omit<Task, 'id' | 'status'>) => {
         if (editingTask) {
             // Update existing task
             setTasks(currentTasks => currentTasks.map(t => t.id === editingTask.id ? { ...editingTask, ...taskData } : t));
@@ -34,7 +34,7 @@ const TaskManagementPage = () => {
             const newTask: Task = {
                 ...taskData,
                 id: `task-${Date.now()}`,
-                isCompleted: false, // New tasks are never completed by default
+                status: 'incomplete',
             };
             setTasks(currentTasks => [newTask, ...currentTasks]);
         }
@@ -60,6 +60,7 @@ const TaskManagementPage = () => {
                                 <th scope="col" className="px-6 py-3">Title</th>
                                 <th scope="col" className="px-6 py-3">Credit Reward</th>
                                 <th scope="col" className="px-6 py-3">Type</th>
+                                <th scope="col" className="px-6 py-3">Requires Proof?</th>
                                 <th scope="col" className="px-6 py-3">Actions</th>
                             </tr>
                         </thead>
@@ -68,7 +69,8 @@ const TaskManagementPage = () => {
                                 <tr key={task.id} className="bg-slate-800 border-b border-slate-700">
                                     <td className="px-6 py-4 font-medium text-white">{task.title}</td>
                                     <td className="px-6 py-4 font-bold text-brand-cyan">+{task.creditReward}</td>
-                                    <td className="px-6 py-4 capitalize">{task.type}</td>
+                                    <td className="px-6 py-4 capitalize">{task.type.replace('_', ' ')}</td>
+                                    <td className="px-6 py-4">{task.requiresProof ? 'Yes' : 'No'}</td>
                                     <td className="px-6 py-4 space-x-4">
                                         <button onClick={() => openEditModal(task)} className="font-medium text-brand-cyan hover:underline">Edit</button>
                                         <button onClick={() => handleDelete(task.id)} className="font-medium text-red-500 hover:underline">Delete</button>
@@ -96,20 +98,26 @@ const TaskManagementPage = () => {
 interface TaskFormModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (taskData: Omit<Task, 'id' | 'isCompleted'>) => void;
+    onSave: (taskData: Omit<Task, 'id' | 'status'>) => void;
     task: Task | null;
 }
+
+const taskTypes: Task['type'][] = ['daily', 'engagement', 'profile', 'youtube_subscribe', 'social_follow', 'social_share', 'app_download'];
 
 const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, onSave, task }) => {
     const [title, setTitle] = useState(task?.title || '');
     const [description, setDescription] = useState(task?.description || '');
     const [creditReward, setCreditReward] = useState(task?.creditReward || 10);
-    const [type, setType] = useState<'daily' | 'engagement' | 'profile'>(task?.type || 'daily');
+    const [type, setType] = useState<Task['type']>(task?.type || 'daily');
+    const [targetUrl, setTargetUrl] = useState(task?.targetUrl || '');
+    const [requiresProof, setRequiresProof] = useState(task?.requiresProof || false);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave({ title, description, creditReward, type });
+        onSave({ title, description, creditReward, type, targetUrl, requiresProof });
     };
+    
+    const showTargetUrlInput = !['daily', 'profile', 'engagement'].includes(type);
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title={task ? 'Edit Task' : 'Create New Task'}>
@@ -141,11 +149,28 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, onSave, 
                         onChange={e => setType(e.target.value as any)}
                         className="w-full bg-slate-800 border border-slate-700 rounded-lg py-2 px-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-indigo"
                     >
-                        <option value="daily">Daily</option>
-                        <option value="engagement">Engagement</option>
-                        <option value="profile">Profile</option>
+                        {taskTypes.map(t => <option key={t} value={t}>{t.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</option>)}
                     </select>
                 </div>
+
+                {showTargetUrlInput && (
+                    <div>
+                        <label htmlFor="targetUrl" className="block text-sm font-medium text-slate-300 mb-1">Target URL</label>
+                        <Input id="targetUrl" type="url" placeholder="https://example.com" value={targetUrl} onChange={e => setTargetUrl(e.target.value)} />
+                    </div>
+                )}
+                
+                <div className="flex items-center">
+                    <input
+                        id="requiresProof"
+                        type="checkbox"
+                        checked={requiresProof}
+                        onChange={(e) => setRequiresProof(e.target.checked)}
+                        className="h-4 w-4 rounded border-slate-600 bg-slate-800 text-brand-indigo focus:ring-brand-indigo"
+                    />
+                    <label htmlFor="requiresProof" className="ml-2 block text-sm text-slate-300">Requires Manual Verification</label>
+                </div>
+
                 <div className="pt-4 flex justify-end space-x-2">
                     <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
                     <Button type="submit">Save Task</Button>
