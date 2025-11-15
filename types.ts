@@ -174,6 +174,7 @@ export interface StaffMember {
 export interface Referral {
     id: string;
     referrerId: string;
+    // FIX: Add missing `referrerUsername` property to the `Referral` interface.
     referrerUsername: string;
     refereeId: string;
     refereeUsername: string;
@@ -215,6 +216,8 @@ export interface AppState {
   announcements: Announcement[];
   referrals: Referral[];
   systemSettings: SystemSettings;
+  brandingSettings: BrandingSettings;
+  contentSettings: ContentSettings;
 }
 
 export type AppAction =
@@ -230,6 +233,7 @@ export type AppAction =
   | { type: 'ADD_NOTIFICATION'; payload: Omit<Notification, 'id' | 'createdAt' | 'read'> }
   | { type: 'MARK_NOTIFICATION_AS_READ'; payload: string }
   | { type: 'UPDATE_SYSTEM_SETTINGS'; payload: SystemSettings }
+  | { type: 'UPDATE_PLATFORM_SETTINGS'; payload: { brandingSettings: BrandingSettings; contentSettings: ContentSettings } }
   | { type: 'INCREMENT_DAILY_GENERATION'; payload: { type: GenerationType } };
 
 export type GenerationType = 'image' | 'video' | 'ad';

@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
 import { ThemeContext } from '../contexts/ThemeContext';
+import { AppContext } from '../contexts/AppContext';
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
 import Modal from '../components/common/Modal';
 import { ImageIcon, VideoIcon, AdIcon, TaskIcon, CreditIcon } from '../constants';
-import { mockBrandingSettings, mockContentSettings } from './admin/data';
 import { ContentSettings, BrandingSettings } from '../types';
 
 const Hologram: React.FC<{ logoUrl: string | null }> = ({ logoUrl }) => {
@@ -85,9 +85,9 @@ const AccordionItem: React.FC<{ title: string, children: React.ReactNode }> = ({
 };
 
 const LandingPage: React.FC = () => {
+    const { state } = useContext(AppContext);
     const { t } = useTranslation();
-    const [content] = useState<ContentSettings>(mockContentSettings);
-    const [branding] = useState<BrandingSettings>(mockBrandingSettings);
+    const { contentSettings, brandingSettings } = state;
     const [modalContent, setModalContent] = useState<{ title: string; content: string } | null>(null);
 
     return (
@@ -108,7 +108,7 @@ const LandingPage: React.FC = () => {
                 <section className="relative flex flex-col items-center justify-center h-screen text-center px-4">
                     <div className="absolute inset-0 bg-slate-50 dark:bg-slate-900/50 [mask-image:linear-gradient(0deg,transparent,black)]"></div>
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-brand-indigo/10 dark:bg-brand-indigo/20 rounded-full blur-3xl animate-pulse-glow"></div>
-                    <div className="z-10"><Hologram logoUrl={branding.hologramLogoUrl} /></div>
+                    <div className="z-10"><Hologram logoUrl={brandingSettings.hologramLogoUrl} /></div>
                     <div className="relative z-10 mt-8">
                         <h2 className="text-4xl md:text-6xl font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight">Unlock Your <span className="text-brand-cyan">Creative</span> Potential</h2>
                         <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-600 dark:text-slate-400">Generate stunning AI images, videos, and ads simply by completing tasks. No payment required.</p>
@@ -120,7 +120,7 @@ const LandingPage: React.FC = () => {
                 <section id="about" className="py-20 px-4 bg-slate-50 dark:bg-slate-900/50">
                     <div className="container mx-auto text-center max-w-3xl">
                         <h3 className="text-3xl font-bold text-slate-900 dark:text-white">About Us</h3>
-                        <p className="text-slate-600 dark:text-slate-400 mt-4 leading-relaxed">{content.aboutUs}</p>
+                        <p className="text-slate-600 dark:text-slate-400 mt-4 leading-relaxed">{contentSettings.aboutUs}</p>
                     </div>
                 </section>
 
@@ -128,7 +128,7 @@ const LandingPage: React.FC = () => {
                     <div className="container mx-auto max-w-3xl">
                         <h3 className="text-3xl font-bold text-center text-slate-900 dark:text-white mb-8">Frequently Asked Questions</h3>
                         <div className="space-y-2">
-                            {content.faqs.map(faq => <AccordionItem key={faq.id} title={faq.question}>{faq.answer}</AccordionItem>)}
+                            {contentSettings.faqs.map(faq => <AccordionItem key={faq.id} title={faq.question}>{faq.answer}</AccordionItem>)}
                         </div>
                     </div>
                 </section>
@@ -136,15 +136,15 @@ const LandingPage: React.FC = () => {
                 <section id="contact" className="py-20 px-4 bg-slate-50 dark:bg-slate-900/50">
                     <div className="container mx-auto text-center max-w-3xl">
                         <h3 className="text-3xl font-bold text-slate-900 dark:text-white">Contact Us</h3>
-                        <p className="text-slate-600 dark:text-slate-400 mt-4 whitespace-pre-line">{content.contactUs}</p>
+                        <p className="text-slate-600 dark:text-slate-400 mt-4 whitespace-pre-line">{contentSettings.contactUs}</p>
                     </div>
                 </section>
             </main>
             
             <footer className="bg-slate-100 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 p-8 text-center text-slate-500">
                 <div className="space-x-4 mb-4">
-                    <button onClick={() => setModalContent({title: "Terms of Service", content: content.termsOfService})} className="hover:text-brand-cyan transition">Terms of Service</button>
-                    <button onClick={() => setModalContent({title: "Privacy Policy", content: content.privacyPolicy})} className="hover:text-brand-cyan transition">Privacy Policy</button>
+                    <button onClick={() => setModalContent({title: "Terms of Service", content: contentSettings.termsOfService})} className="hover:text-brand-cyan transition">Terms of Service</button>
+                    <button onClick={() => setModalContent({title: "Privacy Policy", content: contentSettings.privacyPolicy})} className="hover:text-brand-cyan transition">Privacy Policy</button>
                 </div>
                 <p>&copy; {new Date().getFullYear()} HelloJadanAI. All rights reserved.</p>
             </footer>

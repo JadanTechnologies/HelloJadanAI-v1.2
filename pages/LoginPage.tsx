@@ -42,11 +42,11 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-brand-navy">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
+        <Link to="/" className="text-center mb-8 block">
             <h1 className="text-4xl font-bold text-white">
                 Hello<span className="text-brand-cyan">Jadan</span>AI
             </h1>
-        </div>
+        </Link>
         <Card>
           <div className="mb-6">
               <div className="flex bg-slate-900 border border-slate-700 rounded-lg p-1">

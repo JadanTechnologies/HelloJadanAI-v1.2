@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, ReactNode } from 'react';
-import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement, Referral, SystemSettings, AccessRestrictionRule, GenerationType } from '../types';
-import { mockAnnouncements, mockReferrals, mockSystemSettings } from '../pages/admin/data';
+import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement, Referral, SystemSettings, AccessRestrictionRule, GenerationType, BrandingSettings, ContentSettings } from '../types';
+import { mockAnnouncements, mockReferrals, mockSystemSettings, mockBrandingSettings, mockContentSettings } from '../pages/admin/data';
 
 const mockAdminUser: User = {
     id: 'user-1',
@@ -68,6 +68,8 @@ const initialState: AppState = {
   }),
   referrals: mockReferrals,
   systemSettings: mockSystemSettings,
+  brandingSettings: mockBrandingSettings,
+  contentSettings: mockContentSettings,
 };
 
 const appReducer = (state: AppState, action: AppAction): AppState => {
@@ -147,6 +149,12 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
       };
     case 'UPDATE_SYSTEM_SETTINGS':
         return { ...state, systemSettings: action.payload };
+    case 'UPDATE_PLATFORM_SETTINGS':
+        return {
+            ...state,
+            brandingSettings: action.payload.brandingSettings,
+            contentSettings: action.payload.contentSettings,
+        };
     case 'INCREMENT_DAILY_GENERATION':
         if (!state.user) return state;
         const { type } = action.payload;

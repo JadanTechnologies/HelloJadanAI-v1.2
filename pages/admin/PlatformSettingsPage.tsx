@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import Input from '../../components/common/Input';
+import { AppContext } from '../../contexts/AppContext';
 import { CREDIT_COSTS, TrashIcon, UploadIcon } from '../../constants';
-import { mockBrandingSettings, mockContentSettings, mockApiSettings, mockSystemSettings } from './data';
+import { mockApiSettings } from './data';
 import { BrandingSettings, ContentSettings, FAQItem, ApiSettings, SystemSettings } from '../../types';
 
 type SettingsTab = 'general' | 'branding' | 'content' | 'models_limits' | 'integrations' | 'referrals_fraud';
@@ -20,15 +21,18 @@ const initialProviders = {
 };
 
 const PlatformSettingsPage = () => {
+    const { state, dispatch } = useContext(AppContext);
     const [activeTab, setActiveTab] = useState<SettingsTab>('general');
     
-    // States for each settings category
+    // States for each settings category, initialized from global context
+    const [branding, setBranding] = useState<BrandingSettings>(state.brandingSettings);
+    const [content, setContent] = useState<ContentSettings>(state.contentSettings);
+    const [systemSettings, setSystemSettings] = useState<SystemSettings>(state.systemSettings);
+    
+    // Local-only state for settings not used elsewhere
     const [costs, setCosts] = useState(CREDIT_COSTS);
     const [providers, setProviders] = useState(initialProviders);
-    const [branding, setBranding] = useState<BrandingSettings>(mockBrandingSettings);
-    const [content, setContent] = useState<ContentSettings>(mockContentSettings);
     const [apiSettings, setApiSettings] = useState<ApiSettings>(mockApiSettings);
-    const [systemSettings, setSystemSettings] = useState<SystemSettings>(mockSystemSettings);
     
     const [isSaving, setIsSaving] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -37,10 +41,20 @@ const PlatformSettingsPage = () => {
     const [isFaqModalOpen, setIsFaqModalOpen] = useState(false);
     const [editingFaq, setEditingFaq] = useState<FAQItem | null>(null);
 
+    // Sync local state if global context changes
+    useEffect(() => {
+        setBranding(state.brandingSettings);
+        setContent(state.contentSettings);
+        setSystemSettings(state.systemSettings);
+    }, [state.brandingSettings, state.contentSettings, state.systemSettings]);
+
     const handleSave = () => {
         setIsSaving(true);
         setSaved(false);
         setTimeout(() => {
+            dispatch({ type: 'UPDATE_PLATFORM_SETTINGS', payload: { brandingSettings: branding, contentSettings: content } });
+            dispatch({ type: 'UPDATE_SYSTEM_SETTINGS', payload: systemSettings });
+            
             console.log("Saved Settings:", { costs, providers, branding, content, apiSettings, systemSettings });
             setIsSaving(false);
             setSaved(true);
@@ -132,7 +146,7 @@ const PlatformSettingsPage = () => {
                              <div key={field}>
                                  <label className="block text-sm font-medium text-slate-300 capitalize mb-2">{field.replace('Url', ' ')}</label>
                                  <div className="aspect-square bg-slate-900 rounded-lg flex items-center justify-center relative group">
-                                     {branding[field] ? <img src={branding[field]} alt={field} className="max-w-full max-h-full object-contain p-2"/> : <span className="text-slate-500">No Image</span>}
+                                     {branding[field] ? <img src={branding[field]!} alt={field} className="max-w-full max-h-full object-contain p-2"/> : <span className="text-slate-500">No Image</span>}
                                      <label htmlFor={field} className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                                         <UploadIcon className="w-8 h-8"/> Upload
                                      </label>
