@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, ReactNode } from 'react';
 import en from '../locales/en.json';
 import ha from '../locales/ha.json';
 
@@ -11,7 +11,7 @@ interface LanguageContextType {
   translations: Translations;
 }
 
-const translationsMap = { en, ha };
+const translationsMap: { [key in Locale]: Translations } = { en, ha };
 
 export const LanguageContext = createContext<LanguageContextType>({
   locale: 'en',

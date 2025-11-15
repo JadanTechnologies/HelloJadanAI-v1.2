@@ -14,19 +14,16 @@ import Admin from './pages/Admin';
 import CreditHistory from './pages/CreditHistory';
 
 const PrivateRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
-  // FIX: Property 'user' does not exist on type '{ state: AppState; dispatch: Dispatch<AppAction>; login: () => void; logout: () => void; }'.
   const { state } = useContext(AppContext);
   return state.user ? children : <Navigate to="/login" />;
 };
 
 const AdminRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
-    // FIX: Property 'user' does not exist on type '{ state: AppState; dispatch: Dispatch<AppAction>; login: () => void; logout: () => void; }'.
     const { state } = useContext(AppContext);
     return state.user && state.user.isAdmin ? children : <Navigate to="/" />;
 }
 
 function App() {
-  // FIX: Property 'user' does not exist on type '{ state: AppState; dispatch: Dispatch<AppAction>; login: () => void; logout: () => void; }'.
   const { state } = useContext(AppContext);
 
   return (
