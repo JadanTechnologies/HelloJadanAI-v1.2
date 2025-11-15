@@ -62,13 +62,13 @@ const Dashboard = () => {
             <Card>
               <h3 className="text-lg font-semibold text-white mb-4">{t('quickActions')}</h3>
               <div className="space-y-3">
-                <Link to="/generate-image">
+                <Link to="/app/generate-image">
                   <Button className="w-full justify-start"><ImageIcon className="w-5 h-5 mr-3"/>{t('generateImage')}</Button>
                 </Link>
-                 <Link to="/generate-video">
+                 <Link to="/app/generate-video">
                   <Button className="w-full justify-start"><VideoIcon className="w-5 h-5 mr-3"/>{t('generateVideo')}</Button>
                 </Link>
-                 <Link to="/generate-ad">
+                 <Link to="/app/generate-ad">
                   <Button className="w-full justify-start"><AdIcon className="w-5 h-5 mr-3"/>{t('generateAd')}</Button>
                 </Link>
               </div>

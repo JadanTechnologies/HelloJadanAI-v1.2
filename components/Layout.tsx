@@ -20,7 +20,7 @@ const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
                             </svg>
                         </button>
-                        <Link to="/" className="text-xl font-bold text-white">
+                        <Link to="/app/dashboard" className="text-xl font-bold text-white">
                             Hello<span className="text-brand-cyan">Jadan</span>AI
                         </Link>
                     </div>
@@ -64,6 +64,7 @@ const inactiveLinkClasses = "text-slate-400 hover:bg-slate-700 hover:text-white"
 const NavItem: React.FC<{ to: string, icon: React.ReactNode, label: string, onClick?: () => void }> = ({ to, icon, label, onClick }) => (
     <NavLink
         to={to}
+        end
         onClick={onClick}
         className={({ isActive }) => `${navLinkClasses} ${isActive ? activeLinkClasses : inactiveLinkClasses}`}
     >
@@ -76,7 +77,6 @@ const NavItem: React.FC<{ to: string, icon: React.ReactNode, label: string, onCl
 const Sidebar: React.FC<{ isOpen: boolean, setIsOpen: (isOpen: boolean) => void }> = ({ isOpen, setIsOpen }) => {
     const { state } = useContext(AppContext);
     const { t } = useTranslation();
-    const location = useLocation();
     
     const closeSidebar = () => setIsOpen(false);
 
@@ -85,14 +85,15 @@ const Sidebar: React.FC<{ isOpen: boolean, setIsOpen: (isOpen: boolean) => void 
             <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-transform duration-300 ease-in-out`}>
                 <div className="flex flex-col h-full p-4">
                     <nav className="flex-1 space-y-2">
-                        <NavItem to="/" icon={<HomeIcon className="w-5 h-5"/>} label={t('navDashboard')} onClick={closeSidebar}/>
-                        <NavItem to="/generate-image" icon={<ImageIcon className="w-5 h-5"/>} label={t('navGenerateImage')} onClick={closeSidebar}/>
-                        <NavItem to="/generate-video" icon={<VideoIcon className="w-5 h-5"/>} label={t('navGenerateVideo')} onClick={closeSidebar}/>
-                        <NavItem to="/generate-ad" icon={<AdIcon className="w-5 h-5"/>} label={t('navGenerateAd')} onClick={closeSidebar}/>
-                        <NavItem to="/tasks" icon={<TaskIcon className="w-5 h-5"/>} label={t('navTasks')} onClick={closeSidebar}/>
-                        <NavItem to="/gallery" icon={<GalleryIcon className="w-5 h-5"/>} label={t('navGallery')} onClick={closeSidebar}/>
+                        <NavItem to="/app/dashboard" icon={<HomeIcon className="w-5 h-5"/>} label={t('navDashboard')} onClick={closeSidebar}/>
+                        <NavItem to="/app/generate-image" icon={<ImageIcon className="w-5 h-5"/>} label={t('navGenerateImage')} onClick={closeSidebar}/>
+                        <NavItem to="/app/generate-video" icon={<VideoIcon className="w-5 h-5"/>} label={t('navGenerateVideo')} onClick={closeSidebar}/>
+                        <NavItem to="/app/generate-ad" icon={<AdIcon className="w-5 h-5"/>} label={t('navGenerateAd')} onClick={closeSidebar}/>
+                        <NavItem to="/app/tasks" icon={<TaskIcon className="w-5 h-5"/>} label={t('navTasks')} onClick={closeSidebar}/>
+                        <NavItem to="/app/gallery" icon={<GalleryIcon className="w-5 h-5"/>} label={t('navGallery')} onClick={closeSidebar}/>
+                        <NavItem to="/app/credits" icon={<CreditIcon className="w-5 h-5"/>} label={t('creditHistory')} onClick={closeSidebar}/>
                         {state.user?.isAdmin && (
-                            <NavItem to="/admin" icon={<AdminIcon className="w-5 h-5"/>} label={t('navAdmin')} onClick={closeSidebar}/>
+                            <NavItem to="/app/admin" icon={<AdminIcon className="w-5 h-5"/>} label={t('navAdmin')} onClick={closeSidebar}/>
                         )}
                     </nav>
                 </div>
@@ -104,13 +105,14 @@ const Sidebar: React.FC<{ isOpen: boolean, setIsOpen: (isOpen: boolean) => void 
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const location = useLocation();
 
     return (
         <div className="min-h-screen text-slate-200">
             <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
             <div className="lg:pl-64 flex flex-col flex-1">
                 <Header onMenuClick={() => setSidebarOpen(true)} />
-                <main className="flex-1 p-4 sm:p-6 lg:p-8">
+                <main key={location.pathname} className="flex-1 p-4 sm:p-6 lg:p-8 animate-fade-in-up">
                     {children}
                 </main>
             </div>
