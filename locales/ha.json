@@ -47,6 +47,8 @@
   "analytics": "Kididdiga",
   "taskSettings": "Saitunan Ayyuka",
   "creditHistory": "Tarihin Kiredit",
+  "loginDetails": "Bayanin Shiga",
+  "loginHistory": "Tarihin Shiga",
   "notEnoughCredits": "Babu isassun kiredit don yin wannan aikin.",
   "generationFailed": "Kirkira ya gaza. Don Allah a sake gwadawa."
 }

@@ -9,6 +9,13 @@ const mockUsers: User[] = [
     { id: 'user-2', username: 'Alex', email: 'alex@example.com', avatar: 'https://picsum.photos/seed/alex/100/100', isAdmin: false, tasksCompleted: 12, ip: '10.0.0.5', deviceInfo: 'Safari on iOS' },
 ];
 
+const mockLoginDetails = [
+    { id: 'log-1', date: new Date('2023-10-26T10:00:00Z').toISOString(), ip: '192.168.1.1', device: 'Chrome on macOS', status: 'Success' },
+    { id: 'log-2', date: new Date('2023-10-26T09:30:00Z').toISOString(), ip: '203.0.113.55', device: 'Unknown', status: 'Failed' },
+    { id: 'log-3', date: new Date('2023-10-25T15:12:45Z').toISOString(), ip: '192.168.1.1', device: 'Chrome on macOS', status: 'Success' },
+    { id: 'log-4', date: new Date('2023-10-24T11:05:10Z').toISOString(), ip: '198.51.100.2', device: 'Firefox on Windows', status: 'Success' },
+];
+
 const analyticsData = {
     dau: [
         { date: '2023-10-01', users: 120 }, { date: '2023-10-02', users: 150 }, { date: '2023-10-03', users: 130 }, { date: '2023-10-04', users: 180 },
@@ -86,6 +93,45 @@ const AnalyticsDashboard = () => (
     </div>
 );
 
+const AdminLoginDetails = () => {
+    const { t } = useTranslation();
+    return (
+    <Card>
+        <h2 className="text-xl font-bold mb-4">{t('loginHistory')}</h2>
+        <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left text-slate-400">
+                <thead className="text-xs text-slate-300 uppercase bg-slate-700">
+                    <tr>
+                        <th scope="col" className="px-6 py-3">Date & Time</th>
+                        <th scope="col" className="px-6 py-3">IP Address</th>
+                        <th scope="col" className="px-6 py-3">Device / Browser</th>
+                        <th scope="col" className="px-6 py-3">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {mockLoginDetails.map(log => (
+                        <tr key={log.id} className="bg-slate-800 border-b border-slate-700">
+                            <td className="px-6 py-4">{new Date(log.date).toLocaleString()}</td>
+                            <td className="px-6 py-4">{log.ip}</td>
+                            <td className="px-6 py-4">{log.device}</td>
+                            <td className="px-6 py-4">
+                                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                                    log.status === 'Success' 
+                                    ? 'bg-green-500/20 text-green-400' 
+                                    : 'bg-red-500/20 text-red-400'
+                                }`}>
+                                    {log.status}
+                                </span>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    </Card>
+    );
+};
+
 
 const Admin = () => {
   const { t } = useTranslation();
@@ -94,6 +140,7 @@ const Admin = () => {
   const tabs = [
     { id: 'users', label: t('userManagement') },
     { id: 'analytics', label: t('analytics') },
+    { id: 'logins', label: t('loginDetails') },
   ];
 
   return (
@@ -124,6 +171,7 @@ const Admin = () => {
       <div>
         {activeTab === 'users' && <UserManagement />}
         {activeTab === 'analytics' && <AnalyticsDashboard />}
+        {activeTab === 'logins' && <AdminLoginDetails />}
       </div>
     </div>
   );

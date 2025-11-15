@@ -47,6 +47,8 @@
   "analytics": "Analytics",
   "taskSettings": "Task Settings",
   "creditHistory": "Credit History",
+  "loginDetails": "Login Details",
+  "loginHistory": "Login History",
   "notEnoughCredits": "Not enough credits to perform this action.",
   "generationFailed": "Generation Failed. Please try again."
 }
