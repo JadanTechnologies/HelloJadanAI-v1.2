@@ -133,7 +133,7 @@ const TemplateModal: React.FC<TemplateModalProps> = ({isOpen, onClose, onSave, t
                     <label className="block text-sm font-medium text-slate-300 mb-1">Body</label>
                     <textarea value={body} onChange={e => setBody(e.target.value)} rows={8} className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white font-mono" required />
                     {/* FIX: Corrected the invalid JSX syntax used to display placeholder examples. */}
-                    <p className="text-xs text-slate-500 mt-1">Use placeholders like {'`{{username}}`'} or {'`{{resetLink}}`'}.</p>
+                    <p className="text-xs text-slate-500 mt-1">Use placeholders like {`{{username}}`} or {`{{resetLink}}`}.</p>
                  </div>
                  <div className="pt-4 flex justify-end space-x-2">
                     <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
