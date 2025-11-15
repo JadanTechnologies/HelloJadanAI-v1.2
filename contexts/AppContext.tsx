@@ -1,5 +1,6 @@
 import React, { createContext, useReducer, ReactNode } from 'react';
-import { AppState, AppAction, User, Generation, CreditTransaction, Task } from '../types';
+import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement } from '../types';
+import { mockAnnouncements } from '../pages/admin/data';
 
 const mockAdminUser: User = {
     id: 'user-1',
@@ -50,6 +51,13 @@ const initialState: AppState = {
   generations: initialGenerations,
   creditHistory: initialCreditHistory,
   tasks: initialTasks,
+  notifications: [],
+  announcements: mockAnnouncements.filter(a => {
+      const now = new Date();
+      const start = new Date(a.startDate);
+      const end = a.endDate ? new Date(a.endDate) : null;
+      return a.isActive && start <= now && (!end || end >= now);
+  }),
 };
 
 const appReducer = (state: AppState, action: AppAction): AppState => {
@@ -84,6 +92,21 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
       return { ...state, generations: state.generations.filter(g => g.id !== action.payload) };
     case 'ADD_CREDIT_TRANSACTION':
         return { ...state, creditHistory: [action.payload, ...state.creditHistory]}
+    case 'SET_ANNOUNCEMENTS':
+      return { ...state, announcements: action.payload };
+    case 'ADD_NOTIFICATION':
+      const newNotification: Notification = {
+        ...action.payload,
+        id: `notif-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        read: false,
+      };
+      return { ...state, notifications: [newNotification, ...state.notifications] };
+    case 'MARK_NOTIFICATION_AS_READ':
+      return {
+        ...state,
+        notifications: state.notifications.map(n => n.id === action.payload ? { ...n, read: true } : n),
+      };
     default:
       return state;
   }

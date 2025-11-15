@@ -1,20 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import { mockTaskSubmissions } from './data';
 import { TaskSubmission } from '../../types';
+import { AppContext } from '../../contexts/AppContext';
 
 const TaskMonitoringPage = () => {
+    const { dispatch } = useContext(AppContext);
     const [submissions, setSubmissions] = useState<TaskSubmission[]>(mockTaskSubmissions);
 
     const handleApprove = (submissionId: string) => {
         const submission = submissions.find(s => s.id === submissionId);
-        console.log(`Approving submission ${submissionId} for user ${submission?.userId}. Award credits and update task status.`);
+        if (submission) {
+            console.log(`Approving submission ${submissionId} for user ${submission?.userId}. Award credits and update task status.`);
+            dispatch({
+                type: 'ADD_NOTIFICATION',
+                payload: {
+                    message: `Your submission for "${submission.taskTitle}" has been approved!`,
+                    type: 'success',
+                }
+            });
+        }
         setSubmissions(current => current.filter(s => s.id !== submissionId));
     };
     
     const handleReject = (submissionId: string) => {
-         console.log(`Rejecting submission ${submissionId}.`);
+         const submission = submissions.find(s => s.id === submissionId);
+         if (submission) {
+             console.log(`Rejecting submission ${submissionId}.`);
+              dispatch({
+                type: 'ADD_NOTIFICATION',
+                payload: {
+                    message: `Your submission for "${submission.taskTitle}" was rejected. Please review the task requirements.`,
+                    type: 'warning',
+                }
+            });
+         }
         setSubmissions(current => current.filter(s => s.id !== submissionId));
     };
 

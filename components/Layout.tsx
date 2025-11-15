@@ -4,7 +4,7 @@ import { AppContext } from '../contexts/AppContext';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTranslation } from '../hooks/useTranslation';
-import { HomeIcon, ImageIcon, VideoIcon, AdIcon, TaskIcon, GalleryIcon, CreditIcon } from '../constants';
+import { HomeIcon, ImageIcon, VideoIcon, AdIcon, TaskIcon, GalleryIcon, CreditIcon, BellIcon } from '../constants';
 
 const ThemeToggle: React.FC = () => {
     const { theme, toggleTheme } = useTheme();
@@ -28,9 +28,16 @@ const ThemeToggle: React.FC = () => {
 }
 
 const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
-    const { state, logout } = useContext(AppContext);
+    const { state, dispatch, logout } = useContext(AppContext);
     const { locale, setLocale } = useContext(LanguageContext);
     const { t } = useTranslation();
+    const [isNotifOpen, setIsNotifOpen] = useState(false);
+    
+    const unreadCount = state.notifications.filter(n => !n.read).length;
+
+    const handleMarkAsRead = (id: string) => {
+        dispatch({ type: 'MARK_NOTIFICATION_AS_READ', payload: id });
+    }
 
     return (
         <header className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30">
@@ -63,6 +70,28 @@ const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
                             </select>
                         </div>
                         <ThemeToggle />
+                        <div className="relative">
+                            <button onClick={() => setIsNotifOpen(!isNotifOpen)} className="p-2 rounded-full text-slate-400 hover:bg-slate-700 hover:text-white relative">
+                                <BellIcon className="w-6 h-6"/>
+                                {unreadCount > 0 && <span className="absolute top-1 right-1 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-slate-800"></span>}
+                            </button>
+                            {isNotifOpen && (
+                                <div className="absolute right-0 mt-2 w-80 bg-slate-900 border border-slate-700 rounded-lg shadow-xl z-50">
+                                    <div className="p-3 font-semibold text-white border-b border-slate-700">Notifications</div>
+                                    <div className="max-h-80 overflow-y-auto">
+                                        {state.notifications.length > 0 ? state.notifications.map(notif => (
+                                            <div key={notif.id} className={`p-3 border-b border-slate-800 ${!notif.read ? 'bg-brand-indigo/10' : ''}`}>
+                                                <p className="text-sm text-slate-200">{notif.message}</p>
+                                                <div className="text-xs text-slate-500 mt-1 flex justify-between items-center">
+                                                    <span>{new Date(notif.createdAt).toLocaleDateString()}</span>
+                                                    {!notif.read && <button onClick={() => handleMarkAsRead(notif.id)} className="text-brand-cyan hover:underline">Mark as read</button>}
+                                                </div>
+                                            </div>
+                                        )) : <p className="p-4 text-sm text-slate-400 text-center">No new notifications.</p>}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                          <div className="relative">
                              <button className="flex items-center space-x-2">
                                 <img src={state.user?.avatar} alt="User" className="w-8 h-8 rounded-full"/>
@@ -125,9 +154,18 @@ const Sidebar: React.FC<{ isOpen: boolean, setIsOpen: (isOpen: boolean) => void 
 const Layout: React.FC = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const location = useLocation();
+    const { state } = useContext(AppContext);
+    const [showAnnouncement, setShowAnnouncement] = useState(true);
+    const activeAnnouncement = state.announcements.length > 0 ? state.announcements[0] : null;
 
     return (
         <div className="min-h-screen bg-slate-100 dark:bg-brand-navy text-slate-800 dark:text-slate-200">
+            {activeAnnouncement && showAnnouncement && (
+                <div className={`relative p-3 text-center text-sm text-white ${activeAnnouncement.type === 'warning' ? 'bg-yellow-600' : 'bg-brand-indigo'}`}>
+                    {activeAnnouncement.message}
+                    <button onClick={() => setShowAnnouncement(false)} className="absolute top-1/2 right-4 -translate-y-1/2 font-bold text-lg">×</button>
+                </div>
+            )}
             <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
             <div className="lg:pl-64 flex flex-col flex-1">
                 <Header onMenuClick={() => setSidebarOpen(true)} />

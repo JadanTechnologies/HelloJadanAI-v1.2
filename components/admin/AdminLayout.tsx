@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { NavLink, Link, useLocation, Outlet } from 'react-router-dom';
 import { AppContext } from '../../contexts/AppContext';
 import { useTranslation } from '../../hooks/useTranslation';
-import { AdminIcon, AnalyticsIcon, SettingsIcon, ChecklistIcon, ShieldCheckIcon } from '../../constants';
+import { AdminIcon, AnalyticsIcon, SettingsIcon, ChecklistIcon, ShieldCheckIcon, EnvelopeIcon, MegaphoneIcon, ClockIcon } from '../../constants';
 
 const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
     const { state, logout } = useContext(AppContext);
@@ -79,13 +79,28 @@ const Sidebar: React.FC<{ isOpen: boolean, setIsOpen: (isOpen: boolean) => void 
                     </Link>
                 </div>
                 <div className="flex flex-col h-full p-4">
-                    <nav className="flex-1 space-y-2">
+                    <nav className="flex-1 space-y-1">
                         <NavItem to="/admin/dashboard" icon={<AnalyticsIcon className="w-5 h-5"/>} label="Dashboard" onClick={closeSidebar}/>
-                        <NavItem to="/admin/users" icon={<AdminIcon className="w-5 h-5"/>} label={t('userManagement')} onClick={closeSidebar}/>
-                        <NavItem to="/admin/tasks" icon={<ChecklistIcon className="w-5 h-5" />} label="Task Management" onClick={closeSidebar} />
-                        <NavItem to="/admin/task-monitoring" icon={<ShieldCheckIcon className="w-5 h-5" />} label="Task Monitoring" onClick={closeSidebar} />
-                        <NavItem to="/admin/settings" icon={<SettingsIcon className="w-5 h-5" />} label="Platform Settings" onClick={closeSidebar} />
-                        <NavItem to="/admin/logins" icon={<LoginIcon className="w-5 h-5"/>} label={t('loginDetails')} onClick={closeSidebar}/>
+                        
+                        <div className="pt-4 mt-4 border-t border-slate-800">
+                            <h3 className="px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Management</h3>
+                            <NavItem to="/admin/users" icon={<AdminIcon className="w-5 h-5"/>} label={t('userManagement')} onClick={closeSidebar}/>
+                            <NavItem to="/admin/tasks" icon={<ChecklistIcon className="w-5 h-5" />} label="Task Management" onClick={closeSidebar} />
+                            <NavItem to="/admin/task-monitoring" icon={<ShieldCheckIcon className="w-5 h-5" />} label="Task Monitoring" onClick={closeSidebar} />
+                        </div>
+
+                        <div className="pt-4 mt-4 border-t border-slate-800">
+                            <h3 className="px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Communication</h3>
+                             <NavItem to="/admin/announcements" icon={<MegaphoneIcon className="w-5 h-5"/>} label="Announcements" onClick={closeSidebar}/>
+                             <NavItem to="/admin/templates" icon={<EnvelopeIcon className="w-5 h-5"/>} label="Templates" onClick={closeSidebar}/>
+                        </div>
+
+                        <div className="pt-4 mt-4 border-t border-slate-800">
+                            <h3 className="px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">System</h3>
+                            <NavItem to="/admin/settings" icon={<SettingsIcon className="w-5 h-5" />} label="Platform Settings" onClick={closeSidebar} />
+                            <NavItem to="/admin/cron-jobs" icon={<ClockIcon className="w-5 h-5"/>} label="Cron Jobs" onClick={closeSidebar}/>
+                            <NavItem to="/admin/logins" icon={<LoginIcon className="w-5 h-5"/>} label={t('loginDetails')} onClick={closeSidebar}/>
+                        </div>
                     </nav>
                 </div>
             </aside>

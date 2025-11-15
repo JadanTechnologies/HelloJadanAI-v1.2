@@ -1,4 +1,4 @@
-import { User, Task, BrandingSettings, ContentSettings, TaskSubmission } from '../../types';
+import { User, Task, BrandingSettings, ContentSettings, TaskSubmission, ApiSettings, EmailTemplate, SmsTemplate, Announcement, CronJob } from '../../types';
 
 export const mockUsers: User[] = [
     { id: 'user-1', username: 'Jadan', email: 'jadan@example.com', avatar: 'https://picsum.photos/seed/jadan/100/100', isAdmin: true, tasksCompleted: 5, ip: '192.168.1.1', deviceInfo: 'Chrome on macOS', status: 'active', credits: 150 },
@@ -45,6 +45,32 @@ export const mockContentSettings: ContentSettings = {
         { id: 'faq-3', question: 'Can I use the generated images and videos commercially?', answer: 'Yes, all content you generate is yours to use for personal or commercial purposes, subject to our terms of service regarding acceptable use.' },
     ]
 };
+
+export const mockApiSettings: ApiSettings = {
+  resend: { apiKey: '' },
+  twilio: { accountSid: '', authToken: '', phoneNumber: '' },
+  push: { vapidPublicKey: '', vapidPrivateKey: '' },
+};
+
+export const mockEmailTemplates: EmailTemplate[] = [
+  { id: 'et-1', name: 'Welcome Email', subject: 'Welcome to HelloJadanAI!', body: 'Hi {{username}}, welcome aboard! We are excited to have you.' },
+  { id: 'et-2', name: 'Password Reset', subject: 'Reset Your Password', body: 'Click here to reset your password: {{resetLink}}' },
+];
+
+export const mockSmsTemplates: SmsTemplate[] = [
+  { id: 'st-1', name: 'Phone Verification', body: 'Your verification code is {{code}}.' },
+];
+
+export const mockAnnouncements: Announcement[] = [
+  { id: 'an-1', message: 'New Video Generation styles are now available! Check them out.', type: 'info', isActive: true, startDate: new Date().toISOString(), endDate: null },
+  { id: 'an-2', message: 'We will be undergoing scheduled maintenance this Sunday from 2-3 AM UTC.', type: 'warning', isActive: false, startDate: new Date(Date.now() - 86400000 * 2).toISOString(), endDate: new Date(Date.now() - 86400000).toISOString() },
+];
+
+export const mockCronJobs: CronJob[] = [
+  { id: 'cron-1', name: 'Daily Credit Reset', schedule: '0 0 * * *', status: 'idle', lastRun: new Date(Date.now() - 86400000).toISOString(), nextRun: new Date(Date.now() + 86400000).toISOString() },
+  { id: 'cron-2', name: 'Weekly Inactive User Cleanup', schedule: '0 2 * * 0', status: 'idle', lastRun: new Date(Date.now() - 86400000 * 7).toISOString(), nextRun: new Date(Date.now() + 86400000 * 7).toISOString() },
+  { id: 'cron-3', name: 'Sync Analytics Data', schedule: '*/30 * * * *', status: 'running', lastRun: new Date(Date.now() - 1800000).toISOString(), nextRun: new Date(Date.now() + 1800000).toISOString() },
+];
 
 
 export const analyticsData = {

@@ -88,6 +88,50 @@ export interface ContentSettings {
   faqs: FAQItem[];
 }
 
+export interface Notification {
+  id: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
+  type: 'success' | 'info' | 'warning';
+}
+
+export interface Announcement {
+  id: string;
+  message: string;
+  type: 'info' | 'warning' | 'success';
+  isActive: boolean;
+  startDate: string;
+  endDate: string | null;
+}
+
+export interface EmailTemplate {
+  id: string;
+  name: string;
+  subject: string;
+  body: string;
+}
+
+export interface SmsTemplate {
+  id:string;
+  name: string;
+  body: string;
+}
+
+export interface ApiSettings {
+  resend: { apiKey: string; };
+  twilio: { accountSid: string; authToken: string; phoneNumber: string; };
+  push: { vapidPublicKey: string; vapidPrivateKey: string; };
+}
+
+export interface CronJob {
+  id: string;
+  name: string;
+  schedule: string;
+  status: 'running' | 'idle' | 'error';
+  lastRun: string;
+  nextRun: string;
+}
 
 export interface AppState {
   user: User | null;
@@ -95,6 +139,8 @@ export interface AppState {
   generations: Generation[];
   creditHistory: CreditTransaction[];
   tasks: Task[];
+  notifications: Notification[];
+  announcements: Announcement[];
 }
 
 export type AppAction =
@@ -105,6 +151,9 @@ export type AppAction =
   | { type: 'UPDATE_TASK_STATUS'; payload: { taskId: string; status: 'incomplete' | 'pending' | 'completed' } }
   | { type: 'TOGGLE_FAVORITE'; payload: string }
   | { type: 'DELETE_GENERATION'; payload: string }
-  | { type: 'ADD_CREDIT_TRANSACTION'; payload: CreditTransaction };
+  | { type: 'ADD_CREDIT_TRANSACTION'; payload: CreditTransaction }
+  | { type: 'SET_ANNOUNCEMENTS'; payload: Announcement[] }
+  | { type: 'ADD_NOTIFICATION'; payload: Omit<Notification, 'id' | 'createdAt' | 'read'> }
+  | { type: 'MARK_NOTIFICATION_AS_READ'; payload: string };
 
 export type GenerationType = 'image' | 'video' | 'ad';

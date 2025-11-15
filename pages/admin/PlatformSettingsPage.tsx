@@ -4,10 +4,10 @@ import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import Input from '../../components/common/Input';
 import { CREDIT_COSTS, TrashIcon, UploadIcon } from '../../constants';
-import { mockBrandingSettings, mockContentSettings } from './data';
-import { BrandingSettings, ContentSettings, FAQItem } from '../../types';
+import { mockBrandingSettings, mockContentSettings, mockApiSettings } from './data';
+import { BrandingSettings, ContentSettings, FAQItem, ApiSettings } from '../../types';
 
-type SettingsTab = 'general' | 'branding' | 'content' | 'api';
+type SettingsTab = 'general' | 'branding' | 'content' | 'api' | 'integrations';
 
 const imageProviders = ['Gemini', 'DALL-E 3', 'Midjourney', 'Mock Service'];
 const videoProviders = ['Veo (Google)', 'RunwayML', 'Pika', 'Sora', 'Mock Service'];
@@ -26,6 +26,7 @@ const PlatformSettingsPage = () => {
     const [providers, setProviders] = useState(initialProviders);
     const [branding, setBranding] = useState<BrandingSettings>(mockBrandingSettings);
     const [content, setContent] = useState<ContentSettings>(mockContentSettings);
+    const [apiSettings, setApiSettings] = useState<ApiSettings>(mockApiSettings);
     
     const [isSaving, setIsSaving] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -38,7 +39,7 @@ const PlatformSettingsPage = () => {
         setIsSaving(true);
         setSaved(false);
         setTimeout(() => {
-            console.log("Saved Settings:", { costs, providers, branding, content });
+            console.log("Saved Settings:", { costs, providers, branding, content, apiSettings });
             setIsSaving(false);
             setSaved(true);
             setTimeout(() => setSaved(false), 2000);
@@ -96,11 +97,12 @@ const PlatformSettingsPage = () => {
                 <p className="text-slate-400 mt-1">Manage global settings for the application.</p>
             </div>
 
-            <div className="flex space-x-2 p-1 bg-slate-800 rounded-lg">
+            <div className="flex flex-wrap gap-2 p-1 bg-slate-800 rounded-lg">
                 <TabButton tab="general" label="General"/>
                 <TabButton tab="branding" label="Branding"/>
                 <TabButton tab="content" label="Content"/>
                 <TabButton tab="api" label="API Providers"/>
+                <TabButton tab="integrations" label="Integrations"/>
             </div>
 
             {activeTab === 'general' && (
@@ -175,7 +177,7 @@ const PlatformSettingsPage = () => {
             
             {activeTab === 'api' && (
                  <Card>
-                    <h2 className="text-xl font-bold text-white mb-4">API Provider Management</h2>
+                    <h2 className="text-xl font-bold text-white mb-4">AI Provider Management</h2>
                     <p className="text-slate-400 mb-6">Configure the primary and fallback AI services.</p>
                      <div className="space-y-6">
                          <div>
@@ -190,6 +192,37 @@ const PlatformSettingsPage = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div><label className="text-sm font-medium text-slate-300">Primary Provider</label><select value={providers.video.primary} onChange={e => setProviders(p => ({...p, video: {...p.video, primary: e.target.value}}))} className={inputClasses}>{videoProviders.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
                                 <div><label className="text-sm font-medium text-slate-300">Fallback Provider</label><select value={providers.video.fallback} onChange={e => setProviders(p => ({...p, video: {...p.video, fallback: e.target.value}}))} className={inputClasses}>{videoProviders.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
+                            </div>
+                        </div>
+                    </div>
+                 </Card>
+            )}
+
+            {activeTab === 'integrations' && (
+                 <Card>
+                    <h2 className="text-xl font-bold text-white mb-4">Third-Party Integrations</h2>
+                    <p className="text-slate-400 mb-6">Manage API keys and settings for external services.</p>
+                    <div className="space-y-8">
+                        <div>
+                            <h3 className="text-lg font-semibold text-slate-200 border-b border-slate-700 pb-2 mb-4">Email (Resend)</h3>
+                            <div>
+                                <label className="text-sm font-medium text-slate-300">Resend API Key</label>
+                                <Input type="password" value={apiSettings.resend.apiKey} onChange={e => setApiSettings(p => ({...p, resend: {...p.resend, apiKey: e.target.value}}))} className={inputClasses} />
+                            </div>
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-semibold text-slate-200 border-b border-slate-700 pb-2 mb-4">SMS (Twilio)</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div><label className="text-sm font-medium text-slate-300">Account SID</label><Input type="text" value={apiSettings.twilio.accountSid} onChange={e => setApiSettings(p => ({...p, twilio: {...p.twilio, accountSid: e.target.value}}))} className={inputClasses}/></div>
+                                <div><label className="text-sm font-medium text-slate-300">Auth Token</label><Input type="password" value={apiSettings.twilio.authToken} onChange={e => setApiSettings(p => ({...p, twilio: {...p.twilio, authToken: e.target.value}}))} className={inputClasses}/></div>
+                                <div><label className="text-sm font-medium text-slate-300">Phone Number</label><Input type="text" value={apiSettings.twilio.phoneNumber} onChange={e => setApiSettings(p => ({...p, twilio: {...p.twilio, phoneNumber: e.target.value}}))} className={inputClasses}/></div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-semibold text-slate-200 border-b border-slate-700 pb-2 mb-4">Push Notifications (VAPID Keys)</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div><label className="text-sm font-medium text-slate-300">Public Key</label><textarea value={apiSettings.push.vapidPublicKey} onChange={e => setApiSettings(p => ({...p, push: {...p.push, vapidPublicKey: e.target.value}}))} className={textareaClasses + " !min-h-[80px]"}/></div>
+                                <div><label className="text-sm font-medium text-slate-300">Private Key</label><textarea value={apiSettings.push.vapidPrivateKey} onChange={e => setApiSettings(p => ({...p, push: {...p.push, vapidPrivateKey: e.target.value}}))} className={textareaClasses + " !min-h-[80px]"}/></div>
                             </div>
                         </div>
                     </div>

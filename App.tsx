@@ -24,6 +24,9 @@ import LoginDetailsPage from './pages/admin/LoginDetailsPage';
 import PlatformSettingsPage from './pages/admin/PlatformSettingsPage';
 import TaskManagementPage from './pages/admin/TaskManagementPage';
 import TaskMonitoringPage from './pages/admin/TaskMonitoringPage';
+import TemplateManagementPage from './pages/admin/TemplateManagementPage';
+import AnnouncementPage from './pages/admin/AnnouncementPage';
+import CronJobPage from './pages/admin/CronJobPage';
 
 
 function App() {
@@ -66,6 +69,9 @@ function App() {
           <Route path="settings" element={<PlatformSettingsPage />} />
           <Route path="tasks" element={<TaskManagementPage />} />
           <Route path="task-monitoring" element={<TaskMonitoringPage />} />
+          <Route path="templates" element={<TemplateManagementPage />} />
+          <Route path="announcements" element={<AnnouncementPage />} />
+          <Route path="cron-jobs" element={<CronJobPage />} />
         </Route>
         
         {/* === GLOBAL CATCH-ALL === */}
