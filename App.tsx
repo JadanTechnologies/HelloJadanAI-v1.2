@@ -15,6 +15,7 @@ import Gallery from './pages/Gallery';
 import CreditHistory from './pages/CreditHistory';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import ReferralsPage from './pages/ReferralsPage';
 
 // Admin-facing layout and pages
 import AdminLayout from './components/admin/AdminLayout';
@@ -27,6 +28,8 @@ import TaskMonitoringPage from './pages/admin/TaskMonitoringPage';
 import TemplateManagementPage from './pages/admin/TemplateManagementPage';
 import AnnouncementPage from './pages/admin/AnnouncementPage';
 import CronJobPage from './pages/admin/CronJobPage';
+import ReferralManagementPage from './pages/admin/ReferralManagementPage';
+import FraudDetectionPage from './pages/admin/FraudDetectionPage';
 
 
 function App() {
@@ -55,6 +58,7 @@ function App() {
           <Route path="tasks" element={<Tasks />} />
           <Route path="gallery" element={<Gallery />} />
           <Route path="credits" element={<CreditHistory />} />
+          <Route path="referrals" element={<ReferralsPage />} />
         </Route>
         
         {/* === ADMIN ROUTES === */}
@@ -72,6 +76,8 @@ function App() {
           <Route path="templates" element={<TemplateManagementPage />} />
           <Route path="announcements" element={<AnnouncementPage />} />
           <Route path="cron-jobs" element={<CronJobPage />} />
+          <Route path="referrals" element={<ReferralManagementPage />} />
+          <Route path="fraud-detection" element={<FraudDetectionPage />} />
         </Route>
         
         {/* === GLOBAL CATCH-ALL === */}

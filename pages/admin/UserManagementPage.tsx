@@ -55,6 +55,15 @@ const UserManagementPage = () => {
         };
         return <span className={`px-2 py-1 rounded-full text-xs font-semibold ${styles[status]}`}>{status}</span>;
     };
+    
+    const riskBadge = (risk: User['fraudRisk']) => {
+        const styles = {
+            low: 'bg-green-500/20 text-green-400',
+            medium: 'bg-yellow-500/20 text-yellow-400',
+            high: 'bg-red-500/20 text-red-400',
+        };
+        return <span className={`px-2 py-1 rounded-full text-xs font-semibold ${styles[risk]}`}>{risk} risk</span>;
+    }
 
     const renderModalContent = () => {
         if (!selectedUser || !modalAction) return null;
@@ -106,6 +115,7 @@ const UserManagementPage = () => {
                             <tr>
                                 <th scope="col" className="px-6 py-3">User</th>
                                 <th scope="col" className="px-6 py-3">Status</th>
+                                <th scope="col" className="px-6 py-3">Fraud Risk</th>
                                 <th scope="col" className="px-6 py-3">Credits</th>
                                 <th scope="col" className="px-6 py-3">Tasks</th>
                                 <th scope="col" className="px-6 py-3 text-right">Actions</th>
@@ -122,6 +132,7 @@ const UserManagementPage = () => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 capitalize">{statusBadge(user.status)}</td>
+                                    <td className="px-6 py-4 capitalize">{riskBadge(user.fraudRisk)}</td>
                                     <td className="px-6 py-4 font-semibold text-brand-cyan">{user.credits}</td>
                                     <td className="px-6 py-4">{user.tasksCompleted}</td>
                                     <td className="px-6 py-4 text-right space-x-2">

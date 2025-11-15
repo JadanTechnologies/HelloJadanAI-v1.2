@@ -4,10 +4,10 @@ import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import Input from '../../components/common/Input';
 import { CREDIT_COSTS, TrashIcon, UploadIcon } from '../../constants';
-import { mockBrandingSettings, mockContentSettings, mockApiSettings } from './data';
-import { BrandingSettings, ContentSettings, FAQItem, ApiSettings } from '../../types';
+import { mockBrandingSettings, mockContentSettings, mockApiSettings, mockSystemSettings } from './data';
+import { BrandingSettings, ContentSettings, FAQItem, ApiSettings, SystemSettings } from '../../types';
 
-type SettingsTab = 'general' | 'branding' | 'content' | 'api' | 'integrations';
+type SettingsTab = 'general' | 'branding' | 'content' | 'api' | 'integrations' | 'referrals_fraud';
 
 const imageProviders = ['Gemini', 'DALL-E 3', 'Midjourney', 'Mock Service'];
 const videoProviders = ['Veo (Google)', 'RunwayML', 'Pika', 'Sora', 'Mock Service'];
@@ -27,6 +27,7 @@ const PlatformSettingsPage = () => {
     const [branding, setBranding] = useState<BrandingSettings>(mockBrandingSettings);
     const [content, setContent] = useState<ContentSettings>(mockContentSettings);
     const [apiSettings, setApiSettings] = useState<ApiSettings>(mockApiSettings);
+    const [systemSettings, setSystemSettings] = useState<SystemSettings>(mockSystemSettings);
     
     const [isSaving, setIsSaving] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -39,7 +40,7 @@ const PlatformSettingsPage = () => {
         setIsSaving(true);
         setSaved(false);
         setTimeout(() => {
-            console.log("Saved Settings:", { costs, providers, branding, content, apiSettings });
+            console.log("Saved Settings:", { costs, providers, branding, content, apiSettings, systemSettings });
             setIsSaving(false);
             setSaved(true);
             setTimeout(() => setSaved(false), 2000);
@@ -103,6 +104,7 @@ const PlatformSettingsPage = () => {
                 <TabButton tab="content" label="Content"/>
                 <TabButton tab="api" label="API Providers"/>
                 <TabButton tab="integrations" label="Integrations"/>
+                <TabButton tab="referrals_fraud" label="Referrals & Fraud"/>
             </div>
 
             {activeTab === 'general' && (
@@ -233,6 +235,43 @@ const PlatformSettingsPage = () => {
                         </div>
                     </div>
                  </Card>
+            )}
+
+            {activeTab === 'referrals_fraud' && (
+                <div className="space-y-8">
+                    <Card>
+                        <h2 className="text-xl font-bold text-white mb-4">Referral Program Settings</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300">Credits for New Sign-up</label>
+                                <Input type="number" value={systemSettings.referralRewards.signUp} onChange={e => setSystemSettings(p => ({...p, referralRewards: {...p.referralRewards, signUp: parseInt(e.target.value) || 0}}))} />
+                            </div>
+                             <div>
+                                <label className="block text-sm font-medium text-slate-300">Bonus for First Task Completion</label>
+                                <Input type="number" value={systemSettings.referralRewards.firstTask} onChange={e => setSystemSettings(p => ({...p, referralRewards: {...p.referralRewards, firstTask: parseInt(e.target.value) || 0}}))} />
+                            </div>
+                        </div>
+                    </Card>
+                    <Card>
+                        <h2 className="text-xl font-bold text-white mb-4">Fraud & Security</h2>
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between p-3 bg-slate-900 rounded-lg">
+                                <div>
+                                    <p className="font-medium text-slate-200">Block Temporary Emails</p>
+                                    <p className="text-xs text-slate-400">Prevent users from signing up with disposable email addresses.</p>
+                                </div>
+                                <label htmlFor="toggle-temp-email" className="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="toggle-temp-email" className="sr-only peer" checked={systemSettings.fraudDetection.blockTempEmails} onChange={e => setSystemSettings(p => ({...p, fraudDetection: {...p.fraudDetection, blockTempEmails: e.target.checked}}))} />
+                                    <div className="w-11 h-6 bg-slate-700 rounded-full peer peer-focus:ring-4 peer-focus:ring-brand-indigo/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-indigo"></div>
+                                </label>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300">Max Sign-ups per IP (in 24h)</label>
+                                <Input type="number" value={systemSettings.fraudDetection.maxSignupsPerIp} onChange={e => setSystemSettings(p => ({...p, fraudDetection: {...p.fraudDetection, maxSignupsPerIp: parseInt(e.target.value) || 0}}))} />
+                            </div>
+                        </div>
+                    </Card>
+                </div>
             )}
             
             <div className="pt-2 flex items-center space-x-4">

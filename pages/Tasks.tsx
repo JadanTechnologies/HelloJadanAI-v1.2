@@ -54,20 +54,20 @@ const Tasks = () => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   const handleCompleteTask = (task: Task) => {
-    if (task.status !== 'incomplete') return;
+    if (task.status !== 'incomplete' || !state.user) return;
     
     if (task.requiresProof) {
         setSelectedTask(task);
         setIsProofModalOpen(true);
     } else {
-        dispatch({ type: 'UPDATE_TASK_STATUS', payload: { taskId: task.id, status: 'completed' } });
+        dispatch({ type: 'UPDATE_TASK_STATUS', payload: { taskId: task.id, userId: state.user.id, status: 'completed' } });
     }
   };
   
   const handleProofSubmit = (proof: string) => {
-    if (selectedTask) {
+    if (selectedTask && state.user) {
         console.log(`Submitting proof for task ${selectedTask.id}: ${proof}`);
-        dispatch({ type: 'UPDATE_TASK_STATUS', payload: { taskId: selectedTask.id, status: 'pending' } });
+        dispatch({ type: 'UPDATE_TASK_STATUS', payload: { taskId: selectedTask.id, userId: state.user.id, status: 'pending' } });
     }
     setIsProofModalOpen(false);
     setSelectedTask(null);

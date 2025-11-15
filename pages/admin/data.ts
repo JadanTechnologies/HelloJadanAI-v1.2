@@ -1,10 +1,11 @@
-import { User, Task, BrandingSettings, ContentSettings, TaskSubmission, ApiSettings, EmailTemplate, SmsTemplate, Announcement, CronJob } from '../../types';
+import { User, Task, BrandingSettings, ContentSettings, TaskSubmission, ApiSettings, EmailTemplate, SmsTemplate, Announcement, CronJob, Referral, SystemSettings } from '../../types';
 
 export const mockUsers: User[] = [
-    { id: 'user-1', username: 'Jadan', email: 'jadan@example.com', avatar: 'https://picsum.photos/seed/jadan/100/100', isAdmin: true, tasksCompleted: 5, ip: '192.168.1.1', deviceInfo: 'Chrome on macOS', status: 'active', credits: 150 },
-    { id: 'user-2', username: 'Alex', email: 'alex@example.com', avatar: 'https://picsum.photos/seed/alex/100/100', isAdmin: false, tasksCompleted: 12, ip: '10.0.0.5', deviceInfo: 'Safari on iOS', status: 'active', credits: 75 },
-    { id: 'user-3', username: 'Sam', email: 'sam@example.com', avatar: 'https://picsum.photos/seed/sam/100/100', isAdmin: false, tasksCompleted: 2, ip: '172.16.0.10', deviceInfo: 'Edge on Windows', status: 'suspended', credits: 10 },
-    { id: 'user-4', username: 'BannedUser', email: 'banned@example.com', avatar: 'https://picsum.photos/seed/banned/100/100', isAdmin: false, tasksCompleted: 20, ip: '203.0.113.40', deviceInfo: 'Firefox on Linux', status: 'banned', credits: 0 },
+    { id: 'user-1', username: 'Jadan', email: 'jadan@example.com', avatar: 'https://picsum.photos/seed/jadan/100/100', isAdmin: true, tasksCompleted: 5, ip: '192.168.1.1', deviceInfo: 'Chrome on macOS', status: 'active', credits: 150, referralCode: 'JADAN123', referredBy: undefined, referralStats: { count: 2, creditsEarned: 35 }, fraudRisk: 'low' },
+    { id: 'user-2', username: 'Alex', email: 'alex@example.com', avatar: 'https://picsum.photos/seed/alex/100/100', isAdmin: false, tasksCompleted: 12, ip: '10.0.0.5', deviceInfo: 'Safari on iOS', status: 'active', credits: 75, referralCode: 'ALEX456', referredBy: 'user-1', referralStats: { count: 0, creditsEarned: 0 }, fraudRisk: 'low' },
+    { id: 'user-3', username: 'Sam', email: 'sam@temp-mail.org', avatar: 'https://picsum.photos/seed/sam/100/100', isAdmin: false, tasksCompleted: 2, ip: '172.16.0.10', deviceInfo: 'Edge on Windows', status: 'suspended', credits: 10, referralCode: 'SAM789', referredBy: 'user-1', referralStats: { count: 0, creditsEarned: 0 }, fraudRisk: 'high' },
+    { id: 'user-4', username: 'BannedUser', email: 'banned@example.com', avatar: 'https://picsum.photos/seed/banned/100/100', isAdmin: false, tasksCompleted: 20, ip: '203.0.113.40', deviceInfo: 'Firefox on Linux', status: 'banned', credits: 0, referralCode: 'BANNED00', referredBy: undefined, referralStats: { count: 0, creditsEarned: 0 }, fraudRisk: 'high' },
+    { id: 'user-5', username: 'Newbie', email: 'newbie@example.com', avatar: 'https://picsum.photos/seed/newbie/100/100', isAdmin: false, tasksCompleted: 0, ip: '172.16.0.10', deviceInfo: 'Chrome on Android', status: 'active', credits: 20, referralCode: 'NEWBIE11', referredBy: 'user-2', referralStats: { count: 0, creditsEarned: 0 }, fraudRisk: 'medium' },
 ];
 
 export const mockLoginDetails = [
@@ -72,6 +73,21 @@ export const mockCronJobs: CronJob[] = [
   { id: 'cron-3', name: 'Sync Analytics Data', schedule: '*/30 * * * *', status: 'running', lastRun: new Date(Date.now() - 1800000).toISOString(), nextRun: new Date(Date.now() + 1800000).toISOString() },
 ];
 
+export const mockReferrals: Referral[] = [
+    { id: 'ref-1', referrerId: 'user-1', referrerUsername: 'Jadan', refereeId: 'user-2', refereeUsername: 'Alex', status: 'task_completed', createdAt: new Date(Date.now() - 86400000 * 2).toISOString() },
+    { id: 'ref-2', referrerId: 'user-1', referrerUsername: 'Jadan', refereeId: 'user-3', refereeUsername: 'Sam', status: 'signed_up', createdAt: new Date(Date.now() - 86400000).toISOString() },
+];
+
+export const mockSystemSettings: SystemSettings = {
+    referralRewards: {
+        signUp: 20,
+        firstTask: 15,
+    },
+    fraudDetection: {
+        blockTempEmails: true,
+        maxSignupsPerIp: 3,
+    },
+};
 
 export const analyticsData = {
     dau: [

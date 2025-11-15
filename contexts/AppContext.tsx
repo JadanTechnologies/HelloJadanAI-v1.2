@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, ReactNode } from 'react';
-import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement } from '../types';
-import { mockAnnouncements } from '../pages/admin/data';
+import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement, Referral } from '../types';
+import { mockAnnouncements, mockReferrals } from '../pages/admin/data';
 
 const mockAdminUser: User = {
     id: 'user-1',
@@ -13,6 +13,9 @@ const mockAdminUser: User = {
     deviceInfo: 'Chrome on macOS',
     status: 'active',
     credits: 9999,
+    referralCode: 'ADMINJADAN',
+    referralStats: { count: 0, creditsEarned: 0 },
+    fraudRisk: 'low',
 };
 
 const mockRegularUser: User = {
@@ -26,6 +29,9 @@ const mockRegularUser: User = {
     deviceInfo: 'Firefox on Windows',
     status: 'active',
     credits: 100,
+    referralCode: 'JADAN123',
+    referralStats: { count: 2, creditsEarned: 35 },
+    fraudRisk: 'low',
 };
 
 const initialGenerations: Generation[] = [
@@ -58,6 +64,7 @@ const initialState: AppState = {
       const end = a.endDate ? new Date(a.endDate) : null;
       return a.isActive && start <= now && (!end || end >= now);
   }),
+  referrals: mockReferrals,
 };
 
 const appReducer = (state: AppState, action: AppAction): AppState => {
@@ -71,21 +78,49 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
     case 'ADD_GENERATION':
       return { ...state, generations: [action.payload, ...state.generations] };
     case 'UPDATE_TASK_STATUS':
-        const { taskId, status } = action.payload;
+        const { taskId, status, userId } = action.payload;
         const taskToUpdate = state.tasks.find(t => t.id === taskId);
-        if (!taskToUpdate || taskToUpdate.status !== 'incomplete') return state;
         
-        const isCompleting = status === 'completed';
+        // Ensure user is logged in and task exists
+        if (!state.user || !taskToUpdate) return state;
+        
+        // Prevent re-completing a task
+        if (state.tasks.find(t => t.id === taskId)?.status !== 'incomplete') return state;
 
-        return {
+        const isCompleting = status === 'completed';
+        const isFirstTaskCompletion = state.user.tasksCompleted === 0 && isCompleting;
+
+        // Base state update
+        let newState = {
             ...state,
             credits: isCompleting ? state.credits + taskToUpdate.creditReward : state.credits,
             tasks: state.tasks.map(t => t.id === taskId ? { ...t, status } : t),
-            user: state.user && isCompleting ? { ...state.user, tasksCompleted: state.user.tasksCompleted + 1 } : state.user,
+            user: isCompleting ? { ...state.user, tasksCompleted: state.user.tasksCompleted + 1 } : state.user,
             creditHistory: isCompleting 
                 ? [{ id: `tx-${Date.now()}`, description: `Task: ${taskToUpdate.title}`, amount: taskToUpdate.creditReward, date: new Date().toISOString()}, ...state.creditHistory]
                 : state.creditHistory
         };
+        
+        // Handle referral bonus for the referrer
+        if (isFirstTaskCompletion && state.user.referredBy) {
+            const referrerId = state.user.referredBy;
+            const referralBonus = 15; // This would come from admin settings in a real app
+            console.log(`User ${state.user.id} completed their first task. Awarding ${referralBonus} credits to referrer ${referrerId}`);
+            
+            // In a real app, this would be an API call to update the referrer's balance.
+            // Here, we'll just log it. If the referrer was logged in, we could update them.
+            
+            // We also need to update the referral record status
+            const updatedReferrals = state.referrals.map(r => 
+                r.refereeId === userId && r.referrerId === referrerId 
+                ? { ...r, status: 'task_completed' as 'task_completed' } 
+                : r
+            );
+
+            newState = { ...newState, referrals: updatedReferrals };
+        }
+
+        return newState;
     case 'TOGGLE_FAVORITE':
       return { ...state, generations: state.generations.map(g => g.id === action.payload ? { ...g, isFavorite: !g.isFavorite } : g) };
     case 'DELETE_GENERATION':

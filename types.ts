@@ -9,6 +9,13 @@ export interface User {
   deviceInfo: string;
   status: 'active' | 'suspended' | 'banned';
   credits: number;
+  referralCode: string;
+  referredBy?: string;
+  referralStats: {
+    count: number;
+    creditsEarned: number;
+  };
+  fraudRisk: 'low' | 'medium' | 'high';
 }
 
 export interface Generation {
@@ -133,6 +140,27 @@ export interface CronJob {
   nextRun: string;
 }
 
+export interface Referral {
+    id: string;
+    referrerId: string;
+    referrerUsername: string;
+    refereeId: string;
+    refereeUsername: string;
+    status: 'signed_up' | 'task_completed';
+    createdAt: string;
+}
+
+export interface SystemSettings {
+    referralRewards: {
+        signUp: number;
+        firstTask: number;
+    };
+    fraudDetection: {
+        blockTempEmails: boolean;
+        maxSignupsPerIp: number;
+    };
+}
+
 export interface AppState {
   user: User | null;
   credits: number;
@@ -141,6 +169,7 @@ export interface AppState {
   tasks: Task[];
   notifications: Notification[];
   announcements: Announcement[];
+  referrals: Referral[];
 }
 
 export type AppAction =
@@ -148,7 +177,7 @@ export type AppAction =
   | { type: 'LOGOUT' }
   | { type: 'UPDATE_CREDITS'; payload: number }
   | { type: 'ADD_GENERATION'; payload: Generation }
-  | { type: 'UPDATE_TASK_STATUS'; payload: { taskId: string; status: 'incomplete' | 'pending' | 'completed' } }
+  | { type: 'UPDATE_TASK_STATUS'; payload: { taskId: string; userId: string; status: 'incomplete' | 'pending' | 'completed' } }
   | { type: 'TOGGLE_FAVORITE'; payload: string }
   | { type: 'DELETE_GENERATION'; payload: string }
   | { type: 'ADD_CREDIT_TRANSACTION'; payload: CreditTransaction }
