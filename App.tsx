@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppContext } from './contexts/AppContext';
 
+// User-facing layout and pages
 import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
@@ -10,33 +11,36 @@ import GenerateVideo from './pages/GenerateVideo';
 import GenerateAd from './pages/GenerateAd';
 import Tasks from './pages/Tasks';
 import Gallery from './pages/Gallery';
-import Admin from './pages/Admin';
 import CreditHistory from './pages/CreditHistory';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+
+// Admin-facing layout and pages
+import AdminLayout from './components/admin/AdminLayout';
+import UserManagementPage from './pages/admin/UserManagementPage';
+import AnalyticsPage from './pages/admin/AnalyticsPage';
+import LoginDetailsPage from './pages/admin/LoginDetailsPage';
+
 
 function App() {
   const { state } = useContext(AppContext);
   const user = state.user;
 
+  // Determine the default authenticated path
+  const defaultAuthPath = user?.isAdmin ? '/admin' : '/app';
+
   return (
     <HashRouter>
       <Routes>
         {/* === UNAUTHENTICATED ROUTES === */}
-        {/* These routes are only accessible when the user is logged out. */}
-        {/* If a logged-in user tries to access them, they are redirected to their dashboard. */}
-        {/* A single login page now handles both user and admin authentication. */}
-        <Route path="/" element={!user ? <Navigate to="/login" /> : <Navigate to="/app" />} />
-        <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/app" />} />
-        <Route path="/forgot-password" element={!user ? <ForgotPasswordPage /> : <Navigate to="/app" />} />
-        <Route path="/reset-password" element={!user ? <ResetPasswordPage /> : <Navigate to="/app" />} />
+        <Route path="/" element={!user ? <LoginPage /> : <Navigate to={defaultAuthPath} />} />
+        <Route path="/login" element={!user ? <LoginPage /> : <Navigate to={defaultAuthPath} />} />
+        <Route path="/forgot-password" element={!user ? <ForgotPasswordPage /> : <Navigate to={defaultAuthPath} />} />
+        <Route path="/reset-password" element={!user ? <ResetPasswordPage /> : <Navigate to={defaultAuthPath} />} />
 
-        {/* === AUTHENTICATED ROUTES === */}
-        {/* All routes under "/app" are protected. The Layout is rendered here for all child routes. */}
+        {/* === AUTHENTICATED USER ROUTES === */}
         <Route path="/app" element={user ? <Layout /> : <Navigate to="/login" />}>
-          {/* Default authenticated route: directs to admin panel or user dashboard */}
-          <Route index element={<Navigate to={user?.isAdmin ? 'admin' : 'dashboard'} />} />
-          
+          <Route index element={<Navigate to="dashboard" />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="generate-image" element={<GenerateImage />} />
           <Route path="generate-video" element={<GenerateVideo />} />
@@ -44,14 +48,21 @@ function App() {
           <Route path="tasks" element={<Tasks />} />
           <Route path="gallery" element={<Gallery />} />
           <Route path="credits" element={<CreditHistory />} />
-
-          {/* Admin-only route: only renders Admin page if user is an admin, otherwise redirects */}
-          <Route path="admin" element={user?.isAdmin ? <Admin /> : <Navigate to="dashboard" />} />
+        </Route>
+        
+        {/* === ADMIN ROUTES === */}
+        <Route 
+          path="/admin" 
+          element={user ? (user.isAdmin ? <AdminLayout /> : <Navigate to="/app/dashboard" />) : <Navigate to="/login" />}
+        >
+          <Route index element={<Navigate to="users" />} />
+          <Route path="users" element={<UserManagementPage />} />
+          <Route path="analytics" element={<AnalyticsPage />} />
+          <Route path="logins" element={<LoginDetailsPage />} />
         </Route>
         
         {/* === GLOBAL CATCH-ALL === */}
-        {/* Any other path redirects to the appropriate home page. */}
-        <Route path="*" element={<Navigate to={user ? '/app' : '/'} />} />
+        <Route path="*" element={<Navigate to={user ? defaultAuthPath : '/login'} />} />
       </Routes>
     </HashRouter>
   );

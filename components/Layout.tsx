@@ -4,7 +4,7 @@ import { AppContext } from '../contexts/AppContext';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTranslation } from '../hooks/useTranslation';
-import { HomeIcon, ImageIcon, VideoIcon, AdIcon, TaskIcon, GalleryIcon, AdminIcon, CreditIcon } from '../constants';
+import { HomeIcon, ImageIcon, VideoIcon, AdIcon, TaskIcon, GalleryIcon, CreditIcon } from '../constants';
 
 const ThemeToggle: React.FC = () => {
     const { theme, toggleTheme } = useTheme();
@@ -98,7 +98,6 @@ const NavItem: React.FC<{ to: string, icon: React.ReactNode, label: string, onCl
 
 
 const Sidebar: React.FC<{ isOpen: boolean, setIsOpen: (isOpen: boolean) => void }> = ({ isOpen, setIsOpen }) => {
-    const { state } = useContext(AppContext);
     const { t } = useTranslation();
     
     const closeSidebar = () => setIsOpen(false);
@@ -115,9 +114,6 @@ const Sidebar: React.FC<{ isOpen: boolean, setIsOpen: (isOpen: boolean) => void 
                         <NavItem to="/app/tasks" icon={<TaskIcon className="w-5 h-5"/>} label={t('navTasks')} onClick={closeSidebar}/>
                         <NavItem to="/app/gallery" icon={<GalleryIcon className="w-5 h-5"/>} label={t('navGallery')} onClick={closeSidebar}/>
                         <NavItem to="/app/credits" icon={<CreditIcon className="w-5 h-5"/>} label={t('creditHistory')} onClick={closeSidebar}/>
-                        {state.user?.isAdmin && (
-                            <NavItem to="/app/admin" icon={<AdminIcon className="w-5 h-5"/>} label={t('navAdmin')} onClick={closeSidebar}/>
-                        )}
                     </nav>
                 </div>
             </aside>

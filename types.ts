@@ -19,6 +19,8 @@ export interface Generation {
   // Fields for "Use Again" functionality
   style?: string;
   resolution?: string;
+  aspectRatio?: string;
+  negativePrompt?: string;
   duration?: string;
   platform?: string;
   adType?: string;

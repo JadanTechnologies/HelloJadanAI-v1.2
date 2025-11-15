@@ -7,7 +7,7 @@ import Select from '../components/common/Select';
 import Spinner from '../components/common/Spinner';
 import Card from '../components/common/Card';
 import { generateImage as apiGenerateImage } from '../services/geminiService';
-import { IMAGE_STYLES, IMAGE_RESOLUTIONS, CREDIT_COSTS, ImageIcon } from '../constants';
+import { IMAGE_STYLES, IMAGE_RESOLUTIONS, IMAGE_ASPECT_RATIOS, CREDIT_COSTS, ImageIcon } from '../constants';
 import { Generation } from '../types';
 
 const GenerateImage = () => {
@@ -16,18 +16,22 @@ const GenerateImage = () => {
   const location = useLocation();
   
   const [prompt, setPrompt] = useState('');
+  const [negativePrompt, setNegativePrompt] = useState('');
   const [style, setStyle] = useState(IMAGE_STYLES[0]);
   const [resolution, setResolution] = useState(IMAGE_RESOLUTIONS[0]);
+  const [aspectRatio, setAspectRatio] = useState(IMAGE_ASPECT_RATIOS[0]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Generation | null>(null);
 
   useEffect(() => {
     if (location.state) {
-      const { prompt, style, resolution } = location.state as Generation;
+      const { prompt, style, resolution, aspectRatio, negativePrompt } = location.state as Generation;
       if (prompt) setPrompt(prompt);
       if (style) setStyle(style);
       if (resolution) setResolution(resolution);
+      if (aspectRatio) setAspectRatio(aspectRatio);
+      if (negativePrompt) setNegativePrompt(negativePrompt);
     }
   }, [location.state]);
 
@@ -45,7 +49,7 @@ const GenerateImage = () => {
     setResult(null);
 
     try {
-      const newGeneration = await apiGenerateImage(prompt, style, resolution);
+      const newGeneration = await apiGenerateImage(prompt, style, resolution, aspectRatio, negativePrompt);
       setResult(newGeneration);
       dispatch({ type: 'ADD_GENERATION', payload: newGeneration });
       dispatch({ type: 'UPDATE_CREDITS', payload: state.credits - creditCost });
@@ -73,17 +77,32 @@ const GenerateImage = () => {
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder={t('promptPlaceholder')}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 px-4 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-indigo transition duration-300 h-32"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 px-4 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-indigo transition duration-300 h-28"
                 required
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">{t('styleLabel')}</label>
-              <Select options={IMAGE_STYLES} value={style} onChange={(e) => setStyle(e.target.value)} />
+             <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Negative Prompt <span className="text-slate-500">(optional)</span></label>
+              <textarea
+                value={negativePrompt}
+                onChange={(e) => setNegativePrompt(e.target.value)}
+                placeholder="e.g., blurry, text, watermark, extra fingers"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 px-4 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-indigo transition duration-300 h-20"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">{t('styleLabel')}</label>
+                <Select options={IMAGE_STYLES} value={style} onChange={(e) => setStyle(e.target.value)} />
+              </div>
+               <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">{t('resolutionLabel')}</label>
+                <Select options={IMAGE_RESOLUTIONS} value={resolution} onChange={(e) => setResolution(e.target.value)} />
+              </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">{t('resolutionLabel')}</label>
-              <Select options={IMAGE_RESOLUTIONS} value={resolution} onChange={(e) => setResolution(e.target.value)} />
+              <label className="block text-sm font-medium text-slate-300 mb-2">Aspect Ratio</label>
+              <Select options={IMAGE_ASPECT_RATIOS} value={aspectRatio} onChange={(e) => setAspectRatio(e.target.value)} />
             </div>
             {error && <p className="text-red-400 text-sm">{error}</p>}
             <div className="flex items-center justify-between">
@@ -95,8 +114,8 @@ const GenerateImage = () => {
           </form>
         </Card>
 
-        <Card className="h-full">
-          <div className="flex items-center justify-center w-full aspect-square bg-slate-900 rounded-lg overflow-hidden">
+        <Card>
+          <div className="flex items-center justify-center w-full min-h-[300px] md:min-h-[550px] bg-slate-900 rounded-lg overflow-hidden">
             {isLoading && <Spinner message={t('generating')} />}
             {!isLoading && result && (
               <img src={result.url} alt={result.prompt} className="w-full h-full object-contain" />

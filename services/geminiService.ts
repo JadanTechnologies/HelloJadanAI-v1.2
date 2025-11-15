@@ -7,8 +7,8 @@ import { Generation, AdCreative } from '../types';
 const MOCK_DELAY = 1500;
 const MOCK_VIDEO_DELAY = 10000; // Longer delay for video
 
-export const generateImage = async (prompt: string, style: string, resolution: string): Promise<Generation> => {
-  console.log(`Generating image with prompt: "${prompt}", style: ${style}, resolution: ${resolution}`);
+export const generateImage = async (prompt: string, style: string, resolution: string, aspectRatio: string, negativePrompt: string): Promise<Generation> => {
+  console.log(`Generating image with prompt: "${prompt}", style: ${style}, resolution: ${resolution}, aspect ratio: ${aspectRatio}, negative prompt: "${negativePrompt}"`);
   // In a real app:
   // const response = await ai.models.generateImages({ model: 'imagen-4.0-generate-001', prompt: `${prompt}, ${style} style`, ... });
   // const base64ImageBytes = response.generatedImages[0].image.imageBytes;
@@ -16,16 +16,34 @@ export const generateImage = async (prompt: string, style: string, resolution: s
   
   await new Promise(resolve => setTimeout(resolve, MOCK_DELAY));
   
+  const getDimensions = (ratio: string, res: string): { width: number, height: number } => {
+    const baseSize = res === 'SD' ? 512 : res === 'HD' ? 768 : 1024;
+    const parsedRatio = ratio.split(' ')[0]; // "1:1" from "1:1 (Square)"
+    const [w, h] = parsedRatio.split(':').map(Number);
+
+    if (w > h) { // Landscape
+        return { width: baseSize, height: Math.round(baseSize * (h / w)) };
+    } else if (h > w) { // Portrait
+        return { width: Math.round(baseSize * (w / h)), height: baseSize };
+    } else { // Square
+        return { width: baseSize, height: baseSize };
+    }
+  }
+  
+  const { width, height } = getDimensions(aspectRatio, resolution);
   const randomSeed = Math.random().toString(36).substring(7);
+
   return {
     id: `gen-img-${Date.now()}`,
     type: 'image',
     prompt,
-    url: `https://picsum.photos/seed/${randomSeed}/512/512`,
+    url: `https://picsum.photos/seed/${randomSeed}/${width}/${height}`,
     createdAt: new Date().toISOString(),
     isFavorite: false,
     style,
     resolution,
+    aspectRatio,
+    negativePrompt,
   };
 };
 
@@ -74,8 +92,8 @@ export const generateAdCreative = async (prompt: string, platform: string, adTyp
   
   // Step 2: Generate Visual (Image or Video)
   const visualPrompt = `A high-quality product shot for a ${adType} on ${platform}: ${prompt}`;
-  // For simplicity, we'll just generate an image here
-  const visualGeneration = await generateImage(visualPrompt, 'Product', 'HD');
+  // For simplicity, we'll just generate an image here, with default advanced settings
+  const visualGeneration = await generateImage(visualPrompt, 'Product', 'HD', '1:1 (Square)', '');
 
   await new Promise(resolve => setTimeout(resolve, MOCK_DELAY));
 
