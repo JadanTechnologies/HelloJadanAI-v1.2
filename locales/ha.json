@@ -7,6 +7,7 @@
   "passwordLabel": "Kalmar sirri",
   "loginButton": "Shiga",
   "loginWithGoogle": "Shiga da Google",
+  "forgotPassword": "An manta kalmar sirri?",
   "dashboardTitle": "Dashboard",
   "yourCredits": "Kiredit ɗinka",
   "tasksCompleted": "Ayyukan da aka Kammala",
@@ -53,5 +54,18 @@
   "generationFailed": "Kirkira ya gaza. Don Allah a sake gwadawa.",
   "adminLoginInfoTitle": "Bayanin Shiga na Gwaji",
   "adminLoginInfoText": "Yi amfani da waɗannan bayanan don shiga a matsayin mai gudanarwa:",
-  "invalidCredentials": "Bayanai ba daidai ba. A sake gwadawa."
+  "invalidCredentials": "Bayanai ba daidai ba. A sake gwadawa.",
+  "forgotPasswordTitle": "Manta Kalmar Sirri",
+  "forgotPasswordSubtitle": "Shigar da imel ɗinka kuma za mu aiko maka da hanyar sake saiti.",
+  "sendResetLink": "Aika Hanyar Sake Saiti",
+  "emailSentSuccess": "Idan akwai asusu don wannan imel, an aiko da hanyar sake saiti.",
+  "backToLogin": "Koma Shiga",
+  "resetPasswordTitle": "Sake saita Kalmar Sirrinka",
+  "resetPasswordSubtitle": "Ƙirƙiri sabuwar kalmar sirri mai ƙarfi.",
+  "newPasswordLabel": "Sabuwar Kalmar Sirri",
+  "confirmPasswordLabel": "Tabbatar da Sabuwar Kalmar Sirri",
+  "resetPasswordButton": "Sake saita Kalmar Sirri",
+  "passwordsDoNotMatch": "Kalmomin sirri ba su dace ba.",
+  "passwordResetSuccess": "An yi nasarar sake saita kalmar sirrinka!",
+  "useAgain": "Sake Amfani"
 }

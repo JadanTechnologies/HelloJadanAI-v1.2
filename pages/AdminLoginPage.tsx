@@ -15,10 +15,8 @@ const AdminLoginPage = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
-    if (email === 'admin@example.com' && password === 'password') {
-      loginAsAdmin();
-    } else {
+    const success = loginAsAdmin(email, password);
+    if (!success) {
       setError(t('invalidCredentials'));
     }
   };

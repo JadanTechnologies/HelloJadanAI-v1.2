@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { AppContext } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import Card from '../components/common/Card';
@@ -82,6 +83,11 @@ const Gallery = () => {
                     <p className="text-slate-300">{selectedItem.prompt}</p>
                     <p className="text-xs text-slate-500">Created on: {new Date(selectedItem.createdAt).toLocaleString()}</p>
                     <div className="flex flex-col space-y-2">
+                        {selectedItem.type === 'image' && (
+                          <Link to="/app/generate-image" state={selectedItem}>
+                            <Button variant="secondary" className="w-full">{t('useAgain')}</Button>
+                          </Link>
+                        )}
                          <Button onClick={() => toggleFavorite(selectedItem.id)}>
                             {selectedItem.isFavorite ? 'Unfavorite' : 'Favorite'}
                         </Button>

@@ -24,8 +24,8 @@ const mockRegularUser: User = {
 };
 
 const initialGenerations: Generation[] = [
-    { id: 'gen-1', type: 'image', prompt: 'A futuristic city skyline', url: 'https://picsum.photos/seed/futuristic/512/512', createdAt: new Date().toISOString(), isFavorite: false },
-    { id: 'gen-2', type: 'video', prompt: 'A robot dancing in the rain', url: 'https://www.w3schools.com/html/mov_bbb.mp4', createdAt: new Date().toISOString(), isFavorite: true },
+    { id: 'gen-1', type: 'image', prompt: 'A futuristic city skyline', url: 'https://picsum.photos/seed/futuristic/512/512', createdAt: new Date().toISOString(), isFavorite: false, style: 'Realistic', resolution: 'HD' },
+    { id: 'gen-2', type: 'video', prompt: 'A robot dancing in the rain', url: 'https://www.w3schools.com/html/mov_bbb.mp4', createdAt: new Date().toISOString(), isFavorite: true, style: 'Cinematic', duration: '10s' },
 ];
 
 const initialTasks: Task[] = [
@@ -83,22 +83,36 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
 export const AppContext = createContext<{
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
-  login: () => void;
+  login: (email: string, password: string) => boolean;
   logout: () => void;
-  loginAsAdmin: () => void;
+  loginAsAdmin: (email: string, password: string) => boolean;
 }>({
   state: initialState,
   dispatch: () => null,
-  login: () => {},
+  login: () => false,
   logout: () => {},
-  loginAsAdmin: () => {},
+  loginAsAdmin: () => false,
 });
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
-  const login = () => dispatch({ type: 'LOGIN', payload: mockRegularUser });
-  const loginAsAdmin = () => dispatch({ type: 'LOGIN', payload: mockAdminUser });
+  const login = (email: string, password: string): boolean => {
+    if (email === mockRegularUser.email && password === 'password') {
+      dispatch({ type: 'LOGIN', payload: mockRegularUser });
+      return true;
+    }
+    return false;
+  };
+
+  const loginAsAdmin = (email: string, password: string): boolean => {
+    if (email === mockAdminUser.email && password === 'password') {
+      dispatch({ type: 'LOGIN', payload: mockAdminUser });
+      return true;
+    }
+    return false;
+  };
+
   const logout = () => dispatch({ type: 'LOGOUT' });
 
   return (

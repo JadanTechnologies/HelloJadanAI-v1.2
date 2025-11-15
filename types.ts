@@ -16,6 +16,12 @@ export interface Generation {
   url: string;
   createdAt: string;
   isFavorite: boolean;
+  // Fields for "Use Again" functionality
+  style?: string;
+  resolution?: string;
+  duration?: string;
+  platform?: string;
+  adType?: string;
   adCreative?: AdCreative;
 }
 

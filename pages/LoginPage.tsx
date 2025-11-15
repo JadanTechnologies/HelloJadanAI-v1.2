@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { AppContext } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import Button from '../components/common/Button';
@@ -15,18 +16,15 @@ const LoginPage = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
-    // Simple mock validation
-    if (email === 'jadan@example.com' && password === 'password') {
-      login();
-    } else {
+    const success = login(email, password);
+    if (!success) {
       setError(t('invalidCredentials'));
     }
   };
 
   const handleGoogleLogin = () => {
-    // For demo, Google login just works
-    login();
+    // For demo, Google login just works by logging in the mock user
+    login('jadan@example.com', 'password');
   }
 
   return (
@@ -57,7 +55,10 @@ const LoginPage = () => {
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1">{t('passwordLabel')}</label>
+                <div className="flex justify-between items-center">
+                    <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1">{t('passwordLabel')}</label>
+                    <Link to="/forgot-password" className="text-sm text-brand-cyan hover:underline">{t('forgotPassword')}</Link>
+                </div>
               <Input 
                 type="password" 
                 id="password" 

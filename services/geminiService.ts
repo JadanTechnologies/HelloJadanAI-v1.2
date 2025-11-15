@@ -24,6 +24,8 @@ export const generateImage = async (prompt: string, style: string, resolution: s
     url: `https://picsum.photos/seed/${randomSeed}/512/512`,
     createdAt: new Date().toISOString(),
     isFavorite: false,
+    style,
+    resolution,
   };
 };
 
@@ -51,6 +53,8 @@ export const generateVideo = async (prompt: string, style: string, duration: str
         url: 'https://www.w3schools.com/html/mov_bbb.mp4',
         createdAt: new Date().toISOString(),
         isFavorite: false,
+        style,
+        duration,
     };
 };
 
@@ -80,5 +84,7 @@ export const generateAdCreative = async (prompt: string, platform: string, adTyp
     id: `gen-ad-${Date.now()}`,
     type: 'ad',
     adCreative: mockAdCreative,
+    platform,
+    adType,
   };
 };

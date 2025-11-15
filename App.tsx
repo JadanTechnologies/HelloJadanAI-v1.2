@@ -14,6 +14,8 @@ import Gallery from './pages/Gallery';
 import Admin from './pages/Admin';
 import CreditHistory from './pages/CreditHistory';
 import LandingPage from './pages/LandingPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 const PrivateRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
   const { state } = useContext(AppContext);
@@ -36,7 +38,7 @@ const AuthenticatedApp = () => (
             <Route path="tasks" element={<Tasks />} />
             <Route path="gallery" element={<Gallery />} />
             <Route path="credits" element={<CreditHistory />} />
-            <Route path="admin/*" element={
+            <Route path="admin" element={
                 <AdminRoute>
                     <Admin />
                 </AdminRoute>
@@ -54,6 +56,8 @@ function App() {
     <HashRouter>
       <Routes>
         <Route path="/login" element={state.user ? <Navigate to="/app/dashboard" /> : <LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/admin/login" element={state.user && state.user.isAdmin ? <Navigate to="/app/admin" /> : <AdminLoginPage />} />
         <Route path="/" element={
             !state.user ? <LandingPage /> : 

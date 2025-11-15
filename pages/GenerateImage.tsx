@@ -1,4 +1,5 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { AppContext } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import Button from '../components/common/Button';
@@ -6,19 +7,30 @@ import Select from '../components/common/Select';
 import Spinner from '../components/common/Spinner';
 import Card from '../components/common/Card';
 import { generateImage as apiGenerateImage } from '../services/geminiService';
-// FIX: Imported missing ImageIcon component to fix "Cannot find name 'ImageIcon'" error.
 import { IMAGE_STYLES, IMAGE_RESOLUTIONS, CREDIT_COSTS, ImageIcon } from '../constants';
 import { Generation } from '../types';
 
 const GenerateImage = () => {
   const { state, dispatch } = useContext(AppContext);
   const { t } = useTranslation();
+  const location = useLocation();
+  
   const [prompt, setPrompt] = useState('');
   const [style, setStyle] = useState(IMAGE_STYLES[0]);
   const [resolution, setResolution] = useState(IMAGE_RESOLUTIONS[0]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Generation | null>(null);
+
+  useEffect(() => {
+    if (location.state) {
+      const { prompt, style, resolution } = location.state as Generation;
+      if (prompt) setPrompt(prompt);
+      if (style) setStyle(style);
+      if (resolution) setResolution(resolution);
+    }
+  }, [location.state]);
+
 
   const creditCost = CREDIT_COSTS.image;
 
