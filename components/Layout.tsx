@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { NavLink, Link, useLocation } from 'react-router-dom';
+import { NavLink, Link, useLocation, Outlet } from 'react-router-dom';
 import { AppContext } from '../contexts/AppContext';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { useTranslation } from '../hooks/useTranslation';
@@ -103,7 +103,7 @@ const Sidebar: React.FC<{ isOpen: boolean, setIsOpen: (isOpen: boolean) => void 
     );
 };
 
-const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const Layout: React.FC = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const location = useLocation();
 
@@ -113,7 +113,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <div className="lg:pl-64 flex flex-col flex-1">
                 <Header onMenuClick={() => setSidebarOpen(true)} />
                 <main key={location.pathname} className="flex-1 p-4 sm:p-6 lg:p-8 animate-fade-in-up">
-                    {children}
+                    <Outlet />
                 </main>
             </div>
         </div>
