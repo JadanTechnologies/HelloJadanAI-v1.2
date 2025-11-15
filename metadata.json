@@ -1,0 +1,5 @@
+{
+  "name": "HelloJadanAI",
+  "description": "A modern, responsive web application that allows users to generate AI Images, AI Videos, and AI Ad Creatives using earned credits. Users must complete tasks to earn credits. No financial payments exist inside the system.",
+  "requestFramePermissions": []
+}
