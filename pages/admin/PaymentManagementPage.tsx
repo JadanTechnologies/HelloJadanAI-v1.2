@@ -1,10 +1,12 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useMemo } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import { AppContext } from '../../contexts/AppContext';
-import { Payment, Campaign } from '../../types';
+import { Payment, Campaign, PaymentGateway } from '../../types';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { COLORS } from './data';
 
 const PaymentManagementPage = () => {
     const { state, dispatch } = useContext(AppContext);
@@ -17,6 +19,22 @@ const PaymentManagementPage = () => {
     const [filter, setFilter] = useState('all');
     const [selectedPayment, setSelectedPayment] = useState<Payment | null>(initialSelected);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(!!initialSelected);
+
+    const revenueByGateway = useMemo(() => {
+        const revenueData = state.payments
+            .filter(p => p.status === 'completed')
+            .reduce((acc, payment) => {
+                acc[payment.gateway] = (acc[payment.gateway] || 0) + payment.amount;
+                return acc;
+            }, {} as Record<PaymentGateway, number>);
+
+        return Object.entries(revenueData).map(([name, revenue]) => ({
+            name: name.charAt(0).toUpperCase() + name.slice(1),
+            // FIX: Cast 'revenue' to number to resolve TypeScript error. 'Object.entries' can sometimes result in an 'unknown' type for values.
+            revenue: parseFloat((revenue as number).toFixed(2)),
+        }));
+    }, [state.payments]);
+
 
     const handleOpenReview = (payment: Payment) => {
         setSelectedPayment(payment);
@@ -66,6 +84,28 @@ const PaymentManagementPage = () => {
                 <h1 className="text-3xl font-bold text-white">Payment Management</h1>
                 <p className="text-slate-400 mt-1">Review and manage all campaign payments.</p>
             </div>
+
+            <Card>
+                <h2 className="text-xl font-bold text-white mb-4">Revenue by Gateway</h2>
+                <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={revenueByGateway} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                        <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
+                        <YAxis stroke="#94a3b8" tickFormatter={(value) => `$${value}`} />
+                        <Tooltip
+                            cursor={{ fill: 'rgba(71, 85, 105, 0.3)' }}
+                            contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '0.5rem' }}
+                            labelStyle={{ color: '#cbd5e1' }}
+                            itemStyle={{ fontWeight: 'bold' }}
+                        />
+                        <Bar dataKey="revenue" name="Revenue (USD)" unit="$" radius={[4, 4, 0, 0]}>
+                            {revenueByGateway.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                        </Bar>
+                    </BarChart>
+                </ResponsiveContainer>
+            </Card>
 
             <Card>
                 <div className="flex flex-wrap gap-2">
