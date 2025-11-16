@@ -38,31 +38,31 @@ const LoginPage = () => {
     const result = await api.apiLogin(loginEmail, loginPass);
     setIsLoading(false);
     
-    // Fix: Use an early return for the error case to ensure proper type narrowing.
-    if (!result.success) {
-      setError(result.message || t('invalidCredentials'));
-      return;
-    }
+    // FIX: Switched to an if/else block to properly narrow the discriminated union 'result'.
+    // The previous early-return was failing to convince the type checker.
+    if (result.success) {
+      // Basic role check on the client side.
+      // In a real app, the backend should be the source of truth for roles.
+      const userIsAdmin = result.user.isAdmin;
+      const userIsAdvertiser = result.user.role === 'advertiser';
 
-    // Basic role check on the client side.
-    // In a real app, the backend should be the source of truth for roles.
-    const userIsAdmin = result.user.isAdmin;
-    const userIsAdvertiser = result.user.role === 'advertiser';
-
-    if (loginType === 'admin' && !userIsAdmin) {
-      setError("This account does not have admin privileges.");
-      return;
-    }
-    if (loginType === 'advertiser' && !userIsAdvertiser) {
-      setError("This account is not an advertiser account.");
-      return;
-    }
+      if (loginType === 'admin' && !userIsAdmin) {
+        setError("This account does not have admin privileges.");
+        return;
+      }
+      if (loginType === 'advertiser' && !userIsAdvertiser) {
+        setError("This account is not an advertiser account.");
+        return;
+      }
       if ((loginType === 'user') && (userIsAdmin || userIsAdvertiser)) {
-      setError("Please use the correct login portal for your account type.");
-      return;
+        setError("Please use the correct login portal for your account type.");
+        return;
+      }
+      
+      dispatch({ type: 'LOGIN', payload: result.user });
+    } else {
+      setError(result.message || t('invalidCredentials'));
     }
-    
-    dispatch({ type: 'LOGIN', payload: result.user });
   };
 
   const handleSubmit = (e: React.FormEvent) => {

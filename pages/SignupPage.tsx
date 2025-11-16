@@ -54,14 +54,14 @@ const SignupPage = () => {
         const result = await api.apiSignup({ username, email, password, role });
         setIsLoading(false);
 
-        // Fix: Use an early return for the error case to ensure proper type narrowing.
-        if (!result.success) {
+        // FIX: Switched to an if/else block to properly narrow the discriminated union 'result'.
+        // The previous early-return was failing to convince the type checker.
+        if (result.success) {
+            dispatch({ type: 'LOGIN', payload: result.user });
+            navigate('/app/dashboard');
+        } else {
             setError(result.message || 'An unknown error occurred.');
-            return;
         }
-        
-        dispatch({ type: 'LOGIN', payload: result.user });
-        navigate('/app/dashboard');
     };
 
     return (

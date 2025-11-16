@@ -259,10 +259,12 @@ export const AppContext = createContext<{
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
   isInitializing: boolean;
+  logout: () => void;
 }>({
   state: initialState,
   dispatch: () => null,
   isInitializing: true,
+  logout: () => {},
 });
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -297,8 +299,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }, 500);
   }, []);
 
+  const logout = () => {
+    dispatch({ type: 'LOGOUT' });
+  };
+
   return (
-    <AppContext.Provider value={{ state, dispatch, isInitializing }}>
+    <AppContext.Provider value={{ state, dispatch, isInitializing, logout }}>
       {children}
     </AppContext.Provider>
   );
