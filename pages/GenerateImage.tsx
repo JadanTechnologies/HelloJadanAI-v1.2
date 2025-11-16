@@ -135,7 +135,7 @@ const GenerateImage = () => {
               {sourceImagePreview ? (
                 <div className="relative group">
                     <img src={sourceImagePreview} alt="Source preview" className="w-full rounded-lg" />
-                    <button type="button" onClick={clearSourceImage} className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-white">
+                    <button type="button" onClick={clearSourceImage} className="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-all focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-white">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -144,7 +144,7 @@ const GenerateImage = () => {
               ) : (
                 <div 
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full aspect-video bg-slate-900 border-2 border-dashed border-slate-700 rounded-lg flex flex-col items-center justify-center text-slate-500 hover:border-brand-cyan hover:text-brand-cyan transition cursor-pointer"
+                  className="w-full aspect-video bg-slate-900 hover:bg-slate-800 border-2 border-dashed border-slate-700 rounded-lg flex flex-col items-center justify-center text-slate-500 hover:border-brand-cyan hover:text-brand-cyan transition-colors cursor-pointer"
                 >
                   <UploadIcon className="w-10 h-10 mb-2" />
                   <span>{t('uploadSourceImage')}</span>
