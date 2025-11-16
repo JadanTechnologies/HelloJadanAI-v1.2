@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, ReactNode } from 'react';
-import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement, Referral, SystemSettings, AccessRestrictionRule, GenerationType, BrandingSettings, ContentSettings, Campaign, Payment, RedemptionRequest } from '../types';
-import { mockAnnouncements, mockReferrals, mockSystemSettings, mockBrandingSettings, mockContentSettings, mockCampaigns, mockPayments, mockRedemptionRequests, mockUsers } from '../pages/admin/data';
+import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement, Referral, SystemSettings, AccessRestrictionRule, GenerationType, BrandingSettings, ContentSettings, Campaign, Payment, RedemptionRequest, SupportTicket, SupportTicketMessage } from '../types';
+import { mockAnnouncements, mockReferrals, mockSystemSettings, mockBrandingSettings, mockContentSettings, mockCampaigns, mockPayments, mockRedemptionRequests, mockUsers, mockSupportTickets } from '../pages/admin/data';
 
 const initialGenerations: Generation[] = [
     { id: 'gen-1', type: 'image', prompt: 'A futuristic city skyline', url: 'https://picsum.photos/seed/futuristic/512/512', createdAt: new Date().toISOString(), isFavorite: false, style: 'Realistic', resolution: 'HD' },
@@ -41,6 +41,7 @@ const initialState: AppState = {
   campaigns: mockCampaigns,
   payments: mockPayments,
   redemptionRequests: mockRedemptionRequests,
+  supportTickets: mockSupportTickets,
   recentRedemption: null,
 };
 
@@ -259,6 +260,35 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
         console.log(`Bulk action dispatched: Set status to '${status}' for ${userIds.length} users.`);
         // No state is changed here as user management is handled locally in the component for this demo.
         return state;
+    }
+    case 'CREATE_SUPPORT_TICKET':
+      return {
+        ...state,
+        supportTickets: [action.payload, ...state.supportTickets],
+      };
+    case 'ADD_SUPPORT_TICKET_REPLY': {
+      const { ticketId, message } = action.payload;
+      return {
+        ...state,
+        supportTickets: state.supportTickets.map(ticket =>
+          ticket.id === ticketId
+            ? {
+                ...ticket,
+                messages: [...ticket.messages, message],
+                lastUpdatedAt: new Date().toISOString(),
+              }
+            : ticket
+        ),
+      };
+    }
+    case 'UPDATE_SUPPORT_TICKET_STATUS': {
+      const { ticketId, status } = action.payload;
+      return {
+        ...state,
+        supportTickets: state.supportTickets.map(ticket =>
+          ticket.id === ticketId ? { ...ticket, status, lastUpdatedAt: new Date().toISOString() } : ticket
+        ),
+      };
     }
     default:
       return state;

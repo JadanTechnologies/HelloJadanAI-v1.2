@@ -20,6 +20,7 @@ import AdvertisePage from './pages/AdvertisePage';
 import MaintenancePage from './pages/MaintenancePage';
 import PaymentPage from './pages/PaymentPage';
 import RedemptionPage from './pages/RedemptionPage';
+import SupportPage from './pages/SupportPage';
 
 // Admin-facing layout and pages
 import AdminLayout from './components/admin/AdminLayout';
@@ -39,6 +40,7 @@ import StaffManagementPage from './pages/admin/StaffManagementPage';
 import CampaignManagementPage from './pages/admin/CampaignManagementPage';
 import PaymentManagementPage from './pages/admin/PaymentManagementPage';
 import RedemptionManagementPage from './pages/admin/RedemptionManagementPage';
+import SupportManagementPage from './pages/admin/SupportManagementPage';
 
 
 function App() {
@@ -83,6 +85,7 @@ function App() {
           <Route path="credits" element={<CreditHistory />} />
           <Route path="referrals" element={<ReferralsPage />} />
           <Route path="redeem" element={<RedemptionPage />} />
+          <Route path="support" element={<SupportPage />} />
         </Route>
         
         {/* === ADMIN ROUTES === */}
@@ -107,10 +110,8 @@ function App() {
           <Route path="referrals" element={<ReferralManagementPage />} />
           <Route path="fraud-detection" element={<FraudDetectionPage />} />
           <Route path="access-control" element={<AccessControlPage />} />
+          <Route path="support" element={<SupportManagementPage />} />
         </Route>
-        
-        {/* === GLOBAL CATCH-ALL === */}
-        <Route path="*" element={<Navigate to={user ? defaultAuthPath : '/'} />} />
       </Routes>
     </HashRouter>
   );

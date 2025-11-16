@@ -4,7 +4,7 @@ import { AppContext } from '../contexts/AppContext';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTranslation } from '../hooks/useTranslation';
-import { HomeIcon, ImageIcon, VideoIcon, AdIcon, TaskIcon, GalleryIcon, CreditIcon, BellIcon, ReferralIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, GiftIcon } from '../constants';
+import { HomeIcon, ImageIcon, VideoIcon, AdIcon, TaskIcon, GalleryIcon, CreditIcon, BellIcon, ReferralIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, GiftIcon, SupportIcon } from '../constants';
 
 const ThemeToggle: React.FC = () => {
     const { theme, toggleTheme } = useTheme();
@@ -123,33 +123,60 @@ const NavItem: React.FC<{ to: string, icon: React.ReactNode, label: string, onCl
         title={isCollapsed ? label : undefined}
     >
         <div className="flex-shrink-0">{icon}</div>
-        <span className={`transition-all duration-200 whitespace-nowrap ${isCollapsed ? 'w-0 opacity-0 ml-0 hidden' : 'w-auto opacity-100 ml-3'}`}>{label}</span>
+        <span className={`whitespace-nowrap transition-all duration-200 ${isCollapsed ? 'w-0 opacity-0 ml-0 hidden' : 'w-auto opacity-100 ml-3'}`}>{label}</span>
     </NavLink>
 );
 
-
 const Sidebar: React.FC<{ isOpen: boolean; setIsOpen: (isOpen: boolean) => void; isCollapsed: boolean; toggleCollapse: () => void; }> = ({ isOpen, setIsOpen, isCollapsed, toggleCollapse }) => {
     const { t } = useTranslation();
-    
+    const { state } = useContext(AppContext);
     const closeSidebar = () => setIsOpen(false);
 
     return (
         <>
-            <aside className={`fixed inset-y-0 left-0 z-40 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'}`}>
+            <aside className={`fixed inset-y-0 left-0 z-40 bg-slate-800 border-r border-slate-700 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'}`}>
                 <div className="flex flex-col h-full">
-                    <nav className="flex-1 space-y-2 p-4 overflow-y-auto">
-                        <NavItem to="/app/dashboard" icon={<HomeIcon className="w-5 h-5"/>} label={t('navDashboard')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
-                        <NavItem to="/app/generate-image" icon={<ImageIcon className="w-5 h-5"/>} label={t('navGenerateImage')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
-                        <NavItem to="/app/generate-video" icon={<VideoIcon className="w-5 h-5"/>} label={t('navGenerateVideo')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
-                        <NavItem to="/app/generate-ad" icon={<AdIcon className="w-5 h-5"/>} label={t('navGenerateAd')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
-                        <NavItem to="/app/tasks" icon={<TaskIcon className="w-5 h-5"/>} label={t('navTasks')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
-                        <NavItem to="/app/gallery" icon={<GalleryIcon className="w-5 h-5"/>} label={t('navGallery')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
-                        <NavItem to="/app/credits" icon={<CreditIcon className="w-5 h-5"/>} label={t('creditHistory')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
-                        <NavItem to="/app/referrals" icon={<ReferralIcon className="w-5 h-5"/>} label="Referrals" onClick={closeSidebar} isCollapsed={isCollapsed}/>
-                        <NavItem to="/app/redeem" icon={<GiftIcon className="w-5 h-5"/>} label={t('navRedeem')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
-                    </nav>
-                     <div className="hidden lg:flex items-center justify-center p-4 border-t border-slate-200 dark:border-slate-800 shrink-0">
-                        <button onClick={toggleCollapse} className="p-2 rounded-full text-slate-400 hover:bg-slate-700 hover:text-white">
+                    <div className={`flex items-center h-16 px-4 border-b border-slate-700 shrink-0 ${isCollapsed ? 'justify-center' : 'justify-start'}`}>
+                        <Link to="/app/dashboard" className={`text-xl font-bold text-white transition-opacity duration-200 whitespace-nowrap ${isCollapsed ? 'opacity-0 absolute' : 'opacity-100'}`}>
+                            Hello<span className="text-brand-cyan">Jadan</span>AI
+                        </Link>
+                         {isCollapsed && (
+                            <Link to="/app/dashboard" className="text-xl font-bold text-white">
+                                H<span className="text-brand-cyan">J</span>
+                            </Link>
+                        )}
+                    </div>
+                    
+                    <div className="flex-1 flex flex-col overflow-y-auto">
+                        <nav className="flex-1 space-y-1 p-4">
+                            <NavItem to="/app/dashboard" icon={<HomeIcon className="w-5 h-5"/>} label={t('navDashboard')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                            
+                            <div className={`pt-4 mt-4 border-t border-slate-700 ${isCollapsed ? 'border-none' : ''}`}>
+                                <h3 className={`px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider transition-opacity ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>Create</h3>
+                                <NavItem to="/app/generate-image" icon={<ImageIcon className="w-5 h-5"/>} label={t('navGenerateImage')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                                <NavItem to="/app/generate-video" icon={<VideoIcon className="w-5 h-5"/>} label={t('navGenerateVideo')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                                <NavItem to="/app/generate-ad" icon={<AdIcon className="w-5 h-5"/>} label={t('navGenerateAd')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                            </div>
+
+                            <div className={`pt-4 mt-4 border-t border-slate-700 ${isCollapsed ? 'border-none' : ''}`}>
+                                <h3 className={`px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider transition-opacity ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>Manage</h3>
+                                <NavItem to="/app/tasks" icon={<TaskIcon className="w-5 h-5"/>} label={t('navTasks')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                                <NavItem to="/app/gallery" icon={<GalleryIcon className="w-5 h-5"/>} label={t('navGallery')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                                <NavItem to="/app/credits" icon={<CreditIcon className="w-5 h-5"/>} label={t('creditHistory')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                                <NavItem to="/app/referrals" icon={<ReferralIcon className="w-5 h-5"/>} label={t('referFriend')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                                <NavItem to="/app/redeem" icon={<GiftIcon className="w-5 h-5"/>} label={t('navRedeem')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                                <NavItem to="/app/support" icon={<SupportIcon className="w-5 h-5"/>} label={t('navSupport')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                            </div>
+
+                            {state.user?.isAdmin && (
+                                <div className={`pt-4 mt-4 border-t border-slate-700 ${isCollapsed ? 'border-none' : ''}`}>
+                                    <NavItem to="/admin" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>} label={t('navAdmin')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                                </div>
+                            )}
+                        </nav>
+                    </div>
+                     <div className="hidden lg:flex items-center justify-center p-4 border-t border-slate-700 shrink-0">
+                        <button onClick={toggleCollapse} className="p-2 rounded-full text-slate-400 hover:bg-slate-700">
                             {isCollapsed ? <ChevronDoubleRightIcon className="w-6 h-6"/> : <ChevronDoubleLeftIcon className="w-6 h-6"/>}
                         </button>
                     </div>
@@ -164,21 +191,17 @@ const Layout: React.FC = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const location = useLocation();
-    const { state } = useContext(AppContext);
-    const [showAnnouncement, setShowAnnouncement] = useState(true);
-    const activeAnnouncement = state.announcements.length > 0 ? state.announcements[0] : null;
 
     const toggleSidebarCollapse = () => setIsSidebarCollapsed(prev => !prev);
 
     return (
-        <div className="min-h-screen bg-slate-100 dark:bg-brand-navy text-slate-800 dark:text-slate-200">
-            {activeAnnouncement && showAnnouncement && (
-                <div className={`relative p-3 text-center text-sm text-white ${activeAnnouncement.type === 'warning' ? 'bg-yellow-600' : 'bg-brand-indigo'}`}>
-                    {activeAnnouncement.message}
-                    <button onClick={() => setShowAnnouncement(false)} className="absolute top-1/2 right-4 -translate-y-1/2 font-bold text-lg">×</button>
-                </div>
-            )}
-            <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} isCollapsed={isSidebarCollapsed} toggleCollapse={toggleSidebarCollapse} />
+        <div className="min-h-screen bg-brand-navy text-slate-200 dark:bg-brand-navy">
+            <Sidebar 
+                isOpen={sidebarOpen} 
+                setIsOpen={setSidebarOpen} 
+                isCollapsed={isSidebarCollapsed}
+                toggleCollapse={toggleSidebarCollapse} 
+            />
             <div className={`flex flex-col flex-1 transition-all duration-300 ${isSidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
                 <Header onMenuClick={() => setSidebarOpen(true)} />
                 <main key={location.pathname} className="flex-1 p-4 sm:p-6 lg:p-8 animate-fade-in-up">

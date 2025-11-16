@@ -90,5 +90,17 @@
   "redemptionHistory": "Tarihin Karɓa",
   "redemptionSuccessTitle": "An Yi Nasarar Turawa!",
   "redemptionSuccessMessage": "An aiko da ladanka. Don Allah duba na'urarka.",
-  "adminRedemptions": "Buƙatun Karɓa"
+  "adminRedemptions": "Buƙatun Karɓa",
+  "navSupport": "Taimako",
+  "supportTitle": "Cibiyar Taimako",
+  "supportSubtitle": "Kuna da matsala? Bude tikiti kuma za mu dawo gare ku.",
+  "myTickets": "Tikiti na",
+  "createTicket": "Ƙirƙiri Sabon Tikiti",
+  "ticketSubject": "Jigo",
+  "relatedTask": "Aiki Mai Alaƙa (Na zaɓi)",
+  "selectTask": "Zaɓi aiki...",
+  "yourMessage": "Saƙonka",
+  "sendMessage": "Aika Saƙo",
+  "submitTicket": "Aika Tikiti",
+  "adminSupport": "Tikitin Taimako"
 }

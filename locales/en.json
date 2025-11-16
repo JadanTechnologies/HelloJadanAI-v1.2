@@ -90,5 +90,17 @@
   "redemptionHistory": "Redemption History",
   "redemptionSuccessTitle": "Transfer Successful!",
   "redemptionSuccessMessage": "Your reward has been sent. Please check your device.",
-  "adminRedemptions": "Redemption Requests"
+  "adminRedemptions": "Redemption Requests",
+  "navSupport": "Support",
+  "supportTitle": "Support Center",
+  "supportSubtitle": "Having an issue? Open a ticket and we'll get back to you.",
+  "myTickets": "My Tickets",
+  "createTicket": "Create New Ticket",
+  "ticketSubject": "Subject",
+  "relatedTask": "Related Task (Optional)",
+  "selectTask": "Select a task...",
+  "yourMessage": "Your Message",
+  "sendMessage": "Send Message",
+  "submitTicket": "Submit Ticket",
+  "adminSupport": "Support Tickets"
 }

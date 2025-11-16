@@ -1,4 +1,4 @@
-import { User, Task, BrandingSettings, ContentSettings, TaskSubmission, ApiSettings, EmailTemplate, SmsTemplate, Announcement, CronJob, Referral, SystemSettings, AccessRestrictionRule, StaffMember, Campaign, Payment, RedemptionRequest } from '../../types';
+import { User, Task, BrandingSettings, ContentSettings, TaskSubmission, ApiSettings, EmailTemplate, SmsTemplate, Announcement, CronJob, Referral, SystemSettings, AccessRestrictionRule, StaffMember, Campaign, Payment, RedemptionRequest, SupportTicket } from '../../types';
 import { LOGO_DATA_URL } from '../../constants';
 
 export const mockUsers: User[] = [
@@ -226,3 +226,51 @@ export const analyticsData = {
     }
 };
 export const COLORS = ['#4F46E5', '#22D3EE', '#8884d8'];
+
+export const mockSupportTickets: SupportTicket[] = [
+    {
+        id: 'ticket-1',
+        userId: 'user-2',
+        username: 'Alex',
+        avatar: 'https://picsum.photos/seed/alex/100/100',
+        subject: 'Image generation failed but credits were deducted',
+        relatedTaskId: 'task-2',
+        relatedTaskTitle: 'Generate 1 Image',
+        status: 'open',
+        createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+        lastUpdatedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+        messages: [
+            { id: 'msg-1', authorId: 'user-2', authorName: 'Alex', avatar: 'https://picsum.photos/seed/alex/100/100', message: 'Hello, I tried to generate an image for the "Generate 1 Image" task, but it failed and I lost 5 credits. Can you please refund them?', createdAt: new Date(Date.now() - 86400000 * 2).toISOString() }
+        ]
+    },
+    {
+        id: 'ticket-2',
+        userId: 'user-3',
+        username: 'Sam',
+        avatar: 'https://picsum.photos/seed/sam/100/100',
+        subject: 'Cannot upload proof for social share task',
+        relatedTaskId: 'task-3',
+        relatedTaskTitle: 'Share on Social Media',
+        status: 'in_progress',
+        createdAt: new Date(Date.now() - 86400000).toISOString(),
+        lastUpdatedAt: new Date(Date.now() - 3600000).toISOString(),
+        messages: [
+            { id: 'msg-2', authorId: 'user-3', authorName: 'Sam', avatar: 'https://picsum.photos/seed/sam/100/100', message: 'The proof upload button is not working for the social media sharing task.', createdAt: new Date(Date.now() - 86400000).toISOString() },
+            { id: 'msg-3', authorId: 'user-1', authorName: 'Jadan (Support)', avatar: 'https://picsum.photos/seed/jadan/100/100', message: 'Hi Sam, we are looking into this issue. Can you please provide a screenshot of the error you are seeing?', createdAt: new Date(Date.now() - 3600000).toISOString() }
+        ]
+    },
+    {
+        id: 'ticket-3',
+        userId: 'user-2',
+        username: 'Alex',
+        avatar: 'https://picsum.photos/seed/alex/100/100',
+        subject: 'Question about video generation styles',
+        status: 'closed',
+        createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+        lastUpdatedAt: new Date(Date.now() - 86400000 * 4).toISOString(),
+        messages: [
+            { id: 'msg-4', authorId: 'user-2', authorName: 'Alex', avatar: 'https://picsum.photos/seed/alex/100/100', message: 'Are there any plans to add a "Claymation" style for video generation?', createdAt: new Date(Date.now() - 86400000 * 5).toISOString() },
+            { id: 'msg-5', authorId: 'user-1', authorName: 'Jadan (Support)', avatar: 'https://picsum.photos/seed/jadan/100/100', message: 'Thanks for the suggestion, Alex! We have passed this on to the development team for consideration in a future update.', createdAt: new Date(Date.now() - 86400000 * 4).toISOString() }
+        ]
+    }
+];

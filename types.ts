@@ -274,6 +274,29 @@ export interface SystemSettings {
     paymentGateways: PaymentGatewaySettings;
 }
 
+export interface SupportTicketMessage {
+  id: string;
+  authorId: string;
+  authorName: string;
+  avatar: string;
+  message: string;
+  createdAt: string;
+}
+
+export interface SupportTicket {
+  id: string;
+  userId: string;
+  username: string;
+  avatar: string;
+  subject: string;
+  relatedTaskId?: string;
+  relatedTaskTitle?: string;
+  status: 'open' | 'in_progress' | 'closed';
+  createdAt: string;
+  lastUpdatedAt: string;
+  messages: SupportTicketMessage[];
+}
+
 export interface AppState {
   user: User | null;
   credits: number;
@@ -289,6 +312,7 @@ export interface AppState {
   campaigns: Campaign[];
   payments: Payment[];
   redemptionRequests: RedemptionRequest[];
+  supportTickets: SupportTicket[];
   recentRedemption: { successful: boolean; message: string } | null;
 }
 
@@ -315,7 +339,10 @@ export type AppAction =
   | { type: 'CREATE_REDEMPTION_REQUEST'; payload: RedemptionRequest }
   | { type: 'UPDATE_REDEMPTION_STATUS'; payload: { requestId: string; status: 'completed' | 'rejected' } }
   | { type: 'DISMISS_REDEMPTION_BANNER' }
-  | { type: 'BULK_UPDATE_USER_STATUS'; payload: { userIds: string[], status: 'active' | 'suspended' | 'banned' | 'deleted' } };
+  | { type: 'BULK_UPDATE_USER_STATUS'; payload: { userIds: string[], status: 'active' | 'suspended' | 'banned' | 'deleted' } }
+  | { type: 'CREATE_SUPPORT_TICKET'; payload: SupportTicket }
+  | { type: 'ADD_SUPPORT_TICKET_REPLY'; payload: { ticketId: string; message: SupportTicketMessage } }
+  | { type: 'UPDATE_SUPPORT_TICKET_STATUS'; payload: { ticketId: string; status: 'open' | 'in_progress' | 'closed' } };
 
 
 export type GenerationType = 'image' | 'video' | 'ad';
