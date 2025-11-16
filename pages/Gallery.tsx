@@ -72,11 +72,17 @@ const Gallery = () => {
       {selectedItem && (
         <Modal isOpen={!!selectedItem} onClose={() => setSelectedItem(null)} title="Generation Details">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
+                <div className="space-y-4">
                    {selectedItem.type === 'video' ? (
                         <video src={selectedItem.url} controls autoPlay loop className="w-full rounded-lg" />
                     ) : (
                         <img src={selectedItem.url} alt={selectedItem.prompt} className="w-full rounded-lg" />
+                    )}
+                    {selectedItem.type === 'image' && selectedItem.sourceImageUrl && (
+                        <div className="animate-fade-in-up">
+                            <h4 className="font-semibold text-slate-300 mb-2">Source Image</h4>
+                            <img src={selectedItem.sourceImageUrl} alt="Source for generation" className="w-full rounded-lg border-2 border-slate-700" />
+                        </div>
                     )}
                 </div>
                 <div className="space-y-4">
