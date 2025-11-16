@@ -26,7 +26,6 @@ const ReferralManagementPage = () => {
                         </thead>
                         <tbody>
                             {referrals.map(ref => {
-                                // FIX: Look up referrer username from mockUsers since it's not on the Referral type.
                                 const referrer = mockUsers.find(u => u.id === ref.referrerId);
                                 return (
                                 <tr key={ref.id} className="bg-slate-800 border-b border-slate-700">

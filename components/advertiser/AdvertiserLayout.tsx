@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { NavLink, Link, useLocation, Outlet } from 'react-router-dom';
 import { AppContext } from '../../contexts/AppContext';
 import { useTranslation } from '../../hooks/useTranslation';
+import OnlineStatusIndicator from '../common/OnlineStatusIndicator';
 import { AnalyticsIcon, BriefcaseIcon, CurrencyDollarIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon } from '../../constants';
 
 const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
@@ -82,10 +83,16 @@ const Sidebar: React.FC<{ isOpen: boolean; setIsOpen: (isOpen: boolean) => void;
                         </nav>
                     </div>
 
-                    <div className="hidden lg:flex items-center justify-center p-4 border-t border-slate-800 shrink-0">
-                        <button onClick={toggleCollapse} className="p-2 rounded-full text-slate-400 hover:bg-white/10">
-                            {isCollapsed ? <ChevronDoubleRightIcon className="w-6 h-6"/> : <ChevronDoubleLeftIcon className="w-6 h-6"/>}
-                        </button>
+                    <div className="p-4 border-t border-slate-800 shrink-0">
+                        <div className="hidden lg:flex items-center justify-between">
+                            <OnlineStatusIndicator isCollapsed={isCollapsed} />
+                            <button onClick={toggleCollapse} className="p-2 rounded-full text-slate-400 hover:bg-white/10">
+                                {isCollapsed ? <ChevronDoubleRightIcon className="w-6 h-6"/> : <ChevronDoubleLeftIcon className="w-6 h-6"/>}
+                            </button>
+                        </div>
+                        <div className="lg:hidden">
+                            <OnlineStatusIndicator isCollapsed={false} />
+                        </div>
                     </div>
                 </div>
             </aside>

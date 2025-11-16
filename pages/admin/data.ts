@@ -144,9 +144,7 @@ export const mockStaff: StaffMember[] = [
 ];
 
 export const mockReferrals: Referral[] = [
-    // FIX: Removed `referrerUsername` property as it does not exist on the `Referral` type.
     { id: 'ref-1', referrerId: 'user-1', refereeId: 'user-2', refereeUsername: 'Alex', status: 'task_completed', createdAt: new Date(Date.now() - 86400000 * 2).toISOString() },
-    // FIX: Removed `referrerUsername` property as it does not exist on the `Referral` type.
     { id: 'ref-2', referrerId: 'user-1', refereeId: 'user-3', refereeUsername: 'Sam', status: 'signed_up', createdAt: new Date(Date.now() - 86400000).toISOString() },
 ];
 

@@ -101,7 +101,6 @@ const RoleModal: React.FC<RoleModalProps> = ({ isOpen, onClose, onSave, role }) 
     const [permissions, setPermissions] = useState<Permission[]>(role?.permissions || []);
 
     const groupedPermissions = useMemo(() => {
-        // FIX: Explicitly typed the accumulator in the `reduce` function to correctly group permissions by category. This resolves a TypeScript error where the `perms` variable was inferred as `unknown`, causing a crash when calling `.map()` on it.
         return ALL_PERMISSIONS.reduce<Record<string, (typeof ALL_PERMISSIONS)[number][]>>((acc, perm) => {
             const key = perm.category;
             if (!acc[key]) {
@@ -137,11 +136,12 @@ const RoleModal: React.FC<RoleModalProps> = ({ isOpen, onClose, onSave, role }) 
                 <div>
                     <h3 className="text-lg font-semibold text-white mb-2">Permissions</h3>
                     <div className="space-y-4 max-h-64 overflow-y-auto pr-2">
-                        {Object.entries(groupedPermissions).map(([category, perms]) => (
+                        {/* FIX: Replaced Object.entries with Object.keys to fix TypeScript type inference issue where `perms` was of type `unknown`. */}
+                        {Object.keys(groupedPermissions).map(category => (
                             <div key={category}>
                                 <h4 className="font-semibold text-slate-300 border-b border-slate-700 pb-1 mb-2">{category}</h4>
                                 <div className="space-y-2">
-                                    {perms.map(perm => (
+                                    {groupedPermissions[category].map(perm => (
                                         <label key={perm.id} className="flex items-center space-x-3 cursor-pointer">
                                             <input
                                                 type="checkbox"

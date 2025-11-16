@@ -4,6 +4,7 @@ import { AppContext } from '../contexts/AppContext';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTranslation } from '../hooks/useTranslation';
+import OnlineStatusIndicator from './common/OnlineStatusIndicator';
 import { HomeIcon, ImageIcon, VideoIcon, AdIcon, TaskIcon, GalleryIcon, CreditIcon, BellIcon, ReferralIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, GiftIcon, SupportIcon, ChatBubbleBottomCenterTextIcon, SparklesIcon } from '../constants';
 
 const ThemeToggle: React.FC = () => {
@@ -181,10 +182,16 @@ const Sidebar: React.FC<{ isOpen: boolean; setIsOpen: (isOpen: boolean) => void;
                             )}
                         </nav>
                     </div>
-                     <div className="hidden lg:flex items-center justify-center p-4 border-t border-slate-700 shrink-0">
-                        <button onClick={toggleCollapse} className="p-2 rounded-full text-slate-400 hover:bg-slate-700">
-                            {isCollapsed ? <ChevronDoubleRightIcon className="w-6 h-6"/> : <ChevronDoubleLeftIcon className="w-6 h-6"/>}
-                        </button>
+                    <div className="p-4 border-t border-slate-700 shrink-0">
+                         <div className="hidden lg:flex items-center justify-between">
+                            <OnlineStatusIndicator isCollapsed={isCollapsed} />
+                            <button onClick={toggleCollapse} className="p-2 rounded-full text-slate-400 hover:bg-slate-700">
+                                {isCollapsed ? <ChevronDoubleRightIcon className="w-6 h-6"/> : <ChevronDoubleLeftIcon className="w-6 h-6"/>}
+                            </button>
+                        </div>
+                        <div className="lg:hidden">
+                             <OnlineStatusIndicator isCollapsed={false} />
+                        </div>
                     </div>
                 </div>
             </aside>
