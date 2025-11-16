@@ -27,13 +27,14 @@ export interface User {
     image: number;
     video: number;
     ad: number;
+    social: number;
     lastReset: string; // ISO Date string
   };
 }
 
 export interface Generation {
   id: string;
-  type: 'image' | 'video' | 'ad';
+  type: 'image' | 'video' | 'ad' | 'social';
   prompt: string;
   url: string;
   createdAt: string;
@@ -47,6 +48,11 @@ export interface Generation {
   platform?: string;
   adType?: string;
   adCreative?: AdCreative;
+  socialPost?: {
+    platform: string;
+    tone: string;
+    content: string;
+  };
   // FIX: Added optional sourceImageUrl property to store the URL of the source image used for generation.
   sourceImageUrl?: string;
 }
@@ -160,11 +166,6 @@ export interface ApiSettings {
   ipLookup: {
     provider: string;
     apiKey: string;
-  };
-  aiProviders: {
-    gemini: { apiKey: string };
-    dalle: { apiKey: string };
-    runway: { apiKey: string };
   };
 }
 
@@ -293,6 +294,7 @@ export interface SystemSettings {
         image: number;
         video: number;
         ad: number;
+        social: number;
     };
     maintenanceMode: boolean;
     maintenanceMessage: string;
@@ -377,4 +379,4 @@ export type AppAction =
   | { type: 'DELETE_STAFF'; payload: string };
 
 
-export type GenerationType = 'image' | 'video' | 'ad';
+export type GenerationType = 'image' | 'video' | 'ad' | 'social';

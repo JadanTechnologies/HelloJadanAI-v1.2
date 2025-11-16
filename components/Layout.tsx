@@ -4,7 +4,7 @@ import { AppContext } from '../contexts/AppContext';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTranslation } from '../hooks/useTranslation';
-import { HomeIcon, ImageIcon, VideoIcon, AdIcon, TaskIcon, GalleryIcon, CreditIcon, BellIcon, ReferralIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, GiftIcon, SupportIcon } from '../constants';
+import { HomeIcon, ImageIcon, VideoIcon, AdIcon, TaskIcon, GalleryIcon, CreditIcon, BellIcon, ReferralIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, GiftIcon, SupportIcon, ChatBubbleBottomCenterTextIcon, SparklesIcon } from '../constants';
 
 const ThemeToggle: React.FC = () => {
     const { theme, toggleTheme } = useTheme();
@@ -156,6 +156,12 @@ const Sidebar: React.FC<{ isOpen: boolean; setIsOpen: (isOpen: boolean) => void;
                                 <NavItem to="/app/generate-image" icon={<ImageIcon className="w-5 h-5"/>} label={t('navGenerateImage')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
                                 <NavItem to="/app/generate-video" icon={<VideoIcon className="w-5 h-5"/>} label={t('navGenerateVideo')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
                                 <NavItem to="/app/generate-ad" icon={<AdIcon className="w-5 h-5"/>} label={t('navGenerateAd')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                                <NavItem to="/app/generate-social-post" icon={<ChatBubbleBottomCenterTextIcon className="w-5 h-5"/>} label={t('navGenerateSocial')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                            </div>
+
+                            <div className={`pt-4 mt-4 border-t border-slate-700 ${isCollapsed ? 'border-none' : ''}`}>
+                                <h3 className={`px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider transition-opacity ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>AI Tools</h3>
+                                <NavItem to="/app/chat" icon={<SparklesIcon className="w-5 h-5"/>} label={t('navChat')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
                             </div>
 
                             <div className={`pt-4 mt-4 border-t border-slate-700 ${isCollapsed ? 'border-none' : ''}`}>

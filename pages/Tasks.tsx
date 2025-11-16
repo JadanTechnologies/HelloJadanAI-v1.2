@@ -4,6 +4,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
 import Modal from '../components/common/Modal';
+import Input from '../components/common/Input';
 import { Task } from '../types';
 
 interface ProofSubmissionModalProps {
@@ -52,6 +53,7 @@ const Tasks = () => {
   const { t } = useTranslation();
   const [isProofModalOpen, setIsProofModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleCompleteTask = (task: Task, isSponsored: boolean = false) => {
     if (task.status !== 'incomplete' || !state.user) return;
@@ -159,12 +161,18 @@ const Tasks = () => {
             requiresProof: c.taskType === 'signup',
         }))
     : [];
+    
+  const allTasks = [...sponsoredTasks, ...state.tasks];
+  const filteredTasks = allTasks.filter(task => 
+    task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    task.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const taskCategories = {
-      'Sponsored': sponsoredTasks,
-      'Daily': state.tasks.filter(t => t.type === 'daily'),
-      'Engagement': state.tasks.filter(t => ['engagement', 'social_follow', 'social_share', 'youtube_subscribe'].includes(t.type)),
-      'Special': state.tasks.filter(t => ['profile', 'app_download'].includes(t.type)),
+      'Sponsored': filteredTasks.filter(t => sponsoredTasks.some(st => st.id === t.id)),
+      'Daily': filteredTasks.filter(t => t.type === 'daily'),
+      'Engagement': filteredTasks.filter(t => ['engagement', 'social_follow', 'social_share', 'youtube_subscribe'].includes(t.type)),
+      'Special': filteredTasks.filter(t => ['profile', 'app_download'].includes(t.type)),
   }
 
   return (
@@ -173,6 +181,15 @@ const Tasks = () => {
         <h1 className="text-3xl font-bold text-white">{t('tasksTitle')}</h1>
         <p className="text-slate-400 mt-1">More tasks, more rewards, more creations!</p>
       </div>
+
+      <Card>
+        <Input 
+            type="text"
+            placeholder={t('searchTasks')}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </Card>
 
       {Object.entries(taskCategories).map(([category, tasks]) => (
         tasks.length > 0 && (

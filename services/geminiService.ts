@@ -1,8 +1,9 @@
 import { Generation, AdCreative } from '../types';
+import { GoogleGenAI } from '@google/genai';
 
-// This is a mock service. In a real application, you would import and use @google/genai.
-// For example: import { GoogleGenAI } from "@google/genai";
-// const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Initialize the Google Gemini AI client.
+// The API key is securely accessed from environment variables.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -155,4 +156,63 @@ export const generateAdCreative = async (
     platform,
     adType,
   };
+};
+
+export const generateSocialPost = async (
+  prompt: string,
+  platform: string,
+  tone: string,
+  onProgress: (progress: number, message: string) => void
+): Promise<Generation> => {
+  console.log(`Generating social post for ${platform} with tone ${tone} and prompt: "${prompt}" using Gemini API.`);
+  
+  onProgress(0, "Warming up AI...");
+  await delay(200);
+  onProgress(30, "Crafting your post...");
+
+  const fullPrompt = `You are a social media expert. Write a compelling and engaging social media post for the platform "${platform}" with a "${tone}" tone of voice. The topic is: "${prompt}". Include relevant hashtags. Do not include any preamble, just return the post content.`;
+
+  try {
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: fullPrompt,
+    });
+    
+    onProgress(100, "Finalizing...");
+    await delay(200);
+
+    const content = response.text;
+
+    return {
+      id: `gen-soc-${Date.now()}`,
+      type: 'social',
+      prompt,
+      url: '', // Not used for text generation
+      createdAt: new Date().toISOString(),
+      isFavorite: false,
+      socialPost: {
+        platform,
+        tone,
+        content,
+      }
+    };
+  } catch (error) {
+    console.error("Error generating social post:", error);
+    throw new Error("Failed to generate social post.");
+  }
+};
+
+
+export const chatWithAI = async (message: string): Promise<string> => {
+  console.log(`Sending message to Gemini chat: "${message}"`);
+  try {
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: message,
+    });
+    return response.text;
+  } catch (error) {
+    console.error("Error with AI chat:", error);
+    return "I'm sorry, I encountered an error and can't respond right now.";
+  }
 };

@@ -21,6 +21,8 @@ import MaintenancePage from './pages/MaintenancePage';
 import PaymentPage from './pages/PaymentPage';
 import RedemptionPage from './pages/RedemptionPage';
 import SupportPage from './pages/SupportPage';
+import GenerateSocialPost from './pages/GenerateSocialPost';
+import ChatPage from './pages/ChatPage';
 
 // Admin-facing layout and pages
 import AdminLayout from './components/admin/AdminLayout';
@@ -81,6 +83,8 @@ function App() {
           <Route path="generate-image" element={<GenerateImage />} />
           <Route path="generate-video" element={<GenerateVideo />} />
           <Route path="generate-ad" element={<GenerateAd />} />
+          <Route path="generate-social-post" element={<GenerateSocialPost />} />
+          <Route path="chat" element={<ChatPage />} />
           <Route path="tasks" element={<Tasks />} />
           <Route path="gallery" element={<Gallery />} />
           <Route path="credits" element={<CreditHistory />} />

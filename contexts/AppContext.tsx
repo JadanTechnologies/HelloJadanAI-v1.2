@@ -236,10 +236,12 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
 
         // If last reset was before today, reset the counts
         if (lastResetDate !== today) {
+            // FIX: Property 'social' is missing in type '{ image: number; video: number; ad: number; lastReset: string; }' but required in type '{ image: number; video: number; ad: number; social: number; lastReset: string; }'.
             currentDailyGenerations = {
                 image: 0,
                 video: 0,
                 ad: 0,
+                social: 0,
                 lastReset: new Date().toISOString()
             };
         }

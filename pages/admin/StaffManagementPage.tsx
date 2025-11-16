@@ -69,7 +69,8 @@ const StaffManagementPage = () => {
                 referralCode: data.username!.toUpperCase(),
                 referralStats: { count: 0, creditsEarned: 0 },
                 fraudRisk: 'low',
-                dailyGenerations: { image: 0, video: 0, ad: 0, lastReset: new Date().toISOString() },
+                // FIX: Property 'social' is missing in type '{ image: number; video: number; ad: number; lastReset: string; }' but required in type '{ image: number; video: number; ad: number; social: number; lastReset: string; }'.
+                dailyGenerations: { image: 0, video: 0, ad: 0, social: 0, lastReset: new Date().toISOString() },
             };
 
             // In a real app, an API call would handle this. We simulate by dispatching.

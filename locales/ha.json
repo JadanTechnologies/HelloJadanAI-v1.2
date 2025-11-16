@@ -102,5 +102,14 @@
   "yourMessage": "Saƙonka",
   "sendMessage": "Aika Saƙo",
   "submitTicket": "Aika Tikiti",
-  "adminSupport": "Tikitin Taimako"
+  "adminSupport": "Tikitin Taimako",
+  "navGenerateSocial": "Rubutun Social",
+  "navChat": "Hira da AI",
+  "socialGeneratorTitle": "Mai Kirkirar Rubutun Social Media na AI",
+  "toneLabel": "Yanayin Murya",
+  "socialPromptPlaceholder": "Wani sako mai ban dariya game da wahalar gyara kuskuren kwamfuta...",
+  "chatPageTitle": "Hira da HelloJadanAI",
+  "chatPageSubtitle": "Tambaye ni komai! Daga ra'ayoyin kirkira zuwa ilimi gabaɗaya.",
+  "chatPlaceholder": "Rubuta sakonka anan...",
+  "searchTasks": "Nemo ayyuka..."
 }

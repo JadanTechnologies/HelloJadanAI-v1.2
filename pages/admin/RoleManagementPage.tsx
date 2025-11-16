@@ -100,10 +100,11 @@ const RoleModal: React.FC<RoleModalProps> = ({ isOpen, onClose, onSave, role }) 
     const [description, setDescription] = useState(role?.description || '');
     const [permissions, setPermissions] = useState<Permission[]>(role?.permissions || []);
 
-    // FIX: Refactored the `reduce` function to explicitly type the accumulator with a generic.
-    // This ensures proper type inference for `groupedPermissions` and resolves the downstream error
-    // where `.map` was being called on a property inferred as `unknown`.
+    // FIX: Property 'map' does not exist on type 'unknown'.
+    // The `reduce` function was not correctly typed, causing TypeScript to infer `perms` as `unknown`.
+    // I have added a generic type to `reduce` to explicitly define the accumulator's shape.
     const groupedPermissions = useMemo(() => {
+        // FIX: Add explicit type to the reduce accumulator to prevent TypeScript from inferring it as `unknown`.
         return ALL_PERMISSIONS.reduce<Record<string, (typeof ALL_PERMISSIONS)[number][]>>((acc, perm) => {
             (acc[perm.category] = acc[perm.category] || []).push(perm);
             return acc;

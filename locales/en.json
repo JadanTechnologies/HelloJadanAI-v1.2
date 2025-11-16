@@ -102,5 +102,14 @@
   "yourMessage": "Your Message",
   "sendMessage": "Send Message",
   "submitTicket": "Submit Ticket",
-  "adminSupport": "Support Tickets"
+  "adminSupport": "Support Tickets",
+  "navGenerateSocial": "Social Post",
+  "navChat": "AI Chat",
+  "socialGeneratorTitle": "AI Social Media Post Generator",
+  "toneLabel": "Tone of Voice",
+  "socialPromptPlaceholder": "A witty tweet about the struggles of debugging code...",
+  "chatPageTitle": "Chat with HelloJadanAI",
+  "chatPageSubtitle": "Ask me anything! From creative ideas to general knowledge.",
+  "chatPlaceholder": "Type your message here...",
+  "searchTasks": "Search tasks..."
 }
