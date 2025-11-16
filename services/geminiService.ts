@@ -109,70 +109,35 @@ export const generateVideo = async (
   prompt: string, 
   style: string, 
   duration: string,
-  onProgress: (message: string) => void
+  onProgress: (progress: number, message: string) => void
 ): Promise<Generation> => {
-    onProgress("Initializing video generation...");
-    // Must create a new instance to get the latest key from the dialog
-    const aiWithUserKey = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+  console.log(`Generating video with prompt: "${prompt}", style: ${style}, duration: ${duration}`);
+  
+  onProgress(0, "Warming up the video engine...");
+  await delay(1000);
+  
+  onProgress(25, "Storyboarding the scenes...");
+  await delay(2000);
 
-    let operation;
-    try {
-        operation = await aiWithUserKey.models.generateVideos({
-            model: 'veo-3.1-fast-generate-preview',
-            prompt: `A ${style} video of: ${prompt}`,
-            config: {
-                numberOfVideos: 1,
-                resolution: '720p',
-                aspectRatio: '16:9'
-            }
-        });
-    } catch (error: any) {
-         if (error.message && error.message.includes("API key not valid")) {
-             throw new Error("API_KEY_INVALID");
-         }
-         throw error;
-    }
+  onProgress(60, "Rendering frames...");
+  await delay(3000);
 
-    onProgress("Video generation is queued. This may take a few minutes...");
+  onProgress(90, "Applying post-processing effects...");
+  await delay(1500);
 
-    while (!operation.done) {
-        await new Promise(resolve => setTimeout(resolve, 10000)); // Poll every 10 seconds
-        try {
-            operation = await aiWithUserKey.operations.getVideosOperation({ operation: operation });
-            onProgress(`Processing... Status: ${operation.metadata?.state || 'Unknown'}`);
-        } catch (error: any) {
-            if (error.message && error.message.includes("Requested entity was not found.")) {
-                throw new Error("API_KEY_INVALID");
-            }
-            throw error;
-        }
-    }
-
-    if (operation.error) {
-        throw new Error(`Video generation failed: ${operation.error.message}`);
-    }
-
-    onProgress("Finalizing video...");
-    const downloadLink = operation.response?.generatedVideos?.[0]?.video?.uri;
-    if (!downloadLink) {
-        throw new Error("No video URI found in the response.");
-    }
-    
-    // The response.body contains the MP4 bytes. You must append an API key when fetching from the download link.
-    const response = await fetch(`${downloadLink}&key=${process.env.API_KEY}`);
-    const videoBlob = await response.blob();
-    const videoUrl = URL.createObjectURL(videoBlob);
-
-    return {
-        id: `gen-vid-${Date.now()}`,
-        type: 'video',
-        prompt,
-        url: videoUrl,
-        createdAt: new Date().toISOString(),
-        isFavorite: false,
-        style,
-        duration,
-    };
+  onProgress(100, "Done!");
+  
+  // Return a mock generation object with a placeholder video
+  return {
+    id: `gen-vid-${Date.now()}`,
+    type: 'video',
+    prompt,
+    url: 'https://www.w3schools.com/html/mov_bbb.mp4', // Placeholder video
+    createdAt: new Date().toISOString(),
+    isFavorite: false,
+    style,
+    duration,
+  };
 };
 
 

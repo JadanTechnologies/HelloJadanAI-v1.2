@@ -409,6 +409,33 @@ const PlatformSettingsPage = () => {
                                     />
                                     {errors.midjourneyApiKey && <p className="text-red-400 text-xs mt-1">{errors.midjourneyApiKey}</p>}
                                 </div>
+                                <div>
+                                    <label className="text-sm font-medium text-slate-300">RunwayML API Key</label>
+                                    <Input 
+                                        type="password" 
+                                        value={apiSettings.aiProviders.runway.apiKey} 
+                                        onChange={e => setApiSettings(p => ({...p, aiProviders: {...p.aiProviders, runway: { apiKey: e.target.value }}}))}
+                                        className={inputClasses} 
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-slate-300">Pika API Key</label>
+                                    <Input 
+                                        type="password" 
+                                        value={apiSettings.aiProviders.pika.apiKey} 
+                                        onChange={e => setApiSettings(p => ({...p, aiProviders: {...p.aiProviders, pika: { apiKey: e.target.value }}}))}
+                                        className={inputClasses} 
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-slate-300">OpenAI Sora API Key</label>
+                                    <Input 
+                                        type="password" 
+                                        value={apiSettings.aiProviders.sora.apiKey} 
+                                        onChange={e => setApiSettings(p => ({...p, aiProviders: {...p.aiProviders, sora: { apiKey: e.target.value }}}))}
+                                        className={inputClasses} 
+                                    />
+                                </div>
                             </div>
                         </div>
                         <div>

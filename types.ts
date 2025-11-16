@@ -175,6 +175,9 @@ export interface ApiSettings {
     gemini: { apiKey: string; };
     dalle: { apiKey: string; };
     midjourney: { apiKey: string; };
+    runway: { apiKey: string; };
+    pika: { apiKey: string; };
+    sora: { apiKey: string; };
   };
 }
 

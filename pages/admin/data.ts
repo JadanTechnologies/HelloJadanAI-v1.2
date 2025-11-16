@@ -70,6 +70,9 @@ export const mockApiSettings: ApiSettings = {
     gemini: { apiKey: '' },
     dalle: { apiKey: '' },
     midjourney: { apiKey: '' },
+    runway: { apiKey: '' },
+    pika: { apiKey: '' },
+    sora: { apiKey: '' },
   },
 };
 
