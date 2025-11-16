@@ -3,28 +3,27 @@ import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import Input from '../../components/common/Input';
-import { mockStaff, mockUsers } from './data';
-import { StaffMember, StaffRole, User } from '../../types';
+import { mockUsers } from './data';
+import { StaffMember, Role, User } from '../../types';
 import { TrashIcon } from '../../constants';
 import { AppContext } from '../../contexts/AppContext';
 
-// Role Dropdown and Badge Components
-const roleOptions: StaffRole[] = ['Admin', 'Moderator', 'Support'];
-
-const RoleBadge: React.FC<{ role: StaffRole }> = ({ role }) => {
-    const styles = {
+const RoleBadge: React.FC<{ roleName: string }> = ({ roleName }) => {
+    const styles: { [key: string]: string } = {
         Admin: 'bg-red-500/20 text-red-400',
         Moderator: 'bg-yellow-500/20 text-yellow-400',
         Support: 'bg-blue-500/20 text-blue-400',
+        default: 'bg-slate-500/20 text-slate-400',
     };
-    return <span className={`px-2 py-1 rounded-full text-xs font-semibold ${styles[role]}`}>{role}</span>;
+    const style = styles[roleName] || styles.default;
+    return <span className={`px-2 py-1 rounded-full text-xs font-semibold ${style}`}>{roleName}</span>;
 };
 
 
 // Main Component
 const StaffManagementPage = () => {
-    const { dispatch } = useContext(AppContext);
-    const [staff, setStaff] = useState<StaffMember[]>(mockStaff);
+    const { state, dispatch } = useContext(AppContext);
+    const { staff, roles } = state;
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingStaff, setEditingStaff] = useState<StaffMember | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -47,10 +46,10 @@ const StaffManagementPage = () => {
         setIsDeleteModalOpen(false);
     };
 
-    const handleSave = (data: { username?: string, email?: string, password?: string, role: StaffRole, userId?: string }) => {
+    const handleSave = (data: { username?: string, email?: string, password?: string, roleName: string }) => {
         if (editingStaff) {
             // Edit existing staff's role
-            setStaff(staff.map(s => s.id === editingStaff.id ? { ...s, role: data.role } : s));
+            dispatch({ type: 'UPDATE_STAFF_ROLE', payload: { staffId: editingStaff.id, roleName: data.roleName } });
         } else {
             // Add new staff by creating a new user
             const userId = `user-${Date.now()}`;
@@ -83,16 +82,16 @@ const StaffManagementPage = () => {
                 username: newUser.username,
                 email: newUser.email,
                 avatar: newUser.avatar,
-                role: data.role,
+                roleName: data.roleName,
             };
-            setStaff([newStaff, ...staff]);
+            dispatch({ type: 'ADD_STAFF', payload: newStaff });
         }
         handleCloseModals();
     };
     
     const handleConfirmRemove = () => {
         if (!staffToDelete) return;
-        setStaff(staff.filter(s => s.id !== staffToDelete.id));
+        dispatch({ type: 'DELETE_STAFF', payload: staffToDelete.id });
         handleCloseModals();
     };
     
@@ -127,7 +126,7 @@ const StaffManagementPage = () => {
                                             <p className="text-xs text-slate-500">{member.email}</p>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4"><RoleBadge role={member.role} /></td>
+                                    <td className="px-6 py-4"><RoleBadge roleName={member.roleName} /></td>
                                     <td className="px-6 py-4 text-right space-x-2">
                                         <Button variant="secondary" onClick={() => handleOpenModal(member)} className="py-1 px-2 text-xs">Edit Role</Button>
                                         <Button variant="secondary" onClick={() => handleOpenDeleteModal(member)} className="!bg-red-500/50 hover:!bg-red-500 py-1 px-2 text-xs">Remove</Button>
@@ -147,6 +146,7 @@ const StaffManagementPage = () => {
                 onClose={handleCloseModals}
                 onSave={handleSave}
                 staff={editingStaff}
+                roles={roles}
             />
             
             {staffToDelete && (
@@ -172,32 +172,33 @@ const StaffManagementPage = () => {
 interface StaffModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (data: { username?: string, email?: string, password?: string, role: StaffRole }) => void;
+    onSave: (data: { username?: string, email?: string, password?: string, roleName: string }) => void;
     staff: StaffMember | null;
+    roles: Role[];
 }
 
-const StaffModal: React.FC<StaffModalProps> = ({ isOpen, onClose, onSave, staff }) => {
+const StaffModal: React.FC<StaffModalProps> = ({ isOpen, onClose, onSave, staff, roles }) => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState<StaffRole>(staff?.role || 'Support');
+    const [roleName, setRoleName] = useState<string>(staff?.roleName || 'Support');
     
     React.useEffect(() => {
         if(staff) {
             setUsername(staff.username);
             setEmail(staff.email);
-            setRole(staff.role);
+            setRoleName(staff.roleName);
         } else {
             setUsername('');
             setEmail('');
             setPassword('');
-            setRole('Support');
+            setRoleName(roles[0]?.name || 'Support');
         }
-    }, [staff, isOpen]);
+    }, [staff, isOpen, roles]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave({ username, email, password, role });
+        onSave({ username, email, password, roleName });
     };
 
     const selectClasses = "w-full bg-slate-800 border border-slate-700 rounded-lg py-2 px-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-indigo";
@@ -228,8 +229,8 @@ const StaffModal: React.FC<StaffModalProps> = ({ isOpen, onClose, onSave, staff 
                 )}
                 <div>
                     <label className="block text-sm font-medium text-slate-300 mb-1">Role</label>
-                    <select value={role} onChange={e => setRole(e.target.value as StaffRole)} className={selectClasses} required>
-                        {roleOptions.map(r => <option key={r} value={r}>{r}</option>)}
+                    <select value={roleName} onChange={e => setRoleName(e.target.value)} className={selectClasses} required>
+                        {roles.map(r => <option key={r.id} value={r.name}>{r.name}</option>)}
                     </select>
                 </div>
                 <div className="pt-4 flex justify-end space-x-2">

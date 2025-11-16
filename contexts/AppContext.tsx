@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, ReactNode } from 'react';
-import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement, Referral, SystemSettings, AccessRestrictionRule, GenerationType, BrandingSettings, ContentSettings, Campaign, Payment, RedemptionRequest, SupportTicket, SupportTicketMessage } from '../types';
-import { mockAnnouncements, mockReferrals, mockSystemSettings, mockBrandingSettings, mockContentSettings, mockCampaigns, mockPayments, mockRedemptionRequests, mockUsers, mockSupportTickets } from '../pages/admin/data';
+import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement, Referral, SystemSettings, AccessRestrictionRule, GenerationType, BrandingSettings, ContentSettings, Campaign, Payment, RedemptionRequest, SupportTicket, SupportTicketMessage, Role, StaffMember } from '../types';
+import { mockAnnouncements, mockReferrals, mockSystemSettings, mockBrandingSettings, mockContentSettings, mockCampaigns, mockPayments, mockRedemptionRequests, mockUsers, mockSupportTickets, mockRoles, mockStaff } from '../pages/admin/data';
 
 const initialGenerations: Generation[] = [
     { id: 'gen-1', type: 'image', prompt: 'A futuristic city skyline', url: 'https://picsum.photos/seed/futuristic/512/512', createdAt: new Date().toISOString(), isFavorite: false, style: 'Realistic', resolution: 'HD' },
@@ -43,6 +43,8 @@ const initialState: AppState = {
   redemptionRequests: mockRedemptionRequests,
   supportTickets: mockSupportTickets,
   recentRedemption: null,
+  roles: mockRoles,
+  staff: mockStaff,
 };
 
 const appReducer = (state: AppState, action: AppAction): AppState => {
@@ -289,6 +291,28 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
           ticket.id === ticketId ? { ...ticket, status, lastUpdatedAt: new Date().toISOString() } : ticket
         ),
       };
+    }
+    case 'ADD_OR_UPDATE_ROLE': {
+        const existing = state.roles.find(r => r.id === action.payload.id);
+        if (existing) {
+            return { ...state, roles: state.roles.map(r => r.id === action.payload.id ? action.payload : r) };
+        }
+        return { ...state, roles: [action.payload, ...state.roles] };
+    }
+    case 'DELETE_ROLE': {
+        return { ...state, roles: state.roles.filter(r => r.id !== action.payload) };
+    }
+    case 'ADD_STAFF': {
+        return { ...state, staff: [action.payload, ...state.staff] };
+    }
+    case 'UPDATE_STAFF_ROLE': {
+        return {
+            ...state,
+            staff: state.staff.map(s => s.id === action.payload.staffId ? { ...s, roleName: action.payload.roleName } : s),
+        };
+    }
+    case 'DELETE_STAFF': {
+        return { ...state, staff: state.staff.filter(s => s.id !== action.payload) };
     }
     default:
       return state;

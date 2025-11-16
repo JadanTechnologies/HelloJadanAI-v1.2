@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { NavLink, Link, useLocation, Outlet } from 'react-router-dom';
 import { AppContext } from '../../contexts/AppContext';
 import { useTranslation } from '../../hooks/useTranslation';
-import { AdminIcon, AnalyticsIcon, SettingsIcon, ChecklistIcon, ShieldCheckIcon, EnvelopeIcon, MegaphoneIcon, ClockIcon, ReferralIcon, ShieldExclamationIcon, IdentificationIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, BriefcaseIcon, CurrencyDollarIcon, PhoneIcon, SupportIcon } from '../../constants';
+import { AdminIcon, AnalyticsIcon, SettingsIcon, ChecklistIcon, ShieldCheckIcon, EnvelopeIcon, MegaphoneIcon, ClockIcon, ReferralIcon, ShieldExclamationIcon, IdentificationIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, BriefcaseIcon, CurrencyDollarIcon, PhoneIcon, SupportIcon, KeyIcon } from '../../constants';
 
 const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
     const { state, logout } = useContext(AppContext);
@@ -94,6 +94,7 @@ const Sidebar: React.FC<{ isOpen: boolean; setIsOpen: (isOpen: boolean) => void;
                                 <h3 className={`px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider transition-opacity ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>Management</h3>
                                 <NavItem to="/admin/users" icon={<AdminIcon className="w-5 h-5"/>} label={t('userManagement')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
                                 <NavItem to="/admin/staff" icon={<IdentificationIcon className="w-5 h-5" />} label="Staff Management" onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                                <NavItem to="/admin/roles" icon={<KeyIcon className="w-5 h-5" />} label="Roles & Permissions" onClick={closeSidebar} isCollapsed={isCollapsed}/>
                                 <NavItem to="/admin/tasks" icon={<ChecklistIcon className="w-5 h-5" />} label="Task Management" onClick={closeSidebar} isCollapsed={isCollapsed}/>
                                 <NavItem to="/admin/task-monitoring" icon={<ShieldCheckIcon className="w-5 h-5" />} label="Task Monitoring" onClick={closeSidebar} isCollapsed={isCollapsed}/>
                                 <NavItem to="/admin/campaigns" icon={<BriefcaseIcon className="w-5 h-5" />} label="Campaigns" onClick={closeSidebar} isCollapsed={isCollapsed}/>

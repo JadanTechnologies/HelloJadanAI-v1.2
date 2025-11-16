@@ -41,6 +41,7 @@ import CampaignManagementPage from './pages/admin/CampaignManagementPage';
 import PaymentManagementPage from './pages/admin/PaymentManagementPage';
 import RedemptionManagementPage from './pages/admin/RedemptionManagementPage';
 import SupportManagementPage from './pages/admin/SupportManagementPage';
+import RoleManagementPage from './pages/admin/RoleManagementPage';
 
 
 function App() {
@@ -110,6 +111,7 @@ function App() {
           <Route path="referrals" element={<ReferralManagementPage />} />
           <Route path="fraud-detection" element={<FraudDetectionPage />} />
           <Route path="access-control" element={<AccessControlPage />} />
+          <Route path="roles" element={<RoleManagementPage />} />
           <Route path="support" element={<SupportManagementPage />} />
         </Route>
       </Routes>

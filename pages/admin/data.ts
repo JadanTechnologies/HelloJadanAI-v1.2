@@ -1,4 +1,4 @@
-import { User, Task, BrandingSettings, ContentSettings, TaskSubmission, ApiSettings, EmailTemplate, SmsTemplate, Announcement, CronJob, Referral, SystemSettings, AccessRestrictionRule, StaffMember, Campaign, Payment, RedemptionRequest, SupportTicket } from '../../types';
+import { User, Task, BrandingSettings, ContentSettings, TaskSubmission, ApiSettings, EmailTemplate, SmsTemplate, Announcement, CronJob, Referral, SystemSettings, AccessRestrictionRule, StaffMember, Campaign, Payment, RedemptionRequest, SupportTicket, Role, Permission } from '../../types';
 import { LOGO_DATA_URL } from '../../constants';
 
 export const mockUsers: User[] = [
@@ -85,9 +85,54 @@ export const mockCronJobs: CronJob[] = [
   { id: 'cron-3', name: 'Sync Analytics Data', schedule: '*/30 * * * *', status: 'running', lastRun: new Date(Date.now() - 1800000).toISOString(), nextRun: new Date(Date.now() + 1800000).toISOString() },
 ];
 
+export const ALL_PERMISSIONS: { id: Permission, description: string, category: string }[] = [
+    { id: 'view_dashboard', description: 'View admin dashboard analytics', category: 'General' },
+    { id: 'manage_users', description: 'View, edit, suspend, and delete users', category: 'Users' },
+    { id: 'manage_staff', description: 'Add, edit, and remove staff members', category: 'Users' },
+    { id: 'manage_roles', description: 'Create, edit, and delete staff roles and permissions', category: 'Users' },
+    { id: 'view_login_history', description: 'View platform-wide login history', category: 'Users' },
+    { id: 'edit_platform_settings', description: 'Change global platform settings', category: 'System' },
+    { id: 'manage_tasks', description: 'Create, edit, and delete user tasks', category: 'Content' },
+    { id: 'review_task_submissions', description: 'Approve or reject user task submissions', category: 'Content' },
+    { id: 'manage_campaigns', description: 'Manage advertiser campaigns', category: 'Content' },
+    { id: 'manage_payments', description: 'Manage advertiser payments', category: 'Finance' },
+    { id: 'process_redemptions', description: 'Process user redemption requests', category: 'Finance' },
+    { id: 'manage_support_tickets', description: 'View and reply to all user support tickets', category: 'Support' },
+    { id: 'manage_referrals', description: 'View referral data', category: 'Growth' },
+    { id: 'view_fraud_detection', description: 'View and act on fraud alerts', category: 'Security' },
+    { id: 'manage_access_control', description: 'Manage IP, country, and device restrictions', category: 'Security' },
+    { id: 'manage_announcements', description: 'Create and manage global announcements', category: 'Communication' },
+    { id: 'manage_templates', description: 'Edit email and SMS templates', category: 'Communication' },
+    { id: 'view_cron_jobs', description: 'View status of scheduled system jobs', category: 'System' },
+];
+
+export const mockRoles: Role[] = [
+    {
+        id: 'role-admin',
+        name: 'Admin',
+        description: 'Has unrestricted access to all features.',
+        permissions: ALL_PERMISSIONS.map(p => p.id),
+    },
+    {
+        id: 'role-moderator',
+        name: 'Moderator',
+        description: 'Can manage users, content, and support tickets.',
+        permissions: [
+            'view_dashboard', 'manage_users', 'view_login_history', 'manage_tasks', 'review_task_submissions', 'manage_campaigns',
+            'manage_support_tickets', 'view_fraud_detection', 'manage_announcements'
+        ],
+    },
+    {
+        id: 'role-support',
+        name: 'Support',
+        description: 'Can handle user support tickets and view user data.',
+        permissions: ['manage_support_tickets', 'view_login_history'],
+    }
+];
+
 export const mockStaff: StaffMember[] = [
-    { id: 'staff-1', userId: 'user-1', username: 'Jadan', email: 'jadan@example.com', avatar: 'https://picsum.photos/seed/jadan/100/100', role: 'Admin' },
-    { id: 'staff-2', userId: 'user-2', username: 'Alex', email: 'alex@example.com', avatar: 'https://picsum.photos/seed/alex/100/100', role: 'Moderator' },
+    { id: 'staff-1', userId: 'user-1', username: 'Jadan', email: 'jadan@example.com', avatar: 'https://picsum.photos/seed/jadan/100/100', roleName: 'Admin' },
+    { id: 'staff-2', userId: 'user-2', username: 'Alex', email: 'alex@example.com', avatar: 'https://picsum.photos/seed/alex/100/100', roleName: 'Moderator' },
 ];
 
 export const mockReferrals: Referral[] = [

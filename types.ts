@@ -177,7 +177,32 @@ export interface CronJob {
   nextRun: string;
 }
 
-export type StaffRole = 'Admin' | 'Moderator' | 'Support';
+export type Permission =
+  | 'view_dashboard'
+  | 'manage_users'
+  | 'manage_staff'
+  | 'manage_roles'
+  | 'view_login_history'
+  | 'edit_platform_settings'
+  | 'manage_tasks'
+  | 'review_task_submissions'
+  | 'manage_campaigns'
+  | 'manage_payments'
+  | 'process_redemptions'
+  | 'manage_support_tickets'
+  | 'manage_referrals'
+  | 'view_fraud_detection'
+  | 'manage_access_control'
+  | 'manage_announcements'
+  | 'manage_templates'
+  | 'view_cron_jobs';
+
+export interface Role {
+  id: string;
+  name: string;
+  description: string;
+  permissions: Permission[];
+}
 
 export interface StaffMember {
   id: string;
@@ -185,7 +210,7 @@ export interface StaffMember {
   username: string;
   email: string;
   avatar: string;
-  role: StaffRole;
+  roleName: string;
 }
 
 export interface Referral {
@@ -314,6 +339,8 @@ export interface AppState {
   redemptionRequests: RedemptionRequest[];
   supportTickets: SupportTicket[];
   recentRedemption: { successful: boolean; message: string } | null;
+  roles: Role[];
+  staff: StaffMember[];
 }
 
 export type AppAction =
@@ -342,7 +369,12 @@ export type AppAction =
   | { type: 'BULK_UPDATE_USER_STATUS'; payload: { userIds: string[], status: 'active' | 'suspended' | 'banned' | 'deleted' } }
   | { type: 'CREATE_SUPPORT_TICKET'; payload: SupportTicket }
   | { type: 'ADD_SUPPORT_TICKET_REPLY'; payload: { ticketId: string; message: SupportTicketMessage } }
-  | { type: 'UPDATE_SUPPORT_TICKET_STATUS'; payload: { ticketId: string; status: 'open' | 'in_progress' | 'closed' } };
+  | { type: 'UPDATE_SUPPORT_TICKET_STATUS'; payload: { ticketId: string; status: 'open' | 'in_progress' | 'closed' } }
+  | { type: 'ADD_OR_UPDATE_ROLE'; payload: Role }
+  | { type: 'DELETE_ROLE'; payload: string }
+  | { type: 'ADD_STAFF'; payload: StaffMember }
+  | { type: 'UPDATE_STAFF_ROLE'; payload: { staffId: string, roleName: string } }
+  | { type: 'DELETE_STAFF'; payload: string };
 
 
 export type GenerationType = 'image' | 'video' | 'ad';
