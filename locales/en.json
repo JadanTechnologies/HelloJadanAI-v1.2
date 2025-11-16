@@ -126,5 +126,7 @@
   "alreadyHaveAccount": "Already have an account?",
   "emailExistsError": "An account with this email already exists.",
   "dontHaveAccount": "Don't have an account?",
-  "signUp": "Sign Up"
+  "signUp": "Sign Up",
+  "invalidEmailError": "Please enter a valid email address.",
+  "selectRoleError": "Please select a role that best describes you."
 }

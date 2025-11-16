@@ -26,6 +26,10 @@ const ProofReviewModal: React.FC<ProofReviewModalProps> = ({ isOpen, onClose, on
             return false;
         }
     };
+    
+    const isImage = (url: string) => {
+        return url.startsWith('blob:') || /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+    };
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title={`Review Submission: ${submission.taskTitle}`}>
@@ -39,8 +43,12 @@ const ProofReviewModal: React.FC<ProofReviewModalProps> = ({ isOpen, onClose, on
                 </div>
                  <div>
                     <h4 className="font-semibold text-slate-300">Submitted Proof</h4>
-                    <div className="mt-1 p-3 bg-slate-800 border border-slate-700 rounded-lg max-h-48 overflow-y-auto">
-                        {isUrl(submission.proof) ? (
+                    <div className="mt-1 p-3 bg-slate-800 border border-slate-700 rounded-lg max-h-60 overflow-y-auto">
+                       {isImage(submission.proof) ? (
+                            <a href={submission.proof} target="_blank" rel="noopener noreferrer">
+                                <img src={submission.proof} alt="Proof" className="max-w-full rounded-md" />
+                            </a>
+                        ) : isUrl(submission.proof) ? (
                             <a href={submission.proof} target="_blank" rel="noopener noreferrer" className="text-brand-cyan hover:underline break-all">{submission.proof}</a>
                         ) : (
                             <p className="text-white whitespace-pre-wrap break-words">{submission.proof}</p>

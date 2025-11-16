@@ -126,5 +126,7 @@
   "alreadyHaveAccount": "Ka riga kana da asusu?",
   "emailExistsError": "Akwai asusu da wannan imel ɗin.",
   "dontHaveAccount": "Ba ka da asusu?",
-  "signUp": "Yi Rajista"
+  "signUp": "Yi Rajista",
+  "invalidEmailError": "Da fatan za a shigar da adireshin imel mai aiki.",
+  "selectRoleError": "Da fatan za a zaɓi rawar da ta fi dacewa da ku."
 }

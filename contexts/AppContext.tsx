@@ -322,6 +322,9 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
 };
 
 type LoginResult = { success: boolean; message?: string; };
+type SignupData = { username: string; email: string; password: string; role: 'student' | 'content_creator' | 'startup' };
+type SignupResult = { success: boolean; message?: string; };
+
 
 export const AppContext = createContext<{
   state: AppState;
@@ -329,12 +332,14 @@ export const AppContext = createContext<{
   login: (email: string, password: string) => LoginResult;
   logout: () => void;
   loginAsAdmin: (email: string, password: string) => LoginResult;
+  signup: (data: SignupData) => Promise<SignupResult>;
 }>({
   state: initialState,
   dispatch: () => null,
   login: () => ({ success: false }),
   logout: () => {},
   loginAsAdmin: () => ({ success: false }),
+  signup: async () => ({ success: false }),
 });
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -426,10 +431,52 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return { success: false, message: "Invalid credentials. Please try again." };
   };
 
+  const signup = async (data: SignupData): Promise<SignupResult> => {
+    // Simulate async operation
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const existingUser = mockUsers.find(u => u.email === data.email);
+    if (existingUser) {
+        return { success: false, message: "An account with this email already exists." };
+    }
+
+    const newUser: User = {
+        id: `user-${Date.now()}`,
+        username: data.username,
+        email: data.email,
+        avatar: `https://picsum.photos/seed/${data.username}/100/100`,
+        isAdmin: false,
+        role: data.role,
+        tasksCompleted: 0,
+        ip: '127.0.0.1', // mock IP
+        deviceInfo: 'Mock Browser', // mock device
+        status: 'active',
+        credits: 20, // Starting credits
+        dataBalanceMB: 0,
+        airtimeBalanceNGN: 0,
+        referralCode: data.username.toUpperCase() + Math.floor(Math.random() * 1000),
+        referralStats: { count: 0, creditsEarned: 0 },
+        fraudRisk: 'low',
+        location: { country: 'Unknown', region: 'Unknown', city: 'Unknown' },
+        dailyGenerations: {
+            image: 0,
+            video: 0,
+            ad: 0,
+            social: 0,
+            lastReset: new Date().toISOString()
+        }
+    };
+    
+    mockUsers.push(newUser); // Add to our mock DB
+    dispatch({ type: 'ADD_USER', payload: newUser }); 
+    dispatch({ type: 'LOGIN', payload: newUser });
+    return { success: true };
+  };
+
   const logout = () => dispatch({ type: 'LOGOUT' });
 
   return (
-    <AppContext.Provider value={{ state, dispatch, login, logout, loginAsAdmin }}>
+    <AppContext.Provider value={{ state, dispatch, login, logout, loginAsAdmin, signup }}>
       {children}
     </AppContext.Provider>
   );

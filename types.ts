@@ -332,6 +332,18 @@ export interface SupportTicket {
   messages: SupportTicketMessage[];
 }
 
+export interface LoginHistoryEntry {
+  id: string;
+  userId: string;
+  username: string;
+  avatar: string;
+  email: string;
+  date: string;
+  ip: string;
+  device: string;
+  status: 'Success' | 'Failed';
+}
+
 export interface AppState {
   user: User | null;
   credits: number;

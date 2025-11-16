@@ -6,7 +6,7 @@ import { AppContext } from '../contexts/AppContext';
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
 import Modal from '../components/common/Modal';
-import { ImageIcon, VideoIcon, AdIcon, TaskIcon, CreditIcon } from '../constants';
+import { TaskIcon, CreditIcon, SparklesIcon, UserPlusIcon } from '../constants';
 import { ContentSettings, BrandingSettings } from '../types';
 
 const Hologram: React.FC<{ logoUrl: string | null }> = ({ logoUrl }) => {
@@ -84,6 +84,17 @@ const AccordionItem: React.FC<{ title: string, children: React.ReactNode }> = ({
     );
 };
 
+const HowItWorksStep: React.FC<{icon: React.ReactNode, step: string, title: string, description: string}> = ({icon, step, title, description}) => (
+    <div className="text-center">
+        <div className="relative w-24 h-24 mx-auto mb-4 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-full border-2 border-slate-200 dark:border-slate-700">
+            {icon}
+            <span className="absolute -top-2 -right-2 w-8 h-8 flex items-center justify-center bg-brand-indigo text-white font-bold text-sm rounded-full border-4 border-white dark:border-slate-900/50">{step}</span>
+        </div>
+        <h4 className="text-xl font-semibold text-slate-800 dark:text-white">{title}</h4>
+        <p className="text-slate-600 dark:text-slate-400 mt-2">{description}</p>
+    </div>
+);
+
 const LandingPage: React.FC = () => {
     const { state } = useContext(AppContext);
     const { t } = useTranslation();
@@ -120,6 +131,39 @@ const LandingPage: React.FC = () => {
                     </div>
                 </section>
                 
+                <section id="how-it-works" className="py-20 px-4 bg-slate-50 dark:bg-slate-900/50">
+                    <div className="container mx-auto text-center">
+                        <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">How It Works</h3>
+                        <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-12">A simple, rewarding path to creating stunning AI content for free.</p>
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                            <HowItWorksStep
+                                icon={<UserPlusIcon className="w-10 h-10 text-brand-cyan" />}
+                                step="1"
+                                title="Create an Account"
+                                description="Sign up for free and choose your role as a student, creator, or startup."
+                            />
+                            <HowItWorksStep
+                                icon={<TaskIcon className="w-10 h-10 text-brand-cyan" />}
+                                step="2"
+                                title="Complete Tasks"
+                                description="Engage with simple tasks like daily check-ins or social shares."
+                            />
+                            <HowItWorksStep
+                                icon={<CreditIcon className="w-10 h-10 text-brand-cyan" />}
+                                step="3"
+                                title="Earn Credits"
+                                description="Instantly get rewarded with credits for every task you complete."
+                            />
+                            <HowItWorksStep
+                                icon={<SparklesIcon className="w-10 h-10 text-brand-cyan" />}
+                                step="4"
+                                title="Generate AI Content"
+                                description="Use your credits to generate unlimited images, videos, and ads."
+                            />
+                        </div>
+                    </div>
+                </section>
+
                 <section id="advertise" className="py-20 px-4 bg-slate-100 dark:bg-brand-navy">
                     <div className="container mx-auto text-center max-w-3xl">
                         <h3 className="text-3xl font-bold text-slate-900 dark:text-white">Promote Your Product</h3>

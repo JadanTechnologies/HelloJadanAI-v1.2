@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useRef } from 'react';
 import { AppContext } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import Card from '../components/common/Card';
@@ -6,6 +6,7 @@ import Button from '../components/common/Button';
 import Modal from '../components/common/Modal';
 import Input from '../components/common/Input';
 import { Task } from '../types';
+import { UploadIcon } from '../constants';
 
 interface ProofSubmissionModalProps {
     isOpen: boolean;
@@ -15,32 +16,63 @@ interface ProofSubmissionModalProps {
 }
 
 const ProofSubmissionModal: React.FC<ProofSubmissionModalProps> = ({ isOpen, onClose, onSubmit, taskTitle }) => {
-    const [proof, setProof] = useState('');
+    const [proofFile, setProofFile] = useState<File | null>(null);
+    const [proofPreview, setProofPreview] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setProofFile(file);
+            setProofPreview(URL.createObjectURL(file));
+        }
+    };
+
+    const clearProof = () => {
+        setProofFile(null);
+        setProofPreview(null);
+        if(fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSubmit(proof);
+        if (proofPreview) {
+            onSubmit(proofPreview);
+        }
     };
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title={`Submit Proof for: ${taskTitle}`}>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label htmlFor="proof" className="block text-sm font-medium text-slate-300 mb-1">
-                        Provide proof of completion (e.g., your username, a link to the shared post).
+                    <label htmlFor="proof" className="block text-sm font-medium text-slate-300 mb-2">
+                        Upload proof of completion (e.g., a screenshot).
                     </label>
-                    <textarea
-                        id="proof"
-                        value={proof}
-                        onChange={(e) => setProof(e.target.value)}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg py-2 px-4 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-indigo transition duration-300"
-                        rows={3}
-                        required
-                    />
+                    {proofPreview ? (
+                        <div className="relative group">
+                            <img src={proofPreview} alt="Proof preview" className="w-full max-w-sm mx-auto rounded-lg border border-slate-700" />
+                            <button type="button" onClick={clearProof} className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                    ) : (
+                         <div 
+                            onClick={() => fileInputRef.current?.click()}
+                            className="w-full aspect-video bg-slate-800 border-2 border-dashed border-slate-700 rounded-lg flex flex-col items-center justify-center text-slate-500 hover:border-brand-cyan hover:text-brand-cyan transition cursor-pointer"
+                        >
+                            <UploadIcon className="w-10 h-10 mb-2" />
+                            <span>Click to upload file</span>
+                            <input type="file" ref={fileInputRef} accept="image/*" onChange={handleFileChange} className="hidden" />
+                        </div>
+                    )}
                 </div>
                 <div className="pt-4 flex justify-end space-x-2">
                     <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
-                    <Button type="submit">Submit for Review</Button>
+                    <Button type="submit" disabled={!proofFile}>Submit for Review</Button>
                 </div>
             </form>
         </Modal>

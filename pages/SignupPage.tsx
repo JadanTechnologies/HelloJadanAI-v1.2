@@ -36,12 +36,16 @@ const SignupPage = () => {
         e.preventDefault();
         setError('');
 
+        if (!/\S+@\S+\.\S+/.test(email)) {
+            setError(t('invalidEmailError'));
+            return;
+        }
         if (password !== confirmPassword) {
             setError(t('passwordsDoNotMatch'));
             return;
         }
         if (!role) {
-            setError('Please select a role.');
+            setError(t('selectRoleError'));
             return;
         }
 

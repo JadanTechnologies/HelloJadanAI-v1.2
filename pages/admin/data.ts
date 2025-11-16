@@ -1,4 +1,4 @@
-import { User, Task, BrandingSettings, ContentSettings, TaskSubmission, ApiSettings, EmailTemplate, SmsTemplate, Announcement, CronJob, Referral, SystemSettings, AccessRestrictionRule, StaffMember, Campaign, Payment, RedemptionRequest, SupportTicket, Role, Permission } from '../../types';
+import { User, Task, BrandingSettings, ContentSettings, TaskSubmission, ApiSettings, EmailTemplate, SmsTemplate, Announcement, CronJob, Referral, SystemSettings, AccessRestrictionRule, StaffMember, Campaign, Payment, RedemptionRequest, SupportTicket, Role, Permission, LoginHistoryEntry } from '../../types';
 import { LOGO_DATA_URL } from '../../constants';
 
 export const mockUsers: User[] = [
@@ -10,11 +10,11 @@ export const mockUsers: User[] = [
     { id: 'user-5', username: 'Newbie', email: 'newbie@example.com', avatar: 'https://picsum.photos/seed/newbie/100/100', isAdmin: false, role: 'student', tasksCompleted: 0, ip: '172.16.0.10', deviceInfo: 'Chrome on Android', status: 'active', credits: 20, dataBalanceMB: 0, airtimeBalanceNGN: 0, referralCode: 'NEWBIE11', referredBy: 'user-2', referralStats: { count: 0, creditsEarned: 0 }, fraudRisk: 'medium', location: { country: 'Germany', region: 'Berlin', city: 'Berlin' }, dailyGenerations: { image: 0, video: 0, ad: 0, social: 0, lastReset: new Date().toISOString() } },
 ];
 
-export const mockLoginDetails = [
-    { id: 'log-1', date: new Date('2023-10-26T10:00:00Z').toISOString(), ip: '192.168.1.1', device: 'Chrome on macOS', status: 'Success' },
-    { id: 'log-2', date: new Date('2023-10-26T09:30:00Z').toISOString(), ip: '203.0.113.55', device: 'Unknown', status: 'Failed' },
-    { id: 'log-3', date: new Date('2023-10-25T15:12:45Z').toISOString(), ip: '192.168.1.1', device: 'Chrome on macOS', status: 'Success' },
-    { id: 'log-4', date: new Date('2023-10-24T11:05:10Z').toISOString(), ip: '198.51.100.2', device: 'Firefox on Windows', status: 'Success' },
+export const mockLoginDetails: LoginHistoryEntry[] = [
+    { id: 'log-1', userId: 'user-1', username: 'Jadan', email: 'jadan@example.com', avatar: 'https://picsum.photos/seed/jadan/100/100', date: new Date('2023-10-26T10:00:00Z').toISOString(), ip: '192.168.1.1', device: 'Chrome on macOS', status: 'Success' },
+    { id: 'log-2', userId: 'unknown', username: 'Unknown', email: 'failed_login@example.com', avatar: 'https://picsum.photos/seed/unknown/100/100', date: new Date('2023-10-26T09:30:00Z').toISOString(), ip: '203.0.113.55', device: 'Unknown', status: 'Failed' },
+    { id: 'log-3', userId: 'user-2', username: 'Alex', email: 'alex@example.com', avatar: 'https://picsum.photos/seed/alex/100/100', date: new Date('2023-10-25T15:12:45Z').toISOString(), ip: '10.0.0.5', device: 'Safari on iOS', status: 'Success' },
+    { id: 'log-4', userId: 'user-3', username: 'Sam', email: 'sam@temp-mail.org', avatar: 'https://picsum.photos/seed/sam/100/100', date: new Date('2023-10-24T11:05:10Z').toISOString(), ip: '172.16.0.10', device: 'Edge on Windows', status: 'Success' },
 ];
 
 export const mockTasks: Task[] = [
