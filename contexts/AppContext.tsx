@@ -110,8 +110,8 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
         // Handle referral bonus for the referrer
         if (isFirstTaskCompletion && state.user.referredBy) {
             const referrerId = state.user.referredBy;
-            const referralBonus = 15; // This would come from admin settings in a real app
-            console.log(`User ${state.user.id} completed their first task. Awarding ${referralBonus} credits to referrer ${referrerId}`);
+            const referralBonus = state.systemSettings.referralRewards.firstTask;
+            console.log(`User ${state.user.id} completed their first task. Awarding ${referralBonus} credits to referrer ${referrerId} (SIMULATED)`);
             const updatedReferrals = state.referrals.map(r => 
                 r.refereeId === userId && r.referrerId === referrerId 
                 ? { ...r, status: 'task_completed' as 'task_completed' } 
