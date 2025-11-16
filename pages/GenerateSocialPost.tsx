@@ -3,6 +3,7 @@ import { AppContext } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import Button from '../components/common/Button';
 import Select from '../components/common/Select';
+import InsufficientCreditsError from '../components/common/InsufficientCreditsError';
 import GenerationProgress from '../components/common/GenerationProgress';
 import Card from '../components/common/Card';
 import { generateSocialPost as apiGenerateSocialPost } from '../services/geminiService';
@@ -19,6 +20,7 @@ const GenerateSocialPost = () => {
     
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [showInsufficientCredits, setShowInsufficientCredits] = useState(false);
     const [result, setResult] = useState<Generation | null>(null);
     const [copied, setCopied] = useState(false);
 
@@ -51,9 +53,10 @@ const GenerateSocialPost = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
+        setShowInsufficientCredits(false);
 
         if (state.credits < creditCost) {
-            setError(t('notEnoughCredits'));
+            setShowInsufficientCredits(true);
             return;
         }
         if (hasExceededDailyLimit) {
@@ -108,7 +111,8 @@ const GenerateSocialPost = () => {
                                 <Select options={SOCIAL_TONES} value={tone} onChange={(e) => setTone(e.target.value)} />
                             </div>
                         </div>
-                         {error && <p className="text-red-400 text-sm text-center bg-red-500/10 p-2 rounded-lg">{error}</p>}
+                        {showInsufficientCredits && <InsufficientCreditsError message={t('notEnoughCredits')} />}
+                        {error && !showInsufficientCredits && <p className="text-red-400 text-sm text-center bg-red-500/10 p-2 rounded-lg">{error}</p>}
                         <div className="flex items-center justify-between">
                             <Button type="submit" isLoading={isLoading} disabled={!prompt || isLoading || hasExceededDailyLimit}>
                                 {t('generateButton')}

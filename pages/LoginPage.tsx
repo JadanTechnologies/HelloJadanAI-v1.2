@@ -38,31 +38,32 @@ const LoginPage = () => {
     const result = await api.apiLogin(loginEmail, loginPass);
     setIsLoading(false);
     
-    // FIX: Switched to an if/else block to properly narrow the discriminated union 'result'.
-    // The previous early-return was failing to convince the type checker.
-    if (result.success) {
-      // Basic role check on the client side.
-      // In a real app, the backend should be the source of truth for roles.
-      const userIsAdmin = result.user.isAdmin;
-      const userIsAdvertiser = result.user.role === 'advertiser';
-
-      if (loginType === 'admin' && !userIsAdmin) {
-        setError("This account does not have admin privileges.");
-        return;
-      }
-      if (loginType === 'advertiser' && !userIsAdvertiser) {
-        setError("This account is not an advertiser account.");
-        return;
-      }
-      if ((loginType === 'user') && (userIsAdmin || userIsAdvertiser)) {
-        setError("Please use the correct login portal for your account type.");
-        return;
-      }
-      
-      dispatch({ type: 'LOGIN', payload: result.user });
-    } else {
+    // FIX: Using a strict equality check to ensure TypeScript correctly narrows the discriminated union type.
+    if (result.success === false) {
       setError(result.message || t('invalidCredentials'));
+      return;
     }
+    
+    // At this point, 'result' is known to be the success case.
+    // Basic role check on the client side.
+    // In a real app, the backend should be the source of truth for roles.
+    const userIsAdmin = result.user.isAdmin;
+    const userIsAdvertiser = result.user.role === 'advertiser';
+
+    if (loginType === 'admin' && !userIsAdmin) {
+      setError("This account does not have admin privileges.");
+      return;
+    }
+    if (loginType === 'advertiser' && !userIsAdvertiser) {
+      setError("This account is not an advertiser account.");
+      return;
+    }
+    if ((loginType === 'user') && (userIsAdmin || userIsAdvertiser)) {
+      setError("Please use the correct login portal for your account type.");
+      return;
+    }
+    
+    dispatch({ type: 'LOGIN', payload: result.user });
   };
 
   const handleSubmit = (e: React.FormEvent) => {

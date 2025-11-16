@@ -52,6 +52,7 @@
   "loginHistory": "Tarihin Shiga",
   "notEnoughCredits": "Babu isassun kiredit don yin wannan aikin.",
   "generationFailed": "Kirkira ya gaza. Don Allah a sake gwadawa.",
+  "imageGenerationFailed": "Af! AI bai iya kirkirar hoto daga wannan rubutun ba. Ba a yi amfani da kiredit ɗinka ba. Da fatan za a gwada wani rubutu ko salo daban.",
   "adminLoginInfoTitle": "Bayanin Shiga na Gwaji",
   "adminLoginInfoText": "Yi amfani da waɗannan bayanan don shiga a matsayin mai gudanarwa:",
   "invalidCredentials": "Bayanai ba daidai ba. A sake gwadawa.",

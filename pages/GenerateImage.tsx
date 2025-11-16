@@ -4,6 +4,7 @@ import { AppContext } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import Button from '../components/common/Button';
 import Select from '../components/common/Select';
+import InsufficientCreditsError from '../components/common/InsufficientCreditsError';
 import GenerationProgress from '../components/common/GenerationProgress';
 import Card from '../components/common/Card';
 import { generateImage as apiGenerateImage } from '../services/geminiService';
@@ -27,6 +28,7 @@ const GenerateImage = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showInsufficientCredits, setShowInsufficientCredits] = useState(false);
   const [result, setResult] = useState<Generation | null>(null);
 
   const [progress, setProgress] = useState(0);
@@ -80,9 +82,10 @@ const GenerateImage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setShowInsufficientCredits(false);
 
     if (state.credits < creditCost) {
-      setError(t('notEnoughCredits'));
+      setShowInsufficientCredits(true);
       return;
     }
      if (hasExceededDailyLimit) {
@@ -101,7 +104,7 @@ const GenerateImage = () => {
       dispatch({ type: 'ADD_CREDIT_TRANSACTION', payload: { id: `tx-img-${Date.now()}`, description: 'Generated Image', amount: -creditCost, date: new Date().toISOString() } });
       dispatch({ type: 'INCREMENT_DAILY_GENERATION', payload: { type: generationType } });
     } catch (err) {
-      setError(t('generationFailed'));
+      setError(t('imageGenerationFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -186,7 +189,8 @@ const GenerateImage = () => {
               <label className="block text-sm font-medium text-slate-300 mb-2">Aspect Ratio</label>
               <Select options={IMAGE_ASPECT_RATIOS} value={aspectRatio} onChange={(e) => setAspectRatio(e.target.value)} />
             </div>
-            {error && <p className="text-red-400 text-sm text-center bg-red-500/10 p-2 rounded-lg">{error}</p>}
+            {showInsufficientCredits && <InsufficientCreditsError message={t('notEnoughCredits')} />}
+            {error && !showInsufficientCredits && <p className="text-red-400 text-sm text-center bg-red-500/10 p-2 rounded-lg">{error}</p>}
             <div className="flex items-center justify-between">
               <Button type="submit" isLoading={isLoading} disabled={!prompt || isLoading || hasExceededDailyLimit}>
                 {t('generateButton')}

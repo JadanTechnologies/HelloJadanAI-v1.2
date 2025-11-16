@@ -5,6 +5,7 @@ import { GoogleGenAI } from '@google/genai';
 import { CREDIT_COSTS, SparklesIcon } from '../constants';
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
+import InsufficientCreditsError from '../components/common/InsufficientCreditsError';
 import Spinner from '../components/common/Spinner';
 
 interface Message {
@@ -19,6 +20,7 @@ const ChatPage = () => {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showInsufficientCredits, setShowInsufficientCredits] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -35,11 +37,12 @@ const ChatPage = () => {
         const creditsBeforeDeduction = state.credits;
 
         if (creditsBeforeDeduction < creditCost) {
-            setError(t('notEnoughCredits'));
+            setShowInsufficientCredits(true);
             return;
         }
         
         setError('');
+        setShowInsufficientCredits(false);
         const userMessage: Message = { author: 'user', text: input };
         setMessages(prev => [...prev, userMessage]);
         const currentInput = input;
@@ -108,7 +111,8 @@ const ChatPage = () => {
                     <div ref={messagesEndRef} />
                 </div>
                 <div className="p-4 border-t border-slate-700">
-                    {error && <p className="text-red-400 text-sm text-center mb-2">{error}</p>}
+                    {showInsufficientCredits && <div className="mb-2"><InsufficientCreditsError message={t('notEnoughCredits')} /></div>}
+                    {error && !showInsufficientCredits && <p className="text-red-400 text-sm text-center mb-2">{error}</p>}
                     <form onSubmit={handleSendMessage} className="flex gap-2">
                         <input
                             type="text"

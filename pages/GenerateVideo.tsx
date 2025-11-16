@@ -3,6 +3,7 @@ import { AppContext } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import Button from '../components/common/Button';
 import Select from '../components/common/Select';
+import InsufficientCreditsError from '../components/common/InsufficientCreditsError';
 import GenerationProgress from '../components/common/GenerationProgress';
 import Card from '../components/common/Card';
 import { generateVideo as apiGenerateVideo } from '../services/geminiService';
@@ -18,6 +19,7 @@ const GenerateVideo = () => {
   const [duration, setDuration] = useState(VIDEO_DURATIONS[0]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showInsufficientCredits, setShowInsufficientCredits] = useState(false);
   const [result, setResult] = useState<Generation | null>(null);
   const [progress, setProgress] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState('');
@@ -41,8 +43,9 @@ const GenerateVideo = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setShowInsufficientCredits(false);
     if (state.credits < creditCost) {
-      setError(t('notEnoughCredits'));
+      setShowInsufficientCredits(true);
       return;
     }
     if (hasExceededDailyLimit) {
@@ -101,7 +104,8 @@ const GenerateVideo = () => {
               <label className="block text-sm font-medium text-slate-300 mb-2">{t('durationLabel')} <span className="text-slate-500">(approximate)</span></label>
               <Select options={VIDEO_DURATIONS} value={duration} onChange={(e) => setDuration(e.target.value)} />
             </div>
-            {error && <p className="text-red-400 text-sm text-center bg-red-500/10 p-2 rounded-lg">{error}</p>}
+            {showInsufficientCredits && <InsufficientCreditsError message={t('notEnoughCredits')} />}
+            {error && !showInsufficientCredits && <p className="text-red-400 text-sm text-center bg-red-500/10 p-2 rounded-lg">{error}</p>}
             <div className="flex items-center justify-between">
               <Button type="submit" isLoading={isLoading} disabled={!prompt || isLoading || hasExceededDailyLimit}>
                 {t('generateButton')}
