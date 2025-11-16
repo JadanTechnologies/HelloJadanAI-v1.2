@@ -4,12 +4,33 @@ import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import { AppContext } from '../../contexts/AppContext';
 import { RedemptionRequest } from '../../types';
+import { PhoneIcon, SignalIcon, ClockIcon } from '../../constants';
+
+const KPICard: React.FC<{ title: string; value: string | number; icon: React.ReactNode; }> = ({ title, value, icon }) => (
+    <Card>
+        <div className="flex items-center justify-between">
+            <h4 className="text-sm font-medium text-slate-400">{title}</h4>
+            <div className="text-slate-500">{icon}</div>
+        </div>
+        <p className="text-3xl font-bold text-white mt-1">{value}</p>
+    </Card>
+);
 
 const RedemptionManagementPage = () => {
     const { state, dispatch } = useContext(AppContext);
     const [filter, setFilter] = useState('pending');
     const [selectedRequest, setSelectedRequest] = useState<RedemptionRequest | null>(null);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
+    const totalAirtimePaid = state.redemptionRequests
+        .filter(r => r.status === 'completed' && r.type === 'airtime')
+        .reduce((sum, r) => sum + r.amount, 0);
+
+    const totalDataPaid = state.redemptionRequests
+        .filter(r => r.status === 'completed' && r.type === 'data')
+        .reduce((sum, r) => sum + r.amount, 0);
+
+    const pendingCount = state.redemptionRequests.filter(r => r.status === 'pending').length;
 
     const handleOpenReview = (request: RedemptionRequest) => {
         setSelectedRequest(request);
@@ -43,6 +64,12 @@ const RedemptionManagementPage = () => {
             <div>
                 <h1 className="text-3xl font-bold text-white">Redemption Requests</h1>
                 <p className="text-slate-400 mt-1">Process user requests for data and airtime top-ups.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <KPICard title="Total Airtime Payout (NGN)" value={`₦${totalAirtimePaid.toFixed(2)}`} icon={<PhoneIcon className="w-6 h-6 text-green-500"/>} />
+                <KPICard title="Total Data Payout (MB)" value={`${totalDataPaid.toLocaleString()} MB`} icon={<SignalIcon className="w-6 h-6 text-blue-500"/>} />
+                <KPICard title="Pending Requests" value={pendingCount} icon={<ClockIcon className="w-6 h-6 text-yellow-500"/>} />
             </div>
 
             <Card>

@@ -78,7 +78,6 @@ const TaskMonitoringPage = () => {
     const handleApprove = (submissionId: string) => {
         const submission = submissions.find(s => s.id === submissionId);
         if (submission) {
-            console.log(`Approving submission ${submissionId} for user ${submission?.userId}. Award credits and update task status.`);
             dispatch({
                 type: 'ADD_NOTIFICATION',
                 payload: {
@@ -96,7 +95,6 @@ const TaskMonitoringPage = () => {
     const handleReject = (submissionId: string) => {
          const submission = submissions.find(s => s.id === submissionId);
          if (submission) {
-             console.log(`Rejecting submission ${submissionId}.`);
               dispatch({
                 type: 'ADD_NOTIFICATION',
                 payload: {

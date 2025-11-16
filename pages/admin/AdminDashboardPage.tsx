@@ -64,8 +64,8 @@ const AdminDashboardPage = () => {
             <h2 className="text-xl font-semibold text-white border-l-4 border-brand-cyan pl-4 pt-4">Platform Analytics</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <KPICard title="Total Users" value={mockUsers.length} icon={<UsersIcon className="w-6 h-6" />} onClick={() => navigate('/admin/users')} />
-                <KPICard title="Total Generations" value={analyticsData.kpis.totalGenerations} icon={<BriefcaseIcon className="w-6 h-6" />} />
-                <KPICard title="Credits Spent" value={analyticsData.kpis.creditsSpent} icon={<ArrowDownRightIcon className="w-6 h-6 text-red-500" />} />
+                <KPICard title="Total Generations" value={analyticsData.kpis.totalGenerations} icon={<BriefcaseIcon className="w-6 h-6" />} onClick={() => navigate('/admin/users')} />
+                <KPICard title="Credits Spent" value={analyticsData.kpis.creditsSpent} icon={<ArrowDownRightIcon className="w-6 h-6 text-red-500" />} onClick={() => navigate('/admin/users')} />
                 <KPICard title="Tasks Completed" value={analyticsData.kpis.tasksCompleted} icon={<CheckCircleIcon className="w-6 h-6" />} onClick={() => navigate('/admin/task-monitoring')} />
             </div>
 
