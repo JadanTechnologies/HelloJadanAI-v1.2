@@ -111,5 +111,20 @@
   "chatPageTitle": "Hira da HelloJadanAI",
   "chatPageSubtitle": "Tambaye ni komai! Daga ra'ayoyin kirkira zuwa ilimi gabaɗaya.",
   "chatPlaceholder": "Rubuta sakonka anan...",
-  "searchTasks": "Nemo ayyuka..."
+  "searchTasks": "Nemo ayyuka...",
+  "signupTitle": "Buɗe Asusu",
+  "signupSubtitle": "Shiga cikin al'ummar mu ta masu kirkira.",
+  "createAccountButton": "Buɗe Asusu",
+  "usernameLabel": "Sunan Mai Amfani",
+  "roleLabel": "Wanne ya fi dacewa da kai?",
+  "studentRole": "Ɗalibi",
+  "studentRoleDesc": "Sami kiredit, data, da katin waya don haɓaka kirkirarka da kasancewa a haɗe.",
+  "creatorRole": "Mai Kirkirar Abu",
+  "creatorRoleDesc": "Sami kiredit don kirkirar hotuna, bidiyo, da tallace-tallace marasa iyaka don abubuwanka.",
+  "startupRole": "Mai Fara Kasuwanci",
+  "startupRoleDesc": "Sami kiredit don kirkirar kayan talla na ƙwararru da haɓaka ci gabanka.",
+  "alreadyHaveAccount": "Ka riga kana da asusu?",
+  "emailExistsError": "Akwai asusu da wannan imel ɗin.",
+  "dontHaveAccount": "Ba ka da asusu?",
+  "signUp": "Yi Rajista"
 }

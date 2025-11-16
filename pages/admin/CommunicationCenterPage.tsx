@@ -8,7 +8,6 @@ import { Announcement } from '../../types';
 
 type CommunicationTab = 'broadcast' | 'email' | 'sms';
 
-// FIX: Moved AnnouncementModal before CommunicationCenterPage to fix "used before defined" error.
 interface AnnouncementModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -214,7 +213,6 @@ const CommunicationCenterPage = () => {
                             </table>
                         </div>
                     </Card>
-                    {/* FIX: Corrected component name from `AnnouncementModal` to `openAnnouncementModal` to match the function call */}
                     <AnnouncementModal isOpen={isAnnouncementModalOpen} onClose={closeAnnouncementModal} onSave={handleSaveAnnouncement} announcement={editingAnnouncement} />
                 </div>
             )}
@@ -253,8 +251,7 @@ const CommunicationCenterPage = () => {
                          <div>
                             <label className="block text-sm font-medium text-slate-300 mb-1">Body</label>
                             <textarea value={emailBody} onChange={e => setEmailBody(e.target.value)} rows={8} className={textareaClasses} required />
-                            {/* FIX: Corrected invalid JSX syntax for displaying placeholder examples. */}
-                            <p className="text-xs text-slate-500 mt-1">You can use placeholders like {`{{username}}`} in your body and subject.</p>
+                            <p className="text-xs text-slate-500 mt-1">You can use placeholders like {'{{username}}'} in your body and subject.</p>
                         </div>
                         <div className="pt-2">
                             <Button type="submit" isLoading={isSendingEmail}>Send Email</Button>
@@ -293,8 +290,7 @@ const CommunicationCenterPage = () => {
                         <div>
                             <label className="block text-sm font-medium text-slate-300 mb-1">Message</label>
                             <textarea value={smsBody} onChange={e => setSmsBody(e.target.value)} rows={4} className={textareaClasses} required />
-                            {/* FIX: Corrected invalid JSX syntax for displaying placeholder examples. */}
-                            <p className="text-xs text-slate-500 mt-1">Placeholders like {`{{username}}`} are supported. Be mindful of character limits.</p>
+                            <p className="text-xs text-slate-500 mt-1">Placeholders like {'{{username}}'} are supported. Be mindful of character limits.</p>
                         </div>
                         <div className="pt-2">
                             <Button type="submit" isLoading={isSendingSms}>Send SMS</Button>

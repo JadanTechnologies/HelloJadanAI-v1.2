@@ -59,6 +59,7 @@ const StaffManagementPage = () => {
                 email: data.email!,
                 avatar: `https://picsum.photos/seed/${data.username}/100/100`,
                 isAdmin: true, // All staff are admins for panel access
+                role: 'startup', // Default role for new staff
                 tasksCompleted: 0,
                 ip: 'N/A',
                 deviceInfo: 'N/A',
@@ -69,7 +70,6 @@ const StaffManagementPage = () => {
                 referralCode: data.username!.toUpperCase(),
                 referralStats: { count: 0, creditsEarned: 0 },
                 fraudRisk: 'low',
-                // FIX: Property 'social' is missing in type '{ image: number; video: number; ad: number; lastReset: string; }' but required in type '{ image: number; video: number; ad: number; social: number; lastReset: string; }'.
                 dailyGenerations: { image: 0, video: 0, ad: 0, social: 0, lastReset: new Date().toISOString() },
             };
 

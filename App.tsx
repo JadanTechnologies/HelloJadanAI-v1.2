@@ -6,6 +6,7 @@ import { AppContext } from './contexts/AppContext';
 import Layout from './components/Layout';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage'; // Import the new SignupPage
 import Dashboard from './pages/Dashboard';
 import GenerateImage from './pages/GenerateImage';
 import GenerateVideo from './pages/GenerateVideo';
@@ -72,6 +73,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/advertise" element={<AdvertisePage />} />
         <Route path="/advertise/:campaignId/pay" element={<PaymentPage />} />
+        <Route path="/signup" element={!user ? <SignupPage /> : <Navigate to={defaultAuthPath} />} />
         <Route path="/login" element={!user ? <LoginPage /> : <Navigate to={defaultAuthPath} />} />
         <Route path="/forgot-password" element={!user ? <ForgotPasswordPage /> : <Navigate to={defaultAuthPath} />} />
         <Route path="/reset-password" element={!user ? <ResetPasswordPage /> : <Navigate to={defaultAuthPath} />} />

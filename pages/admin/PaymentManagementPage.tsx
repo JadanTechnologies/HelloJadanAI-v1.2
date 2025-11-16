@@ -30,7 +30,6 @@ const PaymentManagementPage = () => {
 
         return Object.entries(revenueData).map(([name, revenue]) => ({
             name: name.charAt(0).toUpperCase() + name.slice(1),
-            // FIX: Cast 'revenue' to number to resolve TypeScript error. 'Object.entries' can sometimes result in an 'unknown' type for values.
             revenue: parseFloat((revenue as number).toFixed(2)),
         }));
     }, [state.payments]);

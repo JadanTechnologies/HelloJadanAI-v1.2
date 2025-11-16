@@ -4,6 +4,7 @@ export interface User {
   email: string;
   avatar: string;
   isAdmin: boolean;
+  role: 'student' | 'content_creator' | 'startup';
   tasksCompleted: number;
   ip: string;
   deviceInfo: string;
@@ -53,7 +54,7 @@ export interface Generation {
     tone: string;
     content: string;
   };
-  // FIX: Added optional sourceImageUrl property to store the URL of the source image used for generation.
+  // Fields for "Use Again" functionality
   sourceImageUrl?: string;
 }
 
@@ -225,7 +226,6 @@ export interface StaffMember {
 export interface Referral {
     id: string;
     referrerId: string;
-    // FIX: Add missing `referrerUsername` property to the `Referral` interface.
     referrerUsername: string;
     refereeId: string;
     refereeUsername: string;

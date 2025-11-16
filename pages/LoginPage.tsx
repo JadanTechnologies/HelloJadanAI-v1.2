@@ -129,6 +129,16 @@ const LoginPage = () => {
                 </Button>
             </>
           )}
+
+          <div className="text-center mt-6 text-sm">
+            <p className="text-slate-400">
+                {t('dontHaveAccount')}{' '}
+                <Link to="/signup" className="font-semibold text-brand-cyan hover:underline">
+                    {t('signUp')}
+                </Link>
+            </p>
+           </div>
+
         </Card>
       </div>
     </div>

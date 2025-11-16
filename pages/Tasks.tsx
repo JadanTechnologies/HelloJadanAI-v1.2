@@ -146,6 +146,8 @@ const Tasks = () => {
       </Card>
   );
 
+  const nonStudent = state.user?.role === 'content_creator' || state.user?.role === 'startup';
+
   const sponsoredTasks: Task[] = state.systemSettings.sponsoredTasksEnabled
     ? state.campaigns
         .filter(c => c.status === 'active')
@@ -162,7 +164,11 @@ const Tasks = () => {
         }))
     : [];
     
-  const allTasks = [...sponsoredTasks, ...state.tasks];
+  const availableSystemTasks = nonStudent
+    ? state.tasks.filter(t => t.rewardType === 'credits')
+    : state.tasks;
+    
+  const allTasks = [...sponsoredTasks, ...availableSystemTasks];
   const filteredTasks = allTasks.filter(task => 
     task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     task.description.toLowerCase().includes(searchQuery.toLowerCase())

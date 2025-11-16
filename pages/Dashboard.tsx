@@ -4,7 +4,6 @@ import { AppContext } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
-// FIX: Imported missing CreditIcon component.
 import { ImageIcon, VideoIcon, AdIcon, SignalIcon, PhoneIcon, CheckCircleIcon, CreditIcon } from '../constants';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 

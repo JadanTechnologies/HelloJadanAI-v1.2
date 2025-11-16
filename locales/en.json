@@ -111,5 +111,20 @@
   "chatPageTitle": "Chat with HelloJadanAI",
   "chatPageSubtitle": "Ask me anything! From creative ideas to general knowledge.",
   "chatPlaceholder": "Type your message here...",
-  "searchTasks": "Search tasks..."
+  "searchTasks": "Search tasks...",
+  "signupTitle": "Create an Account",
+  "signupSubtitle": "Join our community of creators.",
+  "createAccountButton": "Create Account",
+  "usernameLabel": "Username",
+  "roleLabel": "Which best describes you?",
+  "studentRole": "Student",
+  "studentRoleDesc": "Earn credits, data, and airtime to fuel your creativity and stay connected.",
+  "creatorRole": "Content Creator",
+  "creatorRoleDesc": "Earn credits to generate unlimited images, videos, and ads for your content.",
+  "startupRole": "Startup",
+  "startupRoleDesc": "Earn credits to create professional marketing assets and accelerate your growth.",
+  "alreadyHaveAccount": "Already have an account?",
+  "emailExistsError": "An account with this email already exists.",
+  "dontHaveAccount": "Don't have an account?",
+  "signUp": "Sign Up"
 }
