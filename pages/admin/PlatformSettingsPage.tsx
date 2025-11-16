@@ -41,7 +41,51 @@ const PlatformSettingsPage = () => {
     const [isFaqModalOpen, setIsFaqModalOpen] = useState(false);
     const [editingFaq, setEditingFaq] = useState<FAQItem | null>(null);
 
+    // Validation state
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+    const validate = () => {
+        const newErrors: { [key: string]: string } = {};
+
+        // Check which providers are in use
+        const usedProviders = new Set([
+            providers.image.primary,
+            providers.image.fallback,
+            providers.video.primary,
+            providers.video.fallback,
+            providers.ad.primary,
+            providers.ad.fallback,
+        ]);
+        
+        // Don't validate mock service
+        usedProviders.delete('Mock Service');
+
+        // Validate API keys for used providers
+        if (usedProviders.has('Gemini') && !apiSettings.aiProviders.gemini.apiKey.trim()) {
+            newErrors.geminiApiKey = 'Gemini API key is required as it is selected as a provider.';
+        }
+        if (usedProviders.has('DALL-E 3') && !apiSettings.aiProviders.dalle.apiKey.trim()) {
+            newErrors.dalleApiKey = 'DALL-E API key is required as it is selected as a provider.';
+        }
+        if (usedProviders.has('Midjourney') && !apiSettings.aiProviders.midjourney.apiKey.trim()) {
+            newErrors.midjourneyApiKey = 'Midjourney API key is required as it is selected as a provider.';
+        }
+        
+        setErrors(newErrors);
+        
+        if (Object.keys(newErrors).length > 0) {
+            setActiveTab('integrations');
+            return false;
+        }
+
+        return true;
+    };
+
     const handleSave = () => {
+        if (!validate()) {
+            return;
+        }
+
         setIsSaving(true);
         setSaved(false);
         setTimeout(() => {
@@ -285,8 +329,8 @@ const PlatformSettingsPage = () => {
                     <Card>
                         <h2 className="text-xl font-bold text-white mb-4">Daily Generation Limits</h2>
                         <p className="text-slate-400 mb-6">Set the maximum number of generations a user can perform daily.</p>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {(['image', 'video', 'ad'] as const).map(type => (
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            {(['image', 'video', 'ad', 'social'] as const).map(type => (
                                 <div key={type}>
                                     <label className="block text-sm font-medium text-slate-300 capitalize">{type} Daily Limit</label>
                                     <Input type="number" value={systemSettings.dailyGenerationLimits[type]} onChange={e => setSystemSettings(p => ({...p, dailyGenerationLimits: {...p.dailyGenerationLimits, [type]: parseInt(e.target.value) || 0}}))} />
@@ -328,15 +372,42 @@ const PlatformSettingsPage = () => {
                             <div className="space-y-4">
                                 <div>
                                     <label className="text-sm font-medium text-slate-300">Google Gemini API Key</label>
-                                    <Input type="password" value={apiSettings.aiProviders.gemini.apiKey} onChange={e => setApiSettings(p => ({...p, aiProviders: {...p.aiProviders, gemini: { apiKey: e.target.value }}}))} className={inputClasses} />
+                                    <Input 
+                                        type="password" 
+                                        value={apiSettings.aiProviders.gemini.apiKey} 
+                                        onChange={e => {
+                                            setApiSettings(p => ({...p, aiProviders: {...p.aiProviders, gemini: { apiKey: e.target.value }}}));
+                                            if (errors.geminiApiKey) setErrors(prev => ({...prev, geminiApiKey: ''}));
+                                        }}
+                                        className={`${inputClasses} ${errors.geminiApiKey ? '!border-red-500' : ''}`} 
+                                    />
+                                    {errors.geminiApiKey && <p className="text-red-400 text-xs mt-1">{errors.geminiApiKey}</p>}
                                 </div>
                                 <div>
                                     <label className="text-sm font-medium text-slate-300">OpenAI DALL-E API Key</label>
-                                    <Input type="password" value={apiSettings.aiProviders.dalle.apiKey} onChange={e => setApiSettings(p => ({...p, aiProviders: {...p.aiProviders, dalle: { apiKey: e.target.value }}}))} className={inputClasses} />
+                                    <Input 
+                                        type="password" 
+                                        value={apiSettings.aiProviders.dalle.apiKey} 
+                                        onChange={e => {
+                                            setApiSettings(p => ({...p, aiProviders: {...p.aiProviders, dalle: { apiKey: e.target.value }}}));
+                                            if (errors.dalleApiKey) setErrors(prev => ({...prev, dalleApiKey: ''}));
+                                        }}
+                                        className={`${inputClasses} ${errors.dalleApiKey ? '!border-red-500' : ''}`} 
+                                    />
+                                    {errors.dalleApiKey && <p className="text-red-400 text-xs mt-1">{errors.dalleApiKey}</p>}
                                 </div>
                                 <div>
                                     <label className="text-sm font-medium text-slate-300">Midjourney API Key</label>
-                                    <Input type="password" value={apiSettings.aiProviders.midjourney.apiKey} onChange={e => setApiSettings(p => ({...p, aiProviders: {...p.aiProviders, midjourney: { apiKey: e.target.value }}}))} className={inputClasses} />
+                                    <Input 
+                                        type="password" 
+                                        value={apiSettings.aiProviders.midjourney.apiKey} 
+                                        onChange={e => {
+                                            setApiSettings(p => ({...p, aiProviders: {...p.aiProviders, midjourney: { apiKey: e.target.value }}}));
+                                            if (errors.midjourneyApiKey) setErrors(prev => ({...prev, midjourneyApiKey: ''}));
+                                        }}
+                                        className={`${inputClasses} ${errors.midjourneyApiKey ? '!border-red-500' : ''}`} 
+                                    />
+                                    {errors.midjourneyApiKey && <p className="text-red-400 text-xs mt-1">{errors.midjourneyApiKey}</p>}
                                 </div>
                             </div>
                         </div>
