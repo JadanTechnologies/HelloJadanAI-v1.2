@@ -252,6 +252,14 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
       
         return { ...state, user: updatedUser };
     }
+    case 'BULK_UPDATE_USER_STATUS': {
+        // This is a simulation for an API call.
+        // In a real app, you'd trigger the API and then refetch/update the user list.
+        const { userIds, status } = action.payload;
+        console.log(`Bulk action dispatched: Set status to '${status}' for ${userIds.length} users.`);
+        // No state is changed here as user management is handled locally in the component for this demo.
+        return state;
+    }
     default:
       return state;
   }

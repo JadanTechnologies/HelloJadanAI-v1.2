@@ -314,7 +314,8 @@ export type AppAction =
   | { type: 'INCREMENT_DAILY_GENERATION'; payload: { type: GenerationType } }
   | { type: 'CREATE_REDEMPTION_REQUEST'; payload: RedemptionRequest }
   | { type: 'UPDATE_REDEMPTION_STATUS'; payload: { requestId: string; status: 'completed' | 'rejected' } }
-  | { type: 'DISMISS_REDEMPTION_BANNER' };
+  | { type: 'DISMISS_REDEMPTION_BANNER' }
+  | { type: 'BULK_UPDATE_USER_STATUS'; payload: { userIds: string[], status: 'active' | 'suspended' | 'banned' | 'deleted' } };
 
 
 export type GenerationType = 'image' | 'video' | 'ad';
