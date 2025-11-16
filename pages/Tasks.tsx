@@ -14,7 +14,8 @@ import {
     VideoIcon,
     UserPlusIcon,
     ShareIcon,
-    DevicePhoneMobileIcon
+    DevicePhoneMobileIcon,
+    ClockIcon
 } from '../constants';
 
 interface ProofSubmissionModalProps {
@@ -152,7 +153,12 @@ const Tasks = () => {
           case 'completed':
               return <Button disabled>Completed</Button>;
           case 'pending':
-              return <Button disabled variant="secondary">Pending Review</Button>;
+              return (
+                <Button disabled variant="secondary" className="!cursor-wait">
+                  <ClockIcon className="w-4 h-4 mr-2 animate-spin-slow" />
+                  Pending Review
+                </Button>
+              );
           case 'incomplete':
               return <Button onClick={() => handleCompleteTask(task)}>Complete</Button>;
       }
