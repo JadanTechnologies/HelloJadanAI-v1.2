@@ -1,7 +1,7 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import { AppContext } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
-import { chatWithAI } from '../services/geminiService';
+import { GoogleGenAI } from '@google/genai';
 import { CREDIT_COSTS, SparklesIcon } from '../constants';
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
@@ -32,7 +32,9 @@ const ChatPage = () => {
         if (!input.trim() || isLoading) return;
 
         const creditCost = CREDIT_COSTS.chatMessage;
-        if (state.credits < creditCost) {
+        const creditsBeforeDeduction = state.credits;
+
+        if (creditsBeforeDeduction < creditCost) {
             setError(t('notEnoughCredits'));
             return;
         }
@@ -40,21 +42,29 @@ const ChatPage = () => {
         setError('');
         const userMessage: Message = { author: 'user', text: input };
         setMessages(prev => [...prev, userMessage]);
+        const currentInput = input;
         setInput('');
         setIsLoading(true);
 
         try {
             // Deduct credits immediately
-            dispatch({ type: 'UPDATE_CREDITS', payload: state.credits - creditCost });
+            dispatch({ type: 'UPDATE_CREDITS', payload: creditsBeforeDeduction - creditCost });
             dispatch({ type: 'ADD_CREDIT_TRANSACTION', payload: { id: `tx-chat-${Date.now()}`, description: 'AI Chat Message', amount: -creditCost, date: new Date().toISOString() } });
+            
+            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: currentInput,
+            });
+            const aiResponseText = response.text;
 
-            const aiResponseText = await chatWithAI(input);
             const aiMessage: Message = { author: 'ai', text: aiResponseText };
             setMessages(prev => [...prev, aiMessage]);
         } catch (err) {
-            setError('An error occurred while getting a response.');
+            console.error("Error with AI chat:", err);
+            setError("I'm sorry, I encountered an error and can't respond right now.");
             // Refund credits on error
-            dispatch({ type: 'UPDATE_CREDITS', payload: state.credits });
+            dispatch({ type: 'UPDATE_CREDITS', payload: creditsBeforeDeduction });
         } finally {
             setIsLoading(false);
         }
