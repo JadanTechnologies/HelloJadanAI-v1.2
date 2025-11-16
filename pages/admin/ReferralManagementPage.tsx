@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Card from '../../components/common/Card';
-import { mockReferrals } from './data';
+import { mockReferrals, mockUsers } from './data';
 import { Referral } from '../../types';
 
 const ReferralManagementPage = () => {
@@ -25,9 +25,12 @@ const ReferralManagementPage = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {referrals.map(ref => (
+                            {referrals.map(ref => {
+                                // FIX: Look up referrer username from mockUsers since it's not on the Referral type.
+                                const referrer = mockUsers.find(u => u.id === ref.referrerId);
+                                return (
                                 <tr key={ref.id} className="bg-slate-800 border-b border-slate-700">
-                                    <td className="px-6 py-4 font-medium text-white">{ref.referrerUsername}</td>
+                                    <td className="px-6 py-4 font-medium text-white">{referrer?.username || 'Unknown'}</td>
                                     <td className="px-6 py-4 font-medium text-white">{ref.refereeUsername}</td>
                                     <td className="px-6 py-4">{new Date(ref.createdAt).toLocaleString()}</td>
                                     <td className="px-6 py-4">
@@ -38,7 +41,8 @@ const ReferralManagementPage = () => {
                                         )}
                                     </td>
                                 </tr>
-                            ))}
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>

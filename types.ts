@@ -4,7 +4,7 @@ export interface User {
   email: string;
   avatar: string;
   isAdmin: boolean;
-  role: 'student' | 'content_creator' | 'startup';
+  role: 'student' | 'content_creator' | 'startup' | 'advertiser';
   tasksCompleted: number;
   ip: string;
   deviceInfo: string;
@@ -226,7 +226,6 @@ export interface StaffMember {
 export interface Referral {
     id: string;
     referrerId: string;
-    referrerUsername: string;
     refereeId: string;
     refereeUsername: string;
     status: 'signed_up' | 'task_completed';
@@ -242,6 +241,7 @@ export interface AccessRestrictionRule {
 
 export interface Campaign {
   id: string;
+  advertiserId: string;
   companyName: string;
   contactEmail: string;
   productName: string;

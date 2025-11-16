@@ -6,7 +6,7 @@ import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 import Card from '../components/common/Card';
 
-type LoginType = 'user' | 'admin';
+type LoginType = 'user' | 'admin' | 'advertiser';
 
 const LoginPage = () => {
   const { login, loginAsAdmin, state } = useContext(AppContext);
@@ -21,13 +21,21 @@ const LoginPage = () => {
   const handleTypeChange = (type: LoginType) => {
     setLoginType(type);
     setError('');
-    setEmail(type === 'admin' ? 'jadan@example.com' : 'alex@example.com');
+    if (type === 'admin') {
+      setEmail('jadan@example.com');
+    } else if (type === 'user') {
+      setEmail('alex@example.com');
+    } else if (type === 'advertiser') {
+      setEmail('advertiser@example.com');
+    }
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    const result = loginType === 'user' ? login(email, password) : loginAsAdmin(email, password);
+    const result = loginType === 'admin' 
+      ? loginAsAdmin(email, password)
+      : login(email, password); // Generic login now handles user and advertiser
     if (!result.success) {
       setError(result.message || t('invalidCredentials'));
     }
@@ -57,21 +65,27 @@ const LoginPage = () => {
               <div className="flex bg-slate-900 border border-slate-700 rounded-lg p-1">
                 <button 
                   onClick={() => handleTypeChange('user')}
-                  className={`w-1/2 py-2 rounded-md text-sm font-semibold transition-colors ${loginType === 'user' ? 'bg-brand-indigo text-white' : 'text-slate-400 hover:bg-slate-800'}`}
+                  className={`w-1/3 py-2 rounded-md text-sm font-semibold transition-colors ${loginType === 'user' ? 'bg-brand-indigo text-white' : 'text-slate-400 hover:bg-slate-800'}`}
                 >
-                  User Login
+                  User
+                </button>
+                 <button 
+                  onClick={() => handleTypeChange('advertiser')}
+                  className={`w-1/3 py-2 rounded-md text-sm font-semibold transition-colors ${loginType === 'advertiser' ? 'bg-brand-indigo text-white' : 'text-slate-400 hover:bg-slate-800'}`}
+                >
+                  Advertiser
                 </button>
                  <button 
                   onClick={() => handleTypeChange('admin')}
-                  className={`w-1/2 py-2 rounded-md text-sm font-semibold transition-colors ${loginType === 'admin' ? 'bg-brand-indigo text-white' : 'text-slate-400 hover:bg-slate-800'}`}
+                  className={`w-1/3 py-2 rounded-md text-sm font-semibold transition-colors ${loginType === 'admin' ? 'bg-brand-indigo text-white' : 'text-slate-400 hover:bg-slate-800'}`}
                 >
-                  Admin Login
+                  Admin
                 </button>
               </div>
           </div>
 
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-white">{loginType === 'user' ? t('loginTitle') : 'Admin Access'}</h2>
+            <h2 className="text-2xl font-bold text-white">{loginType === 'user' ? t('loginTitle') : (loginType === 'advertiser' ? t('advertiserLogin') : 'Admin Access')}</h2>
             <p className="text-slate-400 mt-1">{loginType === 'user' ? t('loginSubtitle') : 'Please enter your credentials.'}</p>
           </div>
 
@@ -91,7 +105,7 @@ const LoginPage = () => {
             <div>
                 <div className="flex justify-between items-center">
                     <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1">{t('passwordLabel')}</label>
-                    {loginType === 'user' && (
+                    {loginType !== 'admin' && (
                        <Link to="/forgot-password" className="text-sm text-brand-cyan hover:underline">{t('forgotPassword')}</Link>
                     )}
                 </div>
@@ -131,12 +145,14 @@ const LoginPage = () => {
           )}
 
           <div className="text-center mt-6 text-sm">
-            <p className="text-slate-400">
-                {t('dontHaveAccount')}{' '}
-                <Link to="/signup" className="font-semibold text-brand-cyan hover:underline">
-                    {t('signUp')}
-                </Link>
-            </p>
+            { loginType === 'user' &&
+                <p className="text-slate-400">
+                    {t('dontHaveAccount')}{' '}
+                    <Link to="/signup" className="font-semibold text-brand-cyan hover:underline">
+                        {t('signUp')}
+                    </Link>
+                </p>
+            }
            </div>
 
         </Card>

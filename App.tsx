@@ -46,6 +46,12 @@ import RedemptionManagementPage from './pages/admin/RedemptionManagementPage';
 import SupportManagementPage from './pages/admin/SupportManagementPage';
 import RoleManagementPage from './pages/admin/RoleManagementPage';
 
+// Advertiser-facing layout and pages
+import AdvertiserLayout from './components/advertiser/AdvertiserLayout';
+import AdvertiserDashboardPage from './pages/advertiser/AdvertiserDashboardPage';
+import AdvertiserCampaignsPage from './pages/advertiser/AdvertiserCampaignsPage';
+import AdvertiserBillingPage from './pages/advertiser/AdvertiserBillingPage';
+
 
 function App() {
   const { state } = useContext(AppContext);
@@ -64,7 +70,14 @@ function App() {
   }
   
   // Determine the default authenticated path
-  const defaultAuthPath = user?.isAdmin ? '/admin' : '/app';
+  let defaultAuthPath = '/app';
+  if (user) {
+    if (user.isAdmin) {
+      defaultAuthPath = '/admin';
+    } else if (user.role === 'advertiser') {
+      defaultAuthPath = '/advertiser';
+    }
+  }
 
   return (
     <HashRouter>
@@ -79,7 +92,7 @@ function App() {
         <Route path="/reset-password" element={!user ? <ResetPasswordPage /> : <Navigate to={defaultAuthPath} />} />
 
         {/* === AUTHENTICATED USER ROUTES === */}
-        <Route path="/app" element={user ? <Layout /> : <Navigate to="/login" />}>
+        <Route path="/app" element={user && user.role !== 'advertiser' ? <Layout /> : <Navigate to="/login" />}>
           <Route index element={<Navigate to="dashboard" />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="generate-image" element={<GenerateImage />} />
@@ -95,10 +108,21 @@ function App() {
           <Route path="support" element={<SupportPage />} />
         </Route>
         
+        {/* === ADVERTISER ROUTES === */}
+        <Route 
+          path="/advertiser" 
+          element={user ? (user.role === 'advertiser' ? <AdvertiserLayout /> : <Navigate to="/app" />) : <Navigate to="/login" />}
+        >
+          <Route index element={<Navigate to="dashboard" />} />
+          <Route path="dashboard" element={<AdvertiserDashboardPage />} />
+          <Route path="campaigns" element={<AdvertiserCampaignsPage />} />
+          <Route path="billing" element={<AdvertiserBillingPage />} />
+        </Route>
+
         {/* === ADMIN ROUTES === */}
         <Route 
           path="/admin" 
-          element={user ? (user.isAdmin ? <AdminLayout /> : <Navigate to="/app/dashboard" />) : <Navigate to="/login" />}
+          element={user ? (user.isAdmin ? <AdminLayout /> : <Navigate to={defaultAuthPath} />) : <Navigate to="/login" />}
         >
           <Route index element={<Navigate to="dashboard" />} />
           <Route path="dashboard" element={<AdminDashboardPage />} />

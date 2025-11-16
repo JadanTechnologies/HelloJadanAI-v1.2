@@ -128,5 +128,16 @@
   "dontHaveAccount": "Ba ka da asusu?",
   "signUp": "Yi Rajista",
   "invalidEmailError": "Da fatan za a shigar da adireshin imel mai aiki.",
-  "selectRoleError": "Da fatan za a zaɓi rawar da ta fi dacewa da ku."
+  "selectRoleError": "Da fatan za a zaɓi rawar da ta fi dacewa da ku.",
+  "advertiserLogin": "Shiga Mai Talla",
+  "advertiserDashboardTitle": "Dashboard na Mai Talla",
+  "navAdvertiserDashboard": "Dashboard",
+  "navMyCampaigns": "Kamfen Dina",
+  "navBilling": "Biyan Kuɗi",
+  "totalSpend": "Jimlar Kuɗin da Aka Kashe",
+  "activeCampaigns": "Kamfen Masu Aiki",
+  "completedActions": "Ayyukan da Aka Kammala",
+  "createNewCampaign": "Ƙirƙiri Sabon Kamfen",
+  "recentCampaigns": "Sabbin Kamfen",
+  "myCampaignsTitle": "Kamfen Dina"
 }

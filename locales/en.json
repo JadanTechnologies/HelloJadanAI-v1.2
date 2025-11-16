@@ -128,5 +128,16 @@
   "dontHaveAccount": "Don't have an account?",
   "signUp": "Sign Up",
   "invalidEmailError": "Please enter a valid email address.",
-  "selectRoleError": "Please select a role that best describes you."
+  "selectRoleError": "Please select a role that best describes you.",
+  "advertiserLogin": "Advertiser Login",
+  "advertiserDashboardTitle": "Advertiser Dashboard",
+  "navAdvertiserDashboard": "Dashboard",
+  "navMyCampaigns": "My Campaigns",
+  "navBilling": "Billing",
+  "totalSpend": "Total Spend",
+  "activeCampaigns": "Active Campaigns",
+  "completedActions": "Completed Actions",
+  "createNewCampaign": "Create New Campaign",
+  "recentCampaigns": "Recent Campaigns",
+  "myCampaignsTitle": "My Campaigns"
 }

@@ -8,6 +8,7 @@ export const mockUsers: User[] = [
     { id: 'user-3', username: 'Sam', email: 'sam@temp-mail.org', avatar: 'https://picsum.photos/seed/sam/100/100', isAdmin: false, role: 'student', tasksCompleted: 2, ip: '172.16.0.10', deviceInfo: 'Edge on Windows', status: 'suspended', credits: 10, dataBalanceMB: 0, airtimeBalanceNGN: 0, referralCode: 'SAM789', referredBy: 'user-1', referralStats: { count: 0, creditsEarned: 0 }, fraudRisk: 'high', location: { country: 'United Kingdom', region: 'England', city: 'London' }, dailyGenerations: { image: 1, video: 0, ad: 0, social: 0, lastReset: new Date().toISOString() } },
     { id: 'user-4', username: 'BannedUser', email: 'banned@example.com', avatar: 'https://picsum.photos/seed/banned/100/100', isAdmin: false, role: 'student', tasksCompleted: 20, ip: '203.0.113.40', deviceInfo: 'Firefox on Linux', status: 'banned', credits: 0, dataBalanceMB: 0, airtimeBalanceNGN: 0, referralCode: 'BANNED00', referredBy: undefined, referralStats: { count: 0, creditsEarned: 0 }, fraudRisk: 'high', location: { country: 'Nigeria', region: 'Lagos', city: 'Lagos' }, dailyGenerations: { image: 0, video: 0, ad: 0, social: 0, lastReset: new Date().toISOString() } },
     { id: 'user-5', username: 'Newbie', email: 'newbie@example.com', avatar: 'https://picsum.photos/seed/newbie/100/100', isAdmin: false, role: 'student', tasksCompleted: 0, ip: '172.16.0.10', deviceInfo: 'Chrome on Android', status: 'active', credits: 20, dataBalanceMB: 0, airtimeBalanceNGN: 0, referralCode: 'NEWBIE11', referredBy: 'user-2', referralStats: { count: 0, creditsEarned: 0 }, fraudRisk: 'medium', location: { country: 'Germany', region: 'Berlin', city: 'Berlin' }, dailyGenerations: { image: 0, video: 0, ad: 0, social: 0, lastReset: new Date().toISOString() } },
+    { id: 'user-6', username: 'Innovate Inc.', email: 'advertiser@example.com', avatar: 'https://picsum.photos/seed/innovate/100/100', isAdmin: false, role: 'advertiser', tasksCompleted: 0, ip: '203.0.113.100', deviceInfo: 'Chrome on Windows', status: 'active', credits: 0, dataBalanceMB: 0, airtimeBalanceNGN: 0, referralCode: 'INNOVATE', referredBy: undefined, referralStats: { count: 0, creditsEarned: 0 }, fraudRisk: 'low', location: { country: 'USA', region: 'California', city: 'San Francisco' }, dailyGenerations: { image: 0, video: 0, ad: 0, social: 0, lastReset: new Date().toISOString() } },
 ];
 
 export const mockLoginDetails: LoginHistoryEntry[] = [
@@ -15,6 +16,7 @@ export const mockLoginDetails: LoginHistoryEntry[] = [
     { id: 'log-2', userId: 'unknown', username: 'Unknown', email: 'failed_login@example.com', avatar: 'https://picsum.photos/seed/unknown/100/100', date: new Date('2023-10-26T09:30:00Z').toISOString(), ip: '203.0.113.55', device: 'Unknown', status: 'Failed' },
     { id: 'log-3', userId: 'user-2', username: 'Alex', email: 'alex@example.com', avatar: 'https://picsum.photos/seed/alex/100/100', date: new Date('2023-10-25T15:12:45Z').toISOString(), ip: '10.0.0.5', device: 'Safari on iOS', status: 'Success' },
     { id: 'log-4', userId: 'user-3', username: 'Sam', email: 'sam@temp-mail.org', avatar: 'https://picsum.photos/seed/sam/100/100', date: new Date('2023-10-24T11:05:10Z').toISOString(), ip: '172.16.0.10', device: 'Edge on Windows', status: 'Success' },
+    { id: 'log-5', userId: 'user-6', username: 'Innovate Inc.', email: 'advertiser@example.com', avatar: 'https://picsum.photos/seed/innovate/100/100', date: new Date().toISOString(), ip: '203.0.113.100', device: 'Chrome on Windows', status: 'Success' },
 ];
 
 export const mockTasks: Task[] = [
@@ -142,13 +144,16 @@ export const mockStaff: StaffMember[] = [
 ];
 
 export const mockReferrals: Referral[] = [
-    { id: 'ref-1', referrerId: 'user-1', referrerUsername: 'Jadan', refereeId: 'user-2', refereeUsername: 'Alex', status: 'task_completed', createdAt: new Date(Date.now() - 86400000 * 2).toISOString() },
-    { id: 'ref-2', referrerId: 'user-1', referrerUsername: 'Jadan', refereeId: 'user-3', refereeUsername: 'Sam', status: 'signed_up', createdAt: new Date(Date.now() - 86400000).toISOString() },
+    // FIX: Removed `referrerUsername` property as it does not exist on the `Referral` type.
+    { id: 'ref-1', referrerId: 'user-1', refereeId: 'user-2', refereeUsername: 'Alex', status: 'task_completed', createdAt: new Date(Date.now() - 86400000 * 2).toISOString() },
+    // FIX: Removed `referrerUsername` property as it does not exist on the `Referral` type.
+    { id: 'ref-2', referrerId: 'user-1', refereeId: 'user-3', refereeUsername: 'Sam', status: 'signed_up', createdAt: new Date(Date.now() - 86400000).toISOString() },
 ];
 
 export const mockCampaigns: Campaign[] = [
     {
         id: 'camp-1',
+        advertiserId: 'user-6',
         companyName: 'Innovate Inc.',
         contactEmail: 'contact@innovate.com',
         productName: 'Synth AI Assistant',
@@ -166,6 +171,7 @@ export const mockCampaigns: Campaign[] = [
     },
     {
         id: 'camp-2',
+        advertiserId: 'user-6',
         companyName: 'Gamerz United',
         contactEmail: 'ads@gamerzu.com',
         productName: 'CyberRonin 2088',
@@ -183,13 +189,14 @@ export const mockCampaigns: Campaign[] = [
     },
      {
         id: 'camp-3',
+        advertiserId: 'user-6',
         companyName: 'EcoWear',
         contactEmail: 'partner@ecowear.com',
         productName: 'Sustainable Sneakers',
         taskDescription: 'Check out our new line of eco-friendly sneakers.',
         targetUrl: 'https://ecowear.com',
         taskType: 'visit_website',
-        budget: 0,
+        budget: 200,
         cpa: 1.0,
         userCreditReward: 50,
         status: 'completed',
@@ -199,6 +206,7 @@ export const mockCampaigns: Campaign[] = [
     },
     {
         id: 'camp-4',
+        advertiserId: 'user-6',
         companyName: 'DevTools Co.',
         contactEmail: 'info@devtools.com',
         productName: 'CodeSphere IDE',
