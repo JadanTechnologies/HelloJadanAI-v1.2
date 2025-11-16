@@ -29,14 +29,16 @@ export const generateImage = async (
   
   onProgress(0, "Initializing model...");
 
+  let sourceImageBase64Url: string | undefined = undefined;
+
   try {
       let imageUrl: string;
 
       if (sourceImage) {
-          // Image-to-image generation with gemini-2.5-flash-image
           onProgress(20, "Analyzing source image...");
           const base64Data = await fileToBase64(sourceImage);
           const mimeType = sourceImage.type;
+          sourceImageBase64Url = `data:${mimeType};base64,${base64Data}`;
 
           onProgress(50, "Editing image with AI...");
           const response = await ai.models.generateContent({
@@ -59,7 +61,6 @@ export const generateImage = async (
           imageUrl = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
 
       } else {
-          // Text-to-image generation with imagen
           onProgress(20, "Analyzing prompt...");
           const rawRatio = aspectRatio.split(' ')[0];
           const validRatios = ["1:1", "3:4", "4:3", "9:16", "16:9"] as const;
@@ -94,7 +95,7 @@ export const generateImage = async (
           resolution,
           aspectRatio,
           negativePrompt,
-          sourceImageUrl: sourceImage ? URL.createObjectURL(sourceImage) : undefined,
+          sourceImageUrl: sourceImageBase64Url,
       };
 
   } catch (error) {

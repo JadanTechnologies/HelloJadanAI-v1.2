@@ -5,18 +5,20 @@ import { useTranslation } from '../hooks/useTranslation';
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 import Card from '../components/common/Card';
+import * as api from '../services/api';
+import { User } from '../types';
 
 type LoginType = 'user' | 'admin' | 'advertiser';
 
 const LoginPage = () => {
-  const { login, loginAsAdmin, state } = useContext(AppContext);
+  const { state, dispatch } = useContext(AppContext);
   const { t } = useTranslation();
   
   const [loginType, setLoginType] = useState<LoginType>('user');
-  // From data.ts, alex@example.com is a regular user, jadan@example.com is an admin.
   const [email, setEmail] = useState('alex@example.com');
   const [password, setPassword] = useState('password');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleTypeChange = (type: LoginType) => {
     setLoginType(type);
@@ -30,23 +32,46 @@ const LoginPage = () => {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async (loginEmail: string, loginPass: string) => {
+    setIsLoading(true);
     setError('');
-    const result = loginType === 'admin' 
-      ? loginAsAdmin(email, password)
-      : login(email, password); // Generic login now handles user and advertiser
+    const result = await api.apiLogin(loginEmail, loginPass);
+    setIsLoading(false);
+    
+    // Fix: Use an early return for the error case to ensure proper type narrowing.
     if (!result.success) {
       setError(result.message || t('invalidCredentials'));
+      return;
     }
+
+    // Basic role check on the client side.
+    // In a real app, the backend should be the source of truth for roles.
+    const userIsAdmin = result.user.isAdmin;
+    const userIsAdvertiser = result.user.role === 'advertiser';
+
+    if (loginType === 'admin' && !userIsAdmin) {
+      setError("This account does not have admin privileges.");
+      return;
+    }
+    if (loginType === 'advertiser' && !userIsAdvertiser) {
+      setError("This account is not an advertiser account.");
+      return;
+    }
+      if ((loginType === 'user') && (userIsAdmin || userIsAdvertiser)) {
+      setError("Please use the correct login portal for your account type.");
+      return;
+    }
+    
+    dispatch({ type: 'LOGIN', payload: result.user });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleLogin(email, password);
   };
 
   const handleGoogleLogin = () => {
-    // Use the correct mock regular user for this demo login
-    const result = login('alex@example.com', 'password');
-     if (!result.success) {
-      setError(result.message || t('invalidCredentials'));
-    }
+    handleLogin('alex@example.com', 'password');
   }
 
   return (
@@ -99,7 +124,8 @@ const LoginPage = () => {
                 id="email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required 
+                required
+                disabled={isLoading}
               />
             </div>
             <div>
@@ -114,10 +140,11 @@ const LoginPage = () => {
                 id="password" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required 
+                required
+                disabled={isLoading}
               />
             </div>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" isLoading={isLoading}>
               {t('loginButton')}
             </Button>
           </form>
@@ -132,7 +159,7 @@ const LoginPage = () => {
                     <span className="bg-slate-800 px-2 text-slate-500">Or continue with</span>
                     </div>
                 </div>
-                <Button onClick={handleGoogleLogin} variant="secondary" className="w-full">
+                <Button onClick={handleGoogleLogin} variant="secondary" className="w-full" isLoading={isLoading}>
                     <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M22.56,12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26,1.37-1.04,2.53-2.21,3.31v2.77h3.57c2.08-1.92,3.28-4.74,3.28-8.09Z" fill="#4285F4"/>
                     <path d="M12,23c2.97,0,5.46-.98,7.28-2.66l-3.57-2.77c-.98.66-2.23,1.06-3.71,1.06-2.86,0-5.29-1.93-6.16-4.53H2.18v2.84C3.99,20.53,7.7,23,12,23Z" fill="#34A853"/>

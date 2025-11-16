@@ -6,6 +6,7 @@ import Button from '../components/common/Button';
 import Modal from '../components/common/Modal';
 import Input from '../components/common/Input';
 import { Task } from '../types';
+import * as api from '../services/api';
 import { 
     UploadIcon,
     CalendarDaysIcon,
@@ -97,56 +98,71 @@ const Tasks = () => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const handleCompleteTask = (task: Task, isSponsored: boolean = false) => {
+  const handleTaskAction = async (task: Task, isSponsored: boolean = false) => {
     if (task.status !== 'incomplete' || !state.user) return;
     
-     if (isSponsored) {
-        const campaign = state.campaigns.find(c => c.id === task.id);
-        if (!campaign) return;
+    if (isSponsored) {
+      // Sponsored task logic remains client-side for now as it's simpler
+      const campaign = state.campaigns.find(c => c.id === task.id);
+      if (!campaign) return;
 
-        // Sponsored tasks only give credits in this implementation
-        dispatch({ type: 'UPDATE_CREDITS', payload: state.credits + task.rewardAmount });
-        dispatch({ type: 'ADD_CREDIT_TRANSACTION', payload: { id: `tx-camp-${Date.now()}`, description: `Sponsored Task: ${task.title}`, amount: task.rewardAmount, date: new Date().toISOString() } });
-        
-        const updatedCampaign = { 
-            ...campaign, 
-            budget: campaign.budget - campaign.cpa,
-            completedActions: (campaign.completedActions || 0) + 1,
-        };
-        if (updatedCampaign.budget <= 0) {
-            updatedCampaign.status = 'completed';
-        }
-        dispatch({ type: 'UPDATE_CAMPAIGN', payload: updatedCampaign });
-
-        dispatch({ type: 'ADD_NOTIFICATION', payload: { message: `You earned ${task.rewardAmount} credits for completing a sponsored task!`, type: 'success' } });
-        
-        if (task.targetUrl) {
-            window.open(task.targetUrl, '_blank');
-        }
-
+      dispatch({ type: 'UPDATE_CREDITS', payload: state.credits + task.rewardAmount });
+      dispatch({ type: 'ADD_CREDIT_TRANSACTION', payload: { id: `tx-camp-${Date.now()}`, description: `Sponsored Task: ${task.title}`, amount: task.rewardAmount, date: new Date().toISOString() } });
+      
+      const updatedCampaign = { 
+          ...campaign, 
+          budget: campaign.budget - campaign.cpa,
+          completedActions: (campaign.completedActions || 0) + 1,
+      };
+      if (updatedCampaign.budget <= 0) {
+          updatedCampaign.status = 'completed';
+      }
+      dispatch({ type: 'UPDATE_CAMPAIGN', payload: updatedCampaign });
+      dispatch({ type: 'ADD_NOTIFICATION', payload: { message: `You earned ${task.rewardAmount} credits for completing a sponsored task!`, type: 'success' } });
+      
+      if (task.targetUrl) {
+          window.open(task.targetUrl, '_blank');
+      }
     } else {
+        // System task logic
         if (task.requiresProof) {
             setSelectedTask(task);
             setIsProofModalOpen(true);
         } else {
-            dispatch({ type: 'UPDATE_TASK_STATUS', payload: { taskId: task.id, userId: state.user.id, status: 'completed' } });
+            // Immediately mark as completed and get rewards
+            dispatch({ type: 'UPDATE_TASK_STATUS', payload: { taskId: task.id, status: 'completed' } });
+            const result = await api.apiUpdateTaskStatus(task.id, state.user.id, 'completed');
+            
+            // Dispatch updates from API response
+            if (result.updatedUser) {
+                dispatch({ type: 'LOGIN', payload: { ...state.user, ...result.updatedUser } });
+            }
+            if (result.newTransaction) {
+                dispatch({ type: 'ADD_CREDIT_TRANSACTION', payload: result.newTransaction });
+            }
+            if (result.notification) {
+                dispatch({ type: 'ADD_NOTIFICATION', payload: result.notification });
+            }
         }
     }
   };
   
-  const handleProofSubmit = (proof: string) => {
+  const handleProofSubmit = async (proof: string) => {
     if (selectedTask && state.user) {
         console.log(`Submitting proof for task ${selectedTask.id}: ${proof}`);
+        // Mark as pending in UI immediately
         dispatch({ type: 'UPDATE_TASK_STATUS', payload: { taskId: selectedTask.id, userId: state.user.id, status: 'pending' } });
+        // In a real app, you would upload the proof and then call the API.
+        // For this demo, we'll just call the API to update status.
+        await api.apiUpdateTaskStatus(selectedTask.id, state.user.id, 'pending');
     }
     setIsProofModalOpen(false);
     setSelectedTask(null);
   };
 
   const getTaskButton = (task: Task, isSponsored: boolean = false) => {
-      // For sponsored tasks, we assume they are always completable for this demo.
       if (isSponsored) {
-          return <Button onClick={() => handleCompleteTask(task, true)}>Complete Task</Button>
+          return <Button onClick={() => handleTaskAction(task, true)}>Complete Task</Button>
       }
 
       switch (task.status) {
@@ -160,7 +176,7 @@ const Tasks = () => {
                 </Button>
               );
           case 'incomplete':
-              return <Button onClick={() => handleCompleteTask(task)}>Complete</Button>;
+              return <Button onClick={() => handleTaskAction(task)}>Complete</Button>;
       }
   };
   
@@ -216,28 +232,6 @@ const Tasks = () => {
           </div>
       </Card>
   );
-
-  const nonStudent = state.user?.role === 'content_creator' || state.user?.role === 'startup';
-
-  const sponsoredTasks: Task[] = state.systemSettings.sponsoredTasksEnabled
-    ? state.campaigns
-        .filter(c => c.status === 'active')
-        .map(c => ({
-            id: c.id,
-            title: c.productName,
-            description: c.taskDescription,
-            rewardAmount: c.userCreditReward,
-            rewardType: 'credits',
-            status: 'incomplete', // Assumed for all users in this demo
-            type: 'engagement',
-            targetUrl: c.targetUrl,
-            requiresProof: c.taskType === 'signup',
-        }))
-    : [];
-    
-  const availableSystemTasks = nonStudent
-    ? state.tasks.filter(t => t.rewardType === 'credits')
-    : state.tasks;
     
   const filterBySearch = (tasks: Task[]) => tasks.filter(task => 
     task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -245,11 +239,11 @@ const Tasks = () => {
   );
   
   const taskCategories = {
-      'Sponsored': filterBySearch(sponsoredTasks),
-      'Daily': filterBySearch(availableSystemTasks.filter(t => t.type === 'daily')),
-      'Engagement': filterBySearch(availableSystemTasks.filter(t => ['engagement', 'social_follow', 'social_share', 'youtube_subscribe'].includes(t.type))),
-      'Profile': filterBySearch(availableSystemTasks.filter(t => t.type === 'profile')),
-      'Special Offers': filterBySearch(availableSystemTasks.filter(t => ['app_download'].includes(t.type))),
+      'Sponsored': filterBySearch(state.tasks.filter(t => state.campaigns.some(c => c.id === t.id))),
+      'Daily': filterBySearch(state.tasks.filter(t => t.type === 'daily')),
+      'Engagement': filterBySearch(state.tasks.filter(t => ['engagement', 'social_follow', 'social_share', 'youtube_subscribe'].includes(t.type))),
+      'Profile': filterBySearch(state.tasks.filter(t => t.type === 'profile')),
+      'Special Offers': filterBySearch(state.tasks.filter(t => ['app_download'].includes(t.type))),
   };
 
 

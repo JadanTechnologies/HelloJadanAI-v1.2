@@ -6,6 +6,7 @@ import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 import Card from '../components/common/Card';
 import { User } from '../types';
+import * as api from '../services/api';
 
 type Role = 'student' | 'content_creator' | 'startup';
 
@@ -20,7 +21,7 @@ const RoleCard: React.FC<{ title: string; description: string; isSelected: boole
 );
 
 const SignupPage = () => {
-    const { signup, state } = useContext(AppContext);
+    const { state, dispatch } = useContext(AppContext);
     const { t } = useTranslation();
     const navigate = useNavigate();
 
@@ -50,14 +51,17 @@ const SignupPage = () => {
         }
 
         setIsLoading(true);
-        const result = await signup({ username, email, password, role });
+        const result = await api.apiSignup({ username, email, password, role });
         setIsLoading(false);
 
+        // Fix: Use an early return for the error case to ensure proper type narrowing.
         if (!result.success) {
             setError(result.message || 'An unknown error occurred.');
-        } else {
-            navigate('/app/dashboard');
+            return;
         }
+        
+        dispatch({ type: 'LOGIN', payload: result.user });
+        navigate('/app/dashboard');
     };
 
     return (
@@ -83,21 +87,21 @@ const SignupPage = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-slate-300 mb-1">{t('usernameLabel')}</label>
-                                <Input type="text" value={username} onChange={e => setUsername(e.target.value)} required />
+                                <Input type="text" value={username} onChange={e => setUsername(e.target.value)} required disabled={isLoading} />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-slate-300 mb-1">{t('emailLabel')}</label>
-                                <Input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+                                <Input type="email" value={email} onChange={e => setEmail(e.target.value)} required disabled={isLoading} />
                             </div>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-slate-300 mb-1">{t('passwordLabel')}</label>
-                                <Input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+                                <Input type="password" value={password} onChange={e => setPassword(e.target.value)} required disabled={isLoading} />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-slate-300 mb-1">{t('confirmPasswordLabel')}</label>
-                                <Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required />
+                                <Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required disabled={isLoading} />
                             </div>
                         </div>
 

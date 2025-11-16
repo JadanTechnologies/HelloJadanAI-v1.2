@@ -399,7 +399,11 @@ export type AppAction =
   | { type: 'DELETE_ROLE'; payload: string }
   | { type: 'ADD_STAFF'; payload: StaffMember }
   | { type: 'UPDATE_STAFF_ROLE'; payload: { staffId: string, roleName: string } }
-  | { type: 'DELETE_STAFF'; payload: string };
+  | { type: 'DELETE_STAFF'; payload: string }
+  // Fix: Add new action types to the union
+  | { type: 'SET_TASKS'; payload: Task[] }
+  | { type: 'SET_CAMPAIGNS'; payload: Campaign[] }
+  | { type: 'SET_REFERRALS'; payload: Referral[] };
 
 
 export type GenerationType = 'image' | 'video' | 'ad' | 'social';

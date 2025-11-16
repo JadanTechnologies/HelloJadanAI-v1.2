@@ -1,32 +1,14 @@
-import React, { createContext, useReducer, ReactNode } from 'react';
-import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement, Referral, SystemSettings, AccessRestrictionRule, GenerationType, BrandingSettings, ContentSettings, Campaign, Payment, RedemptionRequest, SupportTicket, SupportTicketMessage, Role, StaffMember } from '../types';
-import { mockAnnouncements, mockReferrals, mockSystemSettings, mockBrandingSettings, mockContentSettings, mockCampaigns, mockPayments, mockRedemptionRequests, mockUsers, mockSupportTickets, mockRoles, mockStaff } from '../pages/admin/data';
-
-const initialGenerations: Generation[] = [
-    { id: 'gen-1', type: 'image', prompt: 'A futuristic city skyline', url: 'https://picsum.photos/seed/futuristic/512/512', createdAt: new Date().toISOString(), isFavorite: false, style: 'Realistic', resolution: 'HD' },
-    { id: 'gen-2', type: 'video', prompt: 'A robot dancing in the rain', url: 'https://www.w3schools.com/html/mov_bbb.mp4', createdAt: new Date().toISOString(), isFavorite: true, style: 'Cinematic', duration: '10s' },
-];
-
-const initialTasks: Task[] = [
-    { id: 'task-1', title: 'Daily Login', description: 'Log in every day to earn credits.', rewardAmount: 10, rewardType: 'credits', status: 'completed', type: 'daily' },
-    { id: 'task-2', title: 'Generate 1 Image', description: 'Create your first masterpiece.', rewardAmount: 5, rewardType: 'credits', status: 'incomplete', type: 'daily' },
-    { id: 'task-3', title: 'Share on Social Media', description: 'Share your creation with friends.', rewardAmount: 15, rewardType: 'credits', status: 'incomplete', type: 'engagement', requiresProof: true, targetUrl: 'https://x.com' },
-    { id: 'task-4', title: 'Complete Profile', description: 'Upload an avatar and set a username.', rewardAmount: 20, rewardType: 'credits', status: 'completed', type: 'profile' },
-    { id: 'task-data-1', title: 'Watch a Tutorial Video', description: 'Learn a new skill and earn data.', rewardAmount: 100, rewardType: 'data', status: 'incomplete', type: 'engagement' },
-    { id: 'task-airtime-1', title: 'Take a Survey', description: 'Give us your feedback for an airtime reward.', rewardAmount: 50, rewardType: 'airtime', status: 'incomplete', type: 'engagement', requiresProof: true },
-];
-
-const initialCreditHistory: CreditTransaction[] = [
-    { id: 'tx-1', description: 'Initial Credits', amount: 100, date: new Date().toISOString() },
-    { id: 'tx-2', description: 'Generated Image', amount: -5, date: new Date().toISOString() },
-]
+import React, { createContext, useReducer, ReactNode, useEffect, useState } from 'react';
+import { AppState, AppAction, User, Generation, CreditTransaction, Task, Notification, Announcement, Referral, SystemSettings, BrandingSettings, ContentSettings, Campaign, Payment, RedemptionRequest, SupportTicket, SupportTicketMessage, Role, StaffMember } from '../types';
+import { mockAnnouncements, mockReferrals, mockSystemSettings, mockBrandingSettings, mockContentSettings, mockCampaigns, mockPayments, mockRedemptionRequests, mockSupportTickets, mockRoles, mockStaff } from '../pages/admin/data';
+import * as api from '../services/api';
 
 const initialState: AppState = {
   user: null,
   credits: 0,
-  generations: initialGenerations,
-  creditHistory: initialCreditHistory,
-  tasks: initialTasks,
+  generations: [], // Will be loaded from user data or local storage
+  creditHistory: [], // Will be loaded from user data
+  tasks: [], // Will be loaded based on user
   notifications: [],
   announcements: mockAnnouncements.filter(a => {
       const now = new Date();
@@ -34,17 +16,17 @@ const initialState: AppState = {
       const end = a.endDate ? new Date(a.endDate) : null;
       return a.isActive && start <= now && (!end || end >= now);
   }),
-  referrals: mockReferrals,
+  referrals: [], // Will be loaded based on user
   systemSettings: mockSystemSettings,
   brandingSettings: mockBrandingSettings,
   contentSettings: mockContentSettings,
-  campaigns: mockCampaigns,
-  payments: mockPayments,
-  redemptionRequests: mockRedemptionRequests,
-  supportTickets: mockSupportTickets,
+  campaigns: [], // Will be loaded
+  payments: mockPayments, // Admin-facing, can still be mock for now
+  redemptionRequests: mockRedemptionRequests, // Admin-facing
+  supportTickets: mockSupportTickets, // Admin-facing
   recentRedemption: null,
-  roles: mockRoles,
-  staff: mockStaff,
+  roles: mockRoles, // Admin-facing
+  staff: mockStaff, // Admin-facing
 };
 
 const appReducer = (state: AppState, action: AppAction): AppState => {
@@ -52,76 +34,24 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
     case 'LOGIN':
       return { ...state, user: action.payload, credits: action.payload.credits };
     case 'LOGOUT':
-      return { ...state, user: null };
+      // Reset user-specific data on logout
+      return { ...state, user: null, credits: 0, tasks: [], generations: [], creditHistory: [], referrals: [] };
     case 'ADD_USER':
-        // This is a simulation for the frontend. In a real app, this would be an API call.
-        // We add the user to the mock users list. This doesn't log them in.
-        console.log("New user added (simulated):", action.payload);
-        return state; // In a real app, you might update a list of all users.
+      // This is now mainly for simulation, login handles the state update
+      console.log("New user signed up (simulated):", action.payload);
+      return state;
     case 'UPDATE_CREDITS':
       return { ...state, credits: action.payload };
     case 'ADD_GENERATION':
       return { ...state, generations: [action.payload, ...state.generations] };
-    // FIX: Wrapped case in a block scope to prevent redeclaration errors of 'updatedUser' in other cases.
     case 'UPDATE_TASK_STATUS': {
-        const { taskId, status, userId } = action.payload;
-        const taskToUpdate = state.tasks.find(t => t.id === taskId);
-        
-        if (!state.user || !taskToUpdate || state.user.id !== userId) return state;
-        if (state.tasks.find(t => t.id === taskId)?.status !== 'incomplete') return state;
-
-        const isCompleting = status === 'completed';
-        if (!isCompleting) {
-             return { ...state, tasks: state.tasks.map(t => t.id === taskId ? { ...t, status } : t) };
-        }
-        
-        const isFirstTaskCompletion = state.user.tasksCompleted === 0;
-
-        let updatedUser = { ...state.user, tasksCompleted: state.user.tasksCompleted + 1 };
-        let newCreditHistory = state.creditHistory;
-        let newNotifications = state.notifications;
-
-        // Handle reward type
-        switch (taskToUpdate.rewardType) {
-            case 'credits':
-                updatedUser.credits += taskToUpdate.rewardAmount;
-                newCreditHistory = [{ id: `tx-${Date.now()}`, description: `Task: ${taskToUpdate.title}`, amount: taskToUpdate.rewardAmount, date: new Date().toISOString()}, ...state.creditHistory];
-                break;
-            case 'data':
-                updatedUser.dataBalanceMB += taskToUpdate.rewardAmount;
-                newNotifications = [{ id: `notif-${Date.now()}`, message: `You earned ${taskToUpdate.rewardAmount}MB of data!`, read: false, createdAt: new Date().toISOString(), type: 'success' }, ...newNotifications];
-                break;
-            case 'airtime':
-                updatedUser.airtimeBalanceNGN += taskToUpdate.rewardAmount;
-                 newNotifications = [{ id: `notif-${Date.now()}`, message: `You earned NGN ${taskToUpdate.rewardAmount} in airtime!`, read: false, createdAt: new Date().toISOString(), type: 'success' }, ...newNotifications];
-                break;
-        }
-
-        // Base state update
-        let newState = {
-            ...state,
-            user: updatedUser,
-            credits: updatedUser.credits,
-            tasks: state.tasks.map(t => t.id === taskId ? { ...t, status } : t),
-            creditHistory: newCreditHistory,
-            notifications: newNotifications,
-        };
-        
-        // Handle referral bonus for the referrer
-        if (isFirstTaskCompletion && state.user.referredBy) {
-            const referrerId = state.user.referredBy;
-            const referralBonus = state.systemSettings.referralRewards.firstTask;
-            console.log(`User ${state.user.id} completed their first task. Awarding ${referralBonus} credits to referrer ${referrerId} (SIMULATED)`);
-            const updatedReferrals = state.referrals.map(r => 
-                r.refereeId === userId && r.referrerId === referrerId 
-                ? { ...r, status: 'task_completed' as 'task_completed' } 
-                : r
-            );
-
-            newState = { ...newState, referrals: updatedReferrals };
-        }
-
-        return newState;
+      // Simplified: This action now just updates the UI status of a task.
+      // The reward logic is handled by the API service.
+      const { taskId, status } = action.payload;
+      return {
+        ...state,
+        tasks: state.tasks.map(t => t.id === taskId ? { ...t, status } : t),
+      };
     }
     case 'TOGGLE_FAVORITE':
       return { ...state, generations: state.generations.map(g => g.id === action.payload ? { ...g, isFavorite: !g.isFavorite } : g) };
@@ -182,12 +112,12 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
             user: userAfterDeduction,
             redemptionRequests: [req, ...state.redemptionRequests]
         };
-    case 'UPDATE_REDEMPTION_STATUS':
+    case 'UPDATE_REDEMPTION_STATUS': {
         const { requestId, status: newStatus } = action.payload;
         const requestToUpdate = state.redemptionRequests.find(r => r.id === requestId);
         if (!requestToUpdate) return state;
 
-        let finalState = {
+        let finalState: AppState = {
             ...state,
             redemptionRequests: state.redemptionRequests.map(r =>
                 r.id === requestId ? { ...r, status: newStatus, processedAt: new Date().toISOString() } : r
@@ -203,14 +133,17 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
                 createdAt: new Date().toISOString(),
                 type: 'success'
             }, ...finalState.notifications];
-            // Here you would also trigger an SMS
             console.log(`SIMULATING SMS: Sending ${requestToUpdate.amount} of ${requestToUpdate.type} to ${requestToUpdate.phoneNumber}.`);
         } else if (newStatus === 'rejected') {
-            // Refund the user if rejected
-            const userToRefund = mockUsers.find(u => u.id === requestToUpdate.userId); // In real app, you'd get the user from state/API
-            if (userToRefund) {
-                 // This is a mock update. In a real app, this would be a single atomic transaction.
-                 console.log(`Refunding ${requestToUpdate.amount} ${requestToUpdate.type} to user ${requestToUpdate.userId}`);
+            // BUG FIX: Refund the user's balance if their request is rejected.
+            if (state.user && state.user.id === requestToUpdate.userId) {
+                const updatedUser = { ...state.user };
+                if (requestToUpdate.type === 'data') {
+                    updatedUser.dataBalanceMB += requestToUpdate.amount;
+                } else {
+                    updatedUser.airtimeBalanceNGN += requestToUpdate.amount;
+                }
+                finalState.user = updatedUser;
             }
              finalState.notifications = [{
                 id: `notif-${Date.now()}`,
@@ -222,9 +155,9 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
         }
         
         return finalState;
+    }
     case 'DISMISS_REDEMPTION_BANNER':
         return { ...state, recentRedemption: null };
-    // FIX: Wrapped case in a block scope to prevent redeclaration errors of 'updatedUser' in other cases.
     case 'INCREMENT_DAILY_GENERATION': {
         if (!state.user) return state;
         const { type } = action.payload;
@@ -234,9 +167,7 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
         
         let currentDailyGenerations = state.user.dailyGenerations;
 
-        // If last reset was before today, reset the counts
         if (lastResetDate !== today) {
-            // FIX: Property 'social' is missing in type '{ image: number; video: number; ad: number; lastReset: string; }' but required in type '{ image: number; video: number; ad: number; social: number; lastReset: string; }'.
             currentDailyGenerations = {
                 image: 0,
                 video: 0,
@@ -246,23 +177,19 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
             };
         }
         
-        // Now increment the count for the current generation
         const updatedUser = {
             ...state.user,
             dailyGenerations: {
             ...currentDailyGenerations,
-            [type]: currentDailyGenerations[type as GenerationType] + 1,
+            [type]: currentDailyGenerations[type] + 1,
             }
         };
       
         return { ...state, user: updatedUser };
     }
     case 'BULK_UPDATE_USER_STATUS': {
-        // This is a simulation for an API call.
-        // In a real app, you'd trigger the API and then refetch/update the user list.
         const { userIds, status } = action.payload;
-        console.log(`Bulk action dispatched: Set status to '${status}' for ${userIds.length} users.`);
-        // No state is changed here as user management is handled locally in the component for this demo.
+        console.log(`API call simulated: Set status to '${status}' for ${userIds.length} users.`);
         return state;
     }
     case 'CREATE_SUPPORT_TICKET':
@@ -316,172 +243,62 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
     case 'DELETE_STAFF': {
         return { ...state, staff: state.staff.filter(s => s.id !== action.payload) };
     }
+    // New actions for setting fetched data
+    case 'SET_TASKS':
+      return { ...state, tasks: action.payload };
+    case 'SET_CAMPAIGNS':
+      return { ...state, campaigns: action.payload };
+    case 'SET_REFERRALS':
+      return { ...state, referrals: action.payload };
     default:
       return state;
   }
 };
 
-type LoginResult = { success: boolean; message?: string; };
-type SignupData = { username: string; email: string; password: string; role: 'student' | 'content_creator' | 'startup' };
-type SignupResult = { success: boolean; message?: string; };
-
-
 export const AppContext = createContext<{
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
-  login: (email: string, password: string) => LoginResult;
-  logout: () => void;
-  loginAsAdmin: (email: string, password: string) => LoginResult;
-  signup: (data: SignupData) => Promise<SignupResult>;
+  isInitializing: boolean;
 }>({
   state: initialState,
   dispatch: () => null,
-  login: () => ({ success: false }),
-  logout: () => {},
-  loginAsAdmin: () => ({ success: false }),
-  signup: async () => ({ success: false }),
+  isInitializing: true,
 });
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
+  const [isInitializing, setIsInitializing] = useState(true);
 
-  const checkAccess = (user: User): { allowed: boolean; message?: string } => {
-    const { accessRestrictions } = state.systemSettings;
-    if (accessRestrictions.length === 0) {
-      return { allowed: true };
-    }
-
-    // Mock location for checking rules
-    const location = { country: 'United States', region: 'California', city: 'San Francisco' };
-    const deviceInfo = user.deviceInfo.toLowerCase();
-    
-    // Parse device info
-    const osMatch = deviceInfo.match(/windows|macos|linux|ios|android/);
-    const os = osMatch ? osMatch[0] : 'unknown';
-    
-    const browserMatch = deviceInfo.match(/chrome|firefox|safari|edge/);
-    const browser = browserMatch ? browserMatch[0] : 'unknown';
-    
-    const deviceType = (os === 'ios' || os === 'android') ? 'Mobile' : 'Desktop';
-    
-    for (const rule of accessRestrictions) {
-        let match = false;
-        const ruleValue = rule.value.toLowerCase();
-
-        switch(rule.criteria) {
-            case 'ip':
-                if (user.ip === rule.value) match = true;
-                break;
-            case 'country':
-                if (location.country.toLowerCase() === ruleValue) match = true;
-                break;
-            case 'region':
-                 if (location.region.toLowerCase() === ruleValue) match = true;
-                break;
-            case 'os':
-                if (os === ruleValue) match = true;
-                break;
-            case 'browser':
-                if (browser === ruleValue) match = true;
-                break;
-            case 'device':
-                if (deviceType.toLowerCase() === ruleValue) match = true;
-                break;
+  // Effect to fetch user-specific data upon login
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (state.user) {
+        setIsInitializing(true);
+        const data = await api.apiFetchUserData(state.user.id);
+        if (data) {
+          dispatch({ type: 'SET_TASKS', payload: data.tasks });
+          dispatch({ type: 'SET_CAMPAIGNS', payload: data.campaigns });
+          dispatch({ type: 'SET_REFERRALS', payload: data.referrals });
         }
-
-        if (match && rule.type === 'block') {
-            return { allowed: false, message: `Access from your location or device is restricted.` };
-        }
-    }
-
-    return { allowed: true };
-  };
-
-  const login = (email: string, password: string): LoginResult => {
-    const user = mockUsers.find(u => u.email === email && !u.isAdmin);
-    if (user && password === 'password') {
-      const access = checkAccess(user);
-      if (!access.allowed) {
-        return { success: false, message: access.message };
+        setIsInitializing(false);
       }
-      const userWithLocation: User = {
-          ...user,
-          location: { country: 'United States', region: 'California', city: 'San Francisco' }
-      };
-      dispatch({ type: 'LOGIN', payload: userWithLocation });
-      return { success: true };
-    }
-    return { success: false, message: "Invalid credentials. Please try again."};
-  };
-
-  const loginAsAdmin = (email: string, password: string): LoginResult => {
-    const user = mockUsers.find(u => u.email === email && u.isAdmin);
-    if (user && password === 'password') {
-       const access = checkAccess(user);
-       if (!access.allowed) {
-        return { success: false, message: access.message };
-      }
-       const userWithLocation: User = {
-          ...user,
-          location: { country: 'United States', region: 'New York', city: 'New York City' }
-      };
-      dispatch({ type: 'LOGIN', payload: userWithLocation });
-      return { success: true };
-    }
-    return { success: false, message: "Invalid credentials. Please try again." };
-  };
-
-  const signup = async (data: SignupData): Promise<SignupResult> => {
-    // Simulate async operation
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    if (localStorage.getItem('hasSignedUpFromDevice')) {
-        return { success: false, message: "An account has already been created from this device. Only one account per device is allowed." };
-    }
-
-    const existingUser = mockUsers.find(u => u.email === data.email);
-    if (existingUser) {
-        return { success: false, message: "An account with this email already exists." };
-    }
-
-    const newUser: User = {
-        id: `user-${Date.now()}`,
-        username: data.username,
-        email: data.email,
-        avatar: `https://picsum.photos/seed/${data.username}/100/100`,
-        isAdmin: false,
-        role: data.role,
-        tasksCompleted: 0,
-        ip: '127.0.0.1', // mock IP
-        deviceInfo: 'Mock Browser', // mock device
-        status: 'active',
-        credits: 20, // Starting credits
-        dataBalanceMB: 0,
-        airtimeBalanceNGN: 0,
-        referralCode: data.username.toUpperCase() + Math.floor(Math.random() * 1000),
-        referralStats: { count: 0, creditsEarned: 0 },
-        fraudRisk: 'low',
-        location: { country: 'Unknown', region: 'Unknown', city: 'Unknown' },
-        dailyGenerations: {
-            image: 0,
-            video: 0,
-            ad: 0,
-            social: 0,
-            lastReset: new Date().toISOString()
-        }
     };
-    
-    mockUsers.push(newUser); // Add to our mock DB
-    dispatch({ type: 'ADD_USER', payload: newUser }); 
-    dispatch({ type: 'LOGIN', payload: newUser });
-    localStorage.setItem('hasSignedUpFromDevice', 'true');
-    return { success: true };
-  };
-
-  const logout = () => dispatch({ type: 'LOGOUT' });
+    fetchUserData();
+  }, [state.user]);
+  
+  // Effect to stop initial loading if there's no user
+   useEffect(() => {
+    // This simulates checking for a user session on initial load.
+    // In a real app with Supabase, you'd check `supabase.auth.session()` here.
+    setTimeout(() => {
+      if (!state.user) {
+        setIsInitializing(false);
+      }
+    }, 500);
+  }, []);
 
   return (
-    <AppContext.Provider value={{ state, dispatch, login, logout, loginAsAdmin, signup }}>
+    <AppContext.Provider value={{ state, dispatch, isInitializing }}>
       {children}
     </AppContext.Provider>
   );
