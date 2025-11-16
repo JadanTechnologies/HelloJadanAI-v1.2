@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { NavLink, Link, useLocation, Outlet } from 'react-router-dom';
 import { AppContext } from '../../contexts/AppContext';
 import { useTranslation } from '../../hooks/useTranslation';
-import { AdminIcon, AnalyticsIcon, SettingsIcon, ChecklistIcon, ShieldCheckIcon, EnvelopeIcon, MegaphoneIcon, ClockIcon, ReferralIcon, ShieldExclamationIcon, IdentificationIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, BriefcaseIcon, CurrencyDollarIcon, PhoneIcon, SupportIcon, KeyIcon } from '../../constants';
+import { AdminIcon, AnalyticsIcon, SettingsIcon, ChecklistIcon, ShieldCheckIcon, EnvelopeIcon, PaperAirplaneIcon, ClockIcon, ReferralIcon, ShieldExclamationIcon, IdentificationIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, BriefcaseIcon, CurrencyDollarIcon, PhoneIcon, SupportIcon, KeyIcon } from '../../constants';
 
 const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
     const { state, logout } = useContext(AppContext);
@@ -112,7 +112,7 @@ const Sidebar: React.FC<{ isOpen: boolean; setIsOpen: (isOpen: boolean) => void;
 
                             <div className={`pt-4 mt-4 border-t border-slate-800 ${isCollapsed ? 'border-none' : ''}`}>
                                 <h3 className={`px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider transition-opacity ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>Communication</h3>
-                                 <NavItem to="/admin/announcements" icon={<MegaphoneIcon className="w-5 h-5"/>} label="Announcements" onClick={closeSidebar} isCollapsed={isCollapsed}/>
+                                 <NavItem to="/admin/communication" icon={<PaperAirplaneIcon className="w-5 h-5"/>} label="Communication Center" onClick={closeSidebar} isCollapsed={isCollapsed}/>
                                  <NavItem to="/admin/templates" icon={<EnvelopeIcon className="w-5 h-5"/>} label="Templates" onClick={closeSidebar} isCollapsed={isCollapsed}/>
                             </div>
 

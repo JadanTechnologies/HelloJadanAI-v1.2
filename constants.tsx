@@ -130,6 +130,9 @@ export const SparklesIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
 export const ChatBubbleBottomCenterTextIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     <svg {...iconProps} {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M18 12.75H6M12 15.75h.008v.008H12v-.008zM12 21.75c-4.418 0-8-3.134-8-7 0-3.866 3.582-7 8-7s8 3.134 8 7c0 1.76-.713 3.4-1.897 4.664l.956 2.867-3.8-1.9a7.965 7.965 0 01-1.258.133z" /></svg>
 );
+export const PaperAirplaneIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg {...iconProps} {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>
+);
 
 
 

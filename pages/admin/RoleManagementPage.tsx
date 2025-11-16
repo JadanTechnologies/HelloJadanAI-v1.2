@@ -138,6 +138,7 @@ const RoleModal: React.FC<RoleModalProps> = ({ isOpen, onClose, onSave, role }) 
                             <div key={category}>
                                 <h4 className="font-semibold text-slate-300 border-b border-slate-700 pb-1 mb-2">{category}</h4>
                                 <div className="space-y-2">
+                                    {/* FIX: Correctly typed the accumulator for the reduce function, so `perms` is now an array and can be mapped. */}
                                     {perms.map(perm => (
                                         <label key={perm.id} className="flex items-center space-x-3 cursor-pointer">
                                             <input

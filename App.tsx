@@ -33,7 +33,7 @@ import PlatformSettingsPage from './pages/admin/PlatformSettingsPage';
 import TaskManagementPage from './pages/admin/TaskManagementPage';
 import TaskMonitoringPage from './pages/admin/TaskMonitoringPage';
 import TemplateManagementPage from './pages/admin/TemplateManagementPage';
-import AnnouncementPage from './pages/admin/AnnouncementPage';
+import CommunicationCenterPage from './pages/admin/CommunicationCenterPage';
 import CronJobPage from './pages/admin/CronJobPage';
 import ReferralManagementPage from './pages/admin/ReferralManagementPage';
 import FraudDetectionPage from './pages/admin/FraudDetectionPage';
@@ -110,7 +110,7 @@ function App() {
           <Route path="payments" element={<PaymentManagementPage />} />
           <Route path="redemptions" element={<RedemptionManagementPage />} />
           <Route path="templates" element={<TemplateManagementPage />} />
-          <Route path="announcements" element={<AnnouncementPage />} />
+          <Route path="communication" element={<CommunicationCenterPage />} />
           <Route path="cron-jobs" element={<CronJobPage />} />
           <Route path="referrals" element={<ReferralManagementPage />} />
           <Route path="fraud-detection" element={<FraudDetectionPage />} />
