@@ -121,9 +121,34 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, onSave, 
     const [type, setType] = useState<Task['type']>(task?.type || 'daily');
     const [targetUrl, setTargetUrl] = useState(task?.targetUrl || '');
     const [requiresProof, setRequiresProof] = useState(task?.requiresProof || false);
+    const [errors, setErrors] = useState<Partial<Record<keyof Omit<Task, 'id' | 'status'>, string>>>({});
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        
+        const newErrors: Partial<Record<keyof Omit<Task, 'id' | 'status'>, string>> = {};
+        if (!title.trim()) newErrors.title = 'Title cannot be empty.';
+        if (!description.trim()) newErrors.description = 'Description cannot be empty.';
+        if (rewardAmount <= 0) newErrors.rewardAmount = 'Reward must be a positive number.';
+
+        const urlIsRequired = ['youtube_subscribe', 'social_follow', 'social_share', 'app_download'].includes(type);
+        if (urlIsRequired && !targetUrl.trim()) {
+            newErrors.targetUrl = 'Target URL is required for this task type.';
+        } else if (targetUrl.trim()) {
+            try {
+                // Simple URL validation
+                new URL(targetUrl);
+            } catch (_) {
+                newErrors.targetUrl = 'Please enter a valid URL (e.g., https://example.com).';
+            }
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+
+        setErrors({});
         onSave({ title, description, rewardAmount, rewardType, type, targetUrl, requiresProof });
     };
     
@@ -135,7 +160,8 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, onSave, 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label className="block text-sm font-medium text-slate-300 mb-1">Title</label>
-                    <Input type="text" value={title} onChange={e => setTitle(e.target.value)} required />
+                    <Input type="text" value={title} onChange={e => setTitle(e.target.value)} />
+                    {errors.title && <p className="text-red-400 text-xs mt-1">{errors.title}</p>}
                 </div>
                  <div>
                     <label className="block text-sm font-medium text-slate-300 mb-1">Description</label>
@@ -144,8 +170,8 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, onSave, 
                         onChange={e => setDescription(e.target.value)}
                         className="w-full bg-slate-800 border border-slate-700 rounded-lg py-2 px-4 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-indigo transition duration-300"
                         rows={3}
-                        required
                     />
+                    {errors.description && <p className="text-red-400 text-xs mt-1">{errors.description}</p>}
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -156,7 +182,8 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, onSave, 
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-300 mb-1">Reward Amount</label>
-                        <Input type="number" value={rewardAmount} onChange={e => setRewardAmount(parseInt(e.target.value, 10))} required />
+                        <Input type="number" value={rewardAmount} onChange={e => setRewardAmount(parseInt(e.target.value, 10))} />
+                        {errors.rewardAmount && <p className="text-red-400 text-xs mt-1">{errors.rewardAmount}</p>}
                     </div>
                 </div>
                 <div>
@@ -170,11 +197,13 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, onSave, 
                     <div>
                         <label className="block text-sm font-medium text-slate-300 mb-1">Target URL</label>
                         <Input type="url" placeholder="https://example.com" value={targetUrl} onChange={e => setTargetUrl(e.target.value)} />
+                        {errors.targetUrl && <p className="text-red-400 text-xs mt-1">{errors.targetUrl}</p>}
                     </div>
                 )}
                 
                 <div className="flex items-center">
                     <input
+                        id="requiresProof"
                         type="checkbox"
                         checked={requiresProof}
                         onChange={(e) => setRequiresProof(e.target.checked)}
