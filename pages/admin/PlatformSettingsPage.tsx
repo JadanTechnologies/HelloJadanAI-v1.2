@@ -323,6 +323,24 @@ const PlatformSettingsPage = () => {
                     <p className="text-slate-400 mb-6">Manage API keys and settings for external services.</p>
                     <div className="space-y-8">
                         <div>
+                            <h3 className="text-lg font-semibold text-slate-200 border-b border-slate-700 pb-2 mb-4">AI Provider API Keys</h3>
+                            <p className="text-sm text-slate-400 mb-4">Enter API keys for the AI models you plan to use.</p>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-sm font-medium text-slate-300">Google Gemini API Key</label>
+                                    <Input type="password" value={apiSettings.aiProviders.gemini.apiKey} onChange={e => setApiSettings(p => ({...p, aiProviders: {...p.aiProviders, gemini: { apiKey: e.target.value }}}))} className={inputClasses} />
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-slate-300">OpenAI DALL-E API Key</label>
+                                    <Input type="password" value={apiSettings.aiProviders.dalle.apiKey} onChange={e => setApiSettings(p => ({...p, aiProviders: {...p.aiProviders, dalle: { apiKey: e.target.value }}}))} className={inputClasses} />
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-slate-300">Midjourney API Key</label>
+                                    <Input type="password" value={apiSettings.aiProviders.midjourney.apiKey} onChange={e => setApiSettings(p => ({...p, aiProviders: {...p.aiProviders, midjourney: { apiKey: e.target.value }}}))} className={inputClasses} />
+                                </div>
+                            </div>
+                        </div>
+                        <div>
                             <h3 className="text-lg font-semibold text-slate-200 border-b border-slate-700 pb-2 mb-4">Email (Resend)</h3>
                             <div>
                                 <label className="text-sm font-medium text-slate-300">Resend API Key</label>

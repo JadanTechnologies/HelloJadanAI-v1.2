@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
-import { mockTaskSubmissions } from './data';
+import { mockPendingTaskSubmissions, mockTaskSubmissionHistory } from './data';
 import { TaskSubmission } from '../../types';
 import { AppContext } from '../../contexts/AppContext';
 
@@ -59,8 +59,12 @@ const ProofReviewModal: React.FC<ProofReviewModalProps> = ({ isOpen, onClose, on
 
 
 const TaskMonitoringPage = () => {
-    const { dispatch } = useContext(AppContext);
-    const [submissions, setSubmissions] = useState<TaskSubmission[]>(mockTaskSubmissions);
+    const { state, dispatch } = useContext(AppContext);
+    const { user: adminUser } = state;
+
+    const [pendingSubmissions, setPendingSubmissions] = useState<TaskSubmission[]>(mockPendingTaskSubmissions);
+    const [submissionHistory, setSubmissionHistory] = useState<TaskSubmission[]>(mockTaskSubmissionHistory);
+
     const [isProofModalOpen, setIsProofModalOpen] = useState(false);
     const [selectedSubmission, setSelectedSubmission] = useState<TaskSubmission | null>(null);
 
@@ -74,9 +78,8 @@ const TaskMonitoringPage = () => {
         setIsProofModalOpen(false);
     };
 
-
     const handleApprove = (submissionId: string) => {
-        const submission = submissions.find(s => s.id === submissionId);
+        const submission = pendingSubmissions.find(s => s.id === submissionId);
         if (submission) {
             dispatch({
                 type: 'ADD_NOTIFICATION',
@@ -85,15 +88,22 @@ const TaskMonitoringPage = () => {
                     type: 'success',
                 }
             });
-            // NOTE: This assumes the reducer logic correctly handles status transition from 'pending' to 'completed' and awards credits.
             dispatch({ type: 'UPDATE_TASK_STATUS', payload: { taskId: submission.taskId, userId: submission.userId, status: 'completed' } });
+            
+            const historyEntry: TaskSubmission = {
+                ...submission,
+                status: 'approved',
+                reviewedBy: adminUser?.username,
+                reviewedAt: new Date().toISOString(),
+            };
+            setSubmissionHistory(prev => [historyEntry, ...prev]);
         }
-        setSubmissions(current => current.filter(s => s.id !== submissionId));
+        setPendingSubmissions(current => current.filter(s => s.id !== submissionId));
         handleCloseProofModal();
     };
     
     const handleReject = (submissionId: string) => {
-         const submission = submissions.find(s => s.id === submissionId);
+         const submission = pendingSubmissions.find(s => s.id === submissionId);
          if (submission) {
               dispatch({
                 type: 'ADD_NOTIFICATION',
@@ -102,11 +112,27 @@ const TaskMonitoringPage = () => {
                     type: 'warning',
                 }
             });
-            // NOTE: This assumes the reducer logic can handle this transition to allow user to re-submit.
             dispatch({ type: 'UPDATE_TASK_STATUS', payload: { taskId: submission.taskId, userId: submission.userId, status: 'incomplete' } });
+
+            const historyEntry: TaskSubmission = {
+                ...submission,
+                status: 'rejected',
+                reviewedBy: adminUser?.username,
+                reviewedAt: new Date().toISOString(),
+            };
+            setSubmissionHistory(prev => [historyEntry, ...prev]);
          }
-        setSubmissions(current => current.filter(s => s.id !== submissionId));
+        setPendingSubmissions(current => current.filter(s => s.id !== submissionId));
         handleCloseProofModal();
+    };
+
+    const statusBadge = (status: TaskSubmission['status']) => {
+        const styles = {
+            pending: 'bg-yellow-500/20 text-yellow-400',
+            approved: 'bg-green-500/20 text-green-400',
+            rejected: 'bg-red-500/20 text-red-400',
+        };
+        return <span className={`px-2 py-1 rounded-full text-xs font-semibold ${styles[status]}`}>{status}</span>;
     };
 
     return (
@@ -116,7 +142,8 @@ const TaskMonitoringPage = () => {
                 <p className="text-slate-400 mt-1">Review and approve user task submissions to prevent fraud.</p>
             </div>
             <Card>
-                {submissions.length > 0 ? (
+                 <h2 className="text-xl font-bold text-white mb-4">Pending Submissions</h2>
+                {pendingSubmissions.length > 0 ? (
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left text-slate-400">
                             <thead className="text-xs text-slate-300 uppercase bg-slate-700">
@@ -129,7 +156,7 @@ const TaskMonitoringPage = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {submissions.map(sub => (
+                                {pendingSubmissions.map(sub => (
                                     <tr key={sub.id} className="bg-slate-800 border-b border-slate-700">
                                         <td className="px-6 py-4 font-medium text-white flex items-center space-x-3">
                                             <img className="w-8 h-8 rounded-full" src={sub.avatar} alt={sub.username} />
@@ -153,6 +180,38 @@ const TaskMonitoringPage = () => {
                     </div>
                 )}
             </Card>
+
+            <Card>
+                <h2 className="text-xl font-bold text-white mb-4">Submission History</h2>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left text-slate-400">
+                        <thead className="text-xs text-slate-300 uppercase bg-slate-700">
+                            <tr>
+                                <th scope="col" className="px-6 py-3">User</th>
+                                <th scope="col" className="px-6 py-3">Task</th>
+                                <th scope="col" className="px-6 py-3">Status</th>
+                                <th scope="col" className="px-6 py-3">Reviewed By</th>
+                                <th scope="col" className="px-6 py-3">Reviewed At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {submissionHistory.map(sub => (
+                                <tr key={sub.id} className="bg-slate-800 border-b border-slate-700">
+                                    <td className="px-6 py-4 font-medium text-white">{sub.username}</td>
+                                    <td className="px-6 py-4">{sub.taskTitle}</td>
+                                    <td className="px-6 py-4">{statusBadge(sub.status)}</td>
+                                    <td className="px-6 py-4">{sub.reviewedBy}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{sub.reviewedAt ? new Date(sub.reviewedAt).toLocaleString() : 'N/A'}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                     {submissionHistory.length === 0 && (
+                        <p className="text-center py-8 text-slate-500">No submission history found.</p>
+                    )}
+                </div>
+            </Card>
+
 
             <ProofReviewModal
                 isOpen={isProofModalOpen}

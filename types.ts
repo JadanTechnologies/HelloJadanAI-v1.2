@@ -93,6 +93,9 @@ export interface TaskSubmission {
   taskTitle: string;
   proof: string;
   submittedAt: string;
+  status: 'pending' | 'approved' | 'rejected';
+  reviewedBy?: string;
+  reviewedAt?: string;
 }
 
 export interface RedemptionRequest {
@@ -166,6 +169,11 @@ export interface ApiSettings {
   ipLookup: {
     provider: string;
     apiKey: string;
+  };
+  aiProviders: {
+    gemini: { apiKey: string; };
+    dalle: { apiKey: string; };
+    midjourney: { apiKey: string; };
   };
 }
 

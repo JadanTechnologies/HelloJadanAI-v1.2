@@ -25,9 +25,14 @@ export const mockTasks: Task[] = [
     { id: 'task-6', title: 'Download our Mobile App', description: 'Generate on the go!', rewardAmount: 100, rewardType: 'airtime', status: 'incomplete', type: 'app_download', targetUrl: 'https://play.google.com', requiresProof: false }
 ];
 
-export const mockTaskSubmissions: TaskSubmission[] = [
-    { id: 'sub-1', userId: 'user-2', username: 'Alex', avatar: 'https://picsum.photos/seed/alex/100/100', taskId: 'task-3', taskTitle: 'Share on Social Media', proof: 'My username is @alex_shares', submittedAt: new Date().toISOString() },
-    { id: 'sub-2', userId: 'user-3', username: 'Sam', avatar: 'https://picsum.photos/seed/sam/100/100', taskId: 'task-5', taskTitle: 'Subscribe to our YouTube', proof: 'My YouTube handle is SamStreams', submittedAt: new Date(Date.now() - 3600 * 1000).toISOString() },
+export const mockPendingTaskSubmissions: TaskSubmission[] = [
+    { id: 'sub-1', userId: 'user-2', username: 'Alex', avatar: 'https://picsum.photos/seed/alex/100/100', taskId: 'task-3', taskTitle: 'Share on Social Media', proof: 'My username is @alex_shares', submittedAt: new Date().toISOString(), status: 'pending' },
+    { id: 'sub-2', userId: 'user-3', username: 'Sam', avatar: 'https://picsum.photos/seed/sam/100/100', taskId: 'task-5', taskTitle: 'Subscribe to our YouTube', proof: 'https://youtube.com/samstreams', submittedAt: new Date(Date.now() - 3600 * 1000).toISOString(), status: 'pending' },
+];
+
+export const mockTaskSubmissionHistory: TaskSubmission[] = [
+    { id: 'sub-hist-1', userId: 'user-5', username: 'Newbie', avatar: 'https://picsum.photos/seed/newbie/100/100', taskId: 'task-3', taskTitle: 'Share on Social Media', proof: 'https://x.com/newb/status/123', submittedAt: new Date(Date.now() - 86400000 * 2).toISOString(), status: 'approved', reviewedBy: 'Jadan', reviewedAt: new Date(Date.now() - 86400000).toISOString() },
+    { id: 'sub-hist-2', userId: 'user-2', username: 'Alex', avatar: 'https://picsum.photos/seed/alex/100/100', taskId: 'task-5', taskTitle: 'Subscribe to our YouTube', proof: 'bad proof', submittedAt: new Date(Date.now() - 3600 * 1000 * 48).toISOString(), status: 'rejected', reviewedBy: 'Alex', reviewedAt: new Date(Date.now() - 3600 * 1000 * 24).toISOString() },
 ];
 
 export const mockRedemptionRequests: RedemptionRequest[] = [
@@ -58,6 +63,11 @@ export const mockApiSettings: ApiSettings = {
   twilio: { accountSid: '', authToken: '', phoneNumber: '' },
   oneSignal: { appId: '', restApiKey: '' },
   ipLookup: { provider: 'Mock Service', apiKey: '' },
+  aiProviders: {
+    gemini: { apiKey: '' },
+    dalle: { apiKey: '' },
+    midjourney: { apiKey: '' },
+  },
 };
 
 export const mockEmailTemplates: EmailTemplate[] = [
