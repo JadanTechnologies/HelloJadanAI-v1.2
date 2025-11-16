@@ -1,21 +1,92 @@
-import React, { useContext, useState, useRef } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import React, { useContext, useState, useRef, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { AppContext } from '../contexts/AppContext';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
 import { Payment, PaymentGateway, Campaign } from '../types';
-import { UploadIcon } from '../constants';
+import { UploadIcon, CheckCircleIcon, ExclamationTriangleIcon } from '../constants';
+import Modal from '../components/common/Modal';
+import Spinner from '../components/common/Spinner';
+import Input from '../components/common/Input';
+
+// --- Start: In-component Modal for Payment Simulation ---
+const PaymentSimulationModal: React.FC<{
+    isOpen: boolean;
+    onClose: () => void;
+    gateway: string;
+    amount: number;
+    onSuccess: () => void;
+}> = ({ isOpen, onClose, gateway, amount, onSuccess }) => {
+    const [status, setStatus] = useState<'processing' | 'success' | 'failed'>('processing');
+
+    const runSimulation = () => {
+        setStatus('processing');
+        setTimeout(() => {
+            // Simulate 80% success rate
+            if (Math.random() < 0.8) {
+                setStatus('success');
+                setTimeout(() => {
+                    onSuccess();
+                }, 2000); // Show success message for 2 seconds before calling parent handler
+            } else {
+                setStatus('failed');
+            }
+        }, 2500); // Simulate processing time
+    };
+
+    useEffect(() => {
+        if (isOpen) {
+            runSimulation();
+        }
+    }, [isOpen]);
+
+    const renderContent = () => {
+        switch (status) {
+            case 'processing':
+                return <Spinner message={`Processing payment with ${gateway}...`} />;
+            case 'success':
+                return (
+                    <div className="text-center p-8">
+                        <CheckCircleIcon className="w-16 h-16 mx-auto text-green-500 mb-4" />
+                        <h3 className="text-2xl font-bold text-white">Payment Successful!</h3>
+                        <p className="text-slate-400 mt-2">Amount of ${amount.toFixed(2)} received. Finalizing submission...</p>
+                    </div>
+                );
+            case 'failed':
+                return (
+                    <div className="text-center p-8">
+                        <ExclamationTriangleIcon className="w-16 h-16 mx-auto text-red-500 mb-4" />
+                        <h3 className="text-2xl font-bold text-white">Payment Failed</h3>
+                        <p className="text-slate-400 mt-2">We were unable to process your payment. Please try again.</p>
+                        <div className="mt-6 flex justify-center space-x-4">
+                            <Button variant="secondary" onClick={onClose}>Cancel</Button>
+                            <Button onClick={runSimulation}>Retry Payment</Button>
+                        </div>
+                    </div>
+                );
+        }
+    };
+
+    return (
+        <Modal isOpen={isOpen} onClose={status !== 'processing' ? onClose : () => {}} title={`Pay with ${gateway}`}>
+            {renderContent()}
+        </Modal>
+    );
+};
+// --- End: In-component Modal ---
+
 
 const PaymentPage = () => {
     const { state, dispatch } = useContext(AppContext);
     const { campaignId } = useParams();
-    const navigate = useNavigate();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [selectedGateway, setSelectedGateway] = useState<PaymentGateway | null>(null);
     const [paymentProof, setPaymentProof] = useState<File | null>(null);
     const [paymentProofPreview, setPaymentProofPreview] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
 
     const campaign = state.campaigns.find(c => c.id === campaignId);
     
@@ -34,7 +105,7 @@ const PaymentPage = () => {
         );
     }
     
-    if (campaign.status !== 'pending_payment') {
+    if (campaign.status !== 'pending_payment' && !isSuccess) {
         return (
              <div className="min-h-screen flex items-center justify-center p-4 bg-brand-navy text-white">
                 <div className="text-center">
@@ -79,11 +150,65 @@ const PaymentPage = () => {
             dispatch({ type: 'UPDATE_CAMPAIGN', payload: updatedCampaign });
 
             setIsLoading(false);
-            navigate('/advertise'); // Redirect to a generic thank you page for simplicity
+            setIsSuccess(true);
         }, 1500);
     };
 
+    const handleGatewayPayment = (gateway: 'paystack' | 'flutterwave') => {
+        setSelectedGateway(gateway);
+        setIsPaymentModalOpen(true);
+    };
+
+    const handlePaymentSuccess = () => {
+        if (!campaign || !selectedGateway || selectedGateway === 'manual') return;
+
+        setIsPaymentModalOpen(false);
+        setIsLoading(true);
+
+        setTimeout(() => {
+            const newPayment: Payment = {
+                id: `pay-${Date.now()}`,
+                campaignId: campaign.id,
+                campaignName: campaign.productName,
+                companyName: campaign.companyName,
+                amount: campaignPrice,
+                currency: 'USD',
+                gateway: selectedGateway,
+                status: 'completed',
+                transactionId: `${selectedGateway}_${Date.now()}`,
+                createdAt: new Date().toISOString(),
+            };
+            dispatch({ type: 'ADD_PAYMENT', payload: newPayment });
+    
+            const updatedCampaign: Campaign = { ...campaign, status: 'pending_review', paymentId: newPayment.id };
+            dispatch({ type: 'UPDATE_CAMPAIGN', payload: updatedCampaign });
+
+            setIsLoading(false);
+            setIsSuccess(true);
+        }, 300);
+    };
+
     const gateways = state.systemSettings.paymentGateways;
+
+    if (isSuccess) {
+        return (
+            <div className="min-h-screen flex items-center justify-center p-4 bg-brand-navy">
+                <div className="w-full max-w-lg text-center">
+                    <Card>
+                        <CheckCircleIcon className="w-20 h-20 mx-auto text-green-500 mb-4" />
+                        <h1 className="text-3xl font-bold text-white">Submission Received!</h1>
+                        <p className="text-slate-400 mt-4">
+                            Thank you for your submission. Your campaign is now pending review by our team.
+                            We will notify you at your contact email once the review is complete.
+                        </p>
+                        <Link to="/" className="mt-8 inline-block">
+                            <Button variant="secondary">Back to Homepage</Button>
+                        </Link>
+                    </Card>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4 bg-brand-navy">
@@ -109,8 +234,8 @@ const PaymentPage = () => {
                     <div className="space-y-4">
                         <h3 className="font-semibold text-white text-center">Select Payment Method</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {gateways.paystack.enabled && <Button variant="secondary" className="w-full" onClick={() => setSelectedGateway('paystack')}>Pay with Paystack</Button>}
-                            {gateways.flutterwave.enabled && <Button variant="secondary" className="w-full" onClick={() => setSelectedGateway('flutterwave')}>Pay with Flutterwave</Button>}
+                            {gateways.paystack.enabled && <Button variant="secondary" className="w-full" onClick={() => handleGatewayPayment('paystack')}>Pay with Paystack</Button>}
+                            {gateways.flutterwave.enabled && <Button variant="secondary" className="w-full" onClick={() => handleGatewayPayment('flutterwave')}>Pay with Flutterwave</Button>}
                             {gateways.manual.enabled && <Button variant="secondary" className="w-full" onClick={() => setSelectedGateway('manual')}>Manual Bank Transfer</Button>}
                         </div>
 
@@ -147,8 +272,17 @@ const PaymentPage = () => {
                     </div>
                 </Card>
             </div>
+            {selectedGateway && selectedGateway !== 'manual' && (
+                <PaymentSimulationModal
+                    isOpen={isPaymentModalOpen}
+                    onClose={() => setIsPaymentModalOpen(false)}
+                    gateway={selectedGateway}
+                    amount={campaignPrice}
+                    onSuccess={handlePaymentSuccess}
+                />
+            )}
         </div>
-    )
-}
+    );
+};
 
 export default PaymentPage;

@@ -131,9 +131,8 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, onSave, 
         if (!description.trim()) newErrors.description = 'Description cannot be empty.';
         if (rewardAmount <= 0) newErrors.rewardAmount = 'Reward must be a positive number.';
 
-        const urlIsRequired = ['youtube_subscribe', 'social_follow', 'social_share', 'app_download'].includes(type);
-        if (urlIsRequired && !targetUrl.trim()) {
-            newErrors.targetUrl = 'Target URL is required for this task type.';
+        if (requiresProof && !targetUrl.trim()) {
+            newErrors.targetUrl = 'Target URL is required when manual verification is needed.';
         } else if (targetUrl.trim()) {
             try {
                 // Simple URL validation
@@ -152,7 +151,6 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, onSave, 
         onSave({ title, description, rewardAmount, rewardType, type, targetUrl, requiresProof });
     };
     
-    const showTargetUrlInput = !['daily', 'profile', 'engagement'].includes(type);
     const selectClasses = "w-full bg-slate-800 border border-slate-700 rounded-lg py-2 px-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-indigo";
 
     return (
@@ -193,13 +191,11 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, onSave, 
                     </select>
                 </div>
 
-                {showTargetUrlInput && (
-                    <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-1">Target URL</label>
-                        <Input type="url" placeholder="https://example.com" value={targetUrl} onChange={e => setTargetUrl(e.target.value)} />
-                        {errors.targetUrl && <p className="text-red-400 text-xs mt-1">{errors.targetUrl}</p>}
-                    </div>
-                )}
+                <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">Target URL</label>
+                    <Input type="url" placeholder="https://example.com" value={targetUrl} onChange={e => setTargetUrl(e.target.value)} />
+                    {errors.targetUrl && <p className="text-red-400 text-xs mt-1">{errors.targetUrl}</p>}
+                </div>
                 
                 <div className="flex items-center">
                     <input

@@ -435,6 +435,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     // Simulate async operation
     await new Promise(resolve => setTimeout(resolve, 500));
 
+    if (localStorage.getItem('hasSignedUpFromDevice')) {
+        return { success: false, message: "An account has already been created from this device. Only one account per device is allowed." };
+    }
+
     const existingUser = mockUsers.find(u => u.email === data.email);
     if (existingUser) {
         return { success: false, message: "An account with this email already exists." };
@@ -470,6 +474,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     mockUsers.push(newUser); // Add to our mock DB
     dispatch({ type: 'ADD_USER', payload: newUser }); 
     dispatch({ type: 'LOGIN', payload: newUser });
+    localStorage.setItem('hasSignedUpFromDevice', 'true');
     return { success: true };
   };
 

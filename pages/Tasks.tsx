@@ -6,7 +6,16 @@ import Button from '../components/common/Button';
 import Modal from '../components/common/Modal';
 import Input from '../components/common/Input';
 import { Task } from '../types';
-import { UploadIcon } from '../constants';
+import { 
+    UploadIcon,
+    CalendarDaysIcon,
+    ArrowUpRightIcon,
+    IdentificationIcon,
+    VideoIcon,
+    UserPlusIcon,
+    ShareIcon,
+    DevicePhoneMobileIcon
+} from '../constants';
 
 interface ProofSubmissionModalProps {
     isOpen: boolean;
@@ -158,11 +167,35 @@ const Tasks = () => {
     }
   };
 
+  const getTaskIcon = (taskType: Task['type']) => {
+    const iconClass = "w-6 h-6 text-slate-500";
+    switch (taskType) {
+        case 'daily':
+            return <CalendarDaysIcon className={iconClass} />;
+        case 'profile':
+            return <IdentificationIcon className={iconClass} />;
+        case 'youtube_subscribe':
+            return <VideoIcon className={iconClass} />;
+        case 'social_follow':
+            return <UserPlusIcon className={iconClass} />;
+        case 'social_share':
+            return <ShareIcon className={iconClass} />;
+        case 'app_download':
+            return <DevicePhoneMobileIcon className={iconClass} />;
+        case 'engagement':
+        default:
+            return <ArrowUpRightIcon className={iconClass} />;
+    }
+  };
+
   const renderTaskCard = (task: Task, isSponsored: boolean = false) => (
       <Card key={task.id} className="flex flex-col md:flex-row md:items-center justify-between">
-          <div className="flex-1 mb-4 md:mb-0">
-              <h3 className="font-semibold text-lg text-white">{task.title}</h3>
-              <p className="text-slate-400 text-sm">{task.description}</p>
+          <div className="flex-1 mb-4 md:mb-0 flex items-start space-x-4">
+              <div className="flex-shrink-0 pt-1">{getTaskIcon(task.type)}</div>
+              <div>
+                  <h3 className="font-semibold text-lg text-white">{task.title}</h3>
+                  <p className="text-slate-400 text-sm">{task.description}</p>
+              </div>
           </div>
           <div className="flex items-center space-x-4">
               {task.targetUrl && (
@@ -200,18 +233,19 @@ const Tasks = () => {
     ? state.tasks.filter(t => t.rewardType === 'credits')
     : state.tasks;
     
-  const allTasks = [...sponsoredTasks, ...availableSystemTasks];
-  const filteredTasks = allTasks.filter(task => 
+  const filterBySearch = (tasks: Task[]) => tasks.filter(task => 
     task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     task.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
+  
   const taskCategories = {
-      'Sponsored': filteredTasks.filter(t => sponsoredTasks.some(st => st.id === t.id)),
-      'Daily': filteredTasks.filter(t => t.type === 'daily'),
-      'Engagement': filteredTasks.filter(t => ['engagement', 'social_follow', 'social_share', 'youtube_subscribe'].includes(t.type)),
-      'Special': filteredTasks.filter(t => ['profile', 'app_download'].includes(t.type)),
-  }
+      'Sponsored': filterBySearch(sponsoredTasks),
+      'Daily': filterBySearch(availableSystemTasks.filter(t => t.type === 'daily')),
+      'Engagement': filterBySearch(availableSystemTasks.filter(t => ['engagement', 'social_follow', 'social_share', 'youtube_subscribe'].includes(t.type))),
+      'Profile': filterBySearch(availableSystemTasks.filter(t => t.type === 'profile')),
+      'Special Offers': filterBySearch(availableSystemTasks.filter(t => ['app_download'].includes(t.type))),
+  };
+
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
