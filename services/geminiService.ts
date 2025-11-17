@@ -1,9 +1,20 @@
 import { Generation, AdCreative } from '../types';
 import { GoogleGenAI, Modality } from '@google/genai';
 
-// Initialize the Google Gemini AI client.
-// The API key is securely accessed from environment variables.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+// Lazily initialize the Google Gemini AI client to prevent app crash on load
+// if the API key environment variable is not set.
+let aiInstance: GoogleGenAI | null = null;
+
+const getAiClient = (): GoogleGenAI => {
+    if (!aiInstance) {
+        // The API key is securely accessed from environment variables.
+        // The GoogleGenAI constructor will throw an error if the key is missing,
+        // which will be caught by the calling functions.
+        aiInstance = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+    }
+    return aiInstance;
+};
+
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -32,6 +43,7 @@ export const generateImage = async (
   let sourceImageBase64Url: string | undefined = undefined;
 
   try {
+      const ai = getAiClient();
       let imageUrl: string;
 
       if (sourceImage) {
@@ -101,7 +113,7 @@ export const generateImage = async (
   } catch (error) {
       console.error("Error generating image with Gemini:", error);
       onProgress(100, "An error occurred.");
-      throw new Error("Image generation failed. Please check the console for more details.");
+      throw new Error("Image generation failed. This might be due to a missing API key or a network issue. Please check the console for more details.");
   }
 };
 
@@ -219,6 +231,7 @@ export const generateSocialPost = async (
   const fullPrompt = `You are a social media expert. Write a compelling and engaging social media post for the platform "${platform}" with a "${tone}" tone of voice. The topic is: "${prompt}". Include relevant hashtags. Do not include any preamble, just return the post content.`;
 
   try {
+    const ai = getAiClient();
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: fullPrompt,
@@ -243,6 +256,6 @@ export const generateSocialPost = async (
     };
   } catch (error) {
     console.error("Error generating social post:", error);
-    throw new Error("Failed to generate social post.");
+    throw new Error("Failed to generate social post. This might be due to a missing API key or a network issue.");
   }
 };
