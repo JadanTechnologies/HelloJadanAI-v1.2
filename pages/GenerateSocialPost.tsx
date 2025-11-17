@@ -30,7 +30,7 @@ const GenerateSocialPost = () => {
     const generationType: GenerationType = 'social';
     const dailyLimit = state.systemSettings.dailyGenerationLimits[generationType];
     const today = new Date().toISOString().split('T')[0];
-    const lastResetDate = state.user?.dailyGenerations?.lastReset?.split('T')[0];
+    const lastResetDate = state.user?.dailyGenerations?.lastReset ? state.user.dailyGenerations.lastReset.split('T')[0] : undefined;
     const dailyCount = lastResetDate === today ? state.user?.dailyGenerations[generationType] ?? 0 : 0;
     const remainingToday = dailyLimit - dailyCount;
     const hasExceededDailyLimit = remainingToday <= 0;
