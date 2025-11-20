@@ -148,7 +148,7 @@ const Sidebar: React.FC<{ isOpen: boolean; setIsOpen: (isOpen: boolean) => void;
                         )}
                     </div>
                     
-                    <div className="flex-1 flex flex-col overflow-y-auto">
+                    <div className="flex-1 flex flex-col overflow-y-auto no-scrollbar">
                         <nav className="flex-1 space-y-1 p-4">
                             <NavItem to="/app/dashboard" icon={<HomeIcon className="w-5 h-5"/>} label={t('navDashboard')} onClick={closeSidebar} isCollapsed={isCollapsed}/>
                             

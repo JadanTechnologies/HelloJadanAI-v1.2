@@ -4,7 +4,7 @@ import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import Input from '../../components/common/Input';
 import { AppContext } from '../../contexts/AppContext';
-import { CREDIT_COSTS, TrashIcon, UploadIcon } from '../../constants';
+import { CREDIT_COSTS, TrashIcon, UploadIcon, CheckCircleIcon } from '../../constants';
 import { mockApiSettings } from './data';
 import { BrandingSettings, ContentSettings, FAQItem, ApiSettings, SystemSettings } from '../../types';
 
@@ -70,9 +70,7 @@ const PlatformSettingsPage = () => {
         usedProviders.delete('Mock Service');
 
         // Validate API keys for used providers
-        if (usedProviders.has('Gemini') && !apiSettings.aiProviders.gemini.apiKey.trim()) {
-            newErrors.geminiApiKey = 'Gemini API key is required as it is selected as a provider.';
-        }
+        // No need to validate Gemini key as it's handled by environment variables.
         if (usedProviders.has('DALL-E 3') && !apiSettings.aiProviders.dalle.apiKey.trim()) {
             newErrors.dalleApiKey = 'DALL-E API key is required as it is selected as a provider.';
         }
@@ -83,7 +81,7 @@ const PlatformSettingsPage = () => {
         setErrors(newErrors);
         
         if (Object.keys(newErrors).length > 0) {
-            if (newErrors.geminiApiKey || newErrors.dalleApiKey || newErrors.midjourneyApiKey) {
+            if (newErrors.dalleApiKey || newErrors.midjourneyApiKey) {
                 return 'integrations';
             }
         }
@@ -384,16 +382,19 @@ const PlatformSettingsPage = () => {
                             <div className="space-y-4">
                                 <div>
                                     <label className="text-sm font-medium text-slate-300">Google Gemini API Key</label>
-                                    <Input 
-                                        type="password" 
-                                        value={apiSettings.aiProviders.gemini.apiKey} 
-                                        onChange={e => {
-                                            setApiSettings(p => ({...p, aiProviders: {...p.aiProviders, gemini: { apiKey: e.target.value }}}));
-                                            if (errors.geminiApiKey) setErrors(prev => ({...prev, geminiApiKey: ''}));
-                                        }}
-                                        className={`${inputClasses} ${errors.geminiApiKey ? '!border-red-500' : ''}`} 
-                                    />
-                                    {errors.geminiApiKey && <p className="text-red-400 text-xs mt-1">{errors.geminiApiKey}</p>}
+                                    <div className="mt-1 flex items-center space-x-2">
+                                        <Input 
+                                            type="text"
+                                            value="Configured via environment variable"
+                                            className={`${inputClasses} !bg-slate-800 !cursor-not-allowed`}
+                                            readOnly
+                                            disabled
+                                        />
+                                        <span className="flex-shrink-0 text-green-400" title="Ready to use">
+                                            <CheckCircleIcon className="w-6 h-6" />
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-slate-500 mt-1">The Gemini API key is securely managed and does not need to be configured here.</p>
                                 </div>
                                 <div>
                                     <label className="text-sm font-medium text-slate-300">OpenAI DALL-E API Key</label>
