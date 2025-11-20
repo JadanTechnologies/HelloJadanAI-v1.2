@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
@@ -43,8 +43,17 @@ const PlatformSettingsPage = () => {
 
     // Validation state
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [errorTab, setErrorTab] = useState<SettingsTab | null>(null);
 
-    const validate = () => {
+    // Effect to clear the save error when settings are changed
+    useEffect(() => {
+        if (errorTab) {
+            setErrorTab(null);
+        }
+    }, [branding, content, systemSettings, costs, providers, apiSettings]);
+
+
+    const validate = (): SettingsTab | null => {
         const newErrors: { [key: string]: string } = {};
 
         // Check which providers are in use
@@ -74,15 +83,18 @@ const PlatformSettingsPage = () => {
         setErrors(newErrors);
         
         if (Object.keys(newErrors).length > 0) {
-            setActiveTab('integrations');
-            return false;
+            if (newErrors.geminiApiKey || newErrors.dalleApiKey || newErrors.midjourneyApiKey) {
+                return 'integrations';
+            }
         }
 
-        return true;
+        return null;
     };
 
     const handleSave = () => {
-        if (!validate()) {
+        const tabWithErrors = validate();
+        if (tabWithErrors) {
+            setErrorTab(tabWithErrors);
             return;
         }
 
@@ -521,6 +533,11 @@ const PlatformSettingsPage = () => {
             <div className="pt-2 flex items-center space-x-4">
                 <Button onClick={handleSave} isLoading={isSaving}>Save All Changes</Button>
                 {saved && <p className="text-green-400 text-sm animate-fade-in-up">Settings saved successfully!</p>}
+                {errorTab && (
+                    <p className="text-red-400 text-sm animate-fade-in-up">
+                        Please fix errors on the <button className="underline font-bold capitalize" onClick={() => setActiveTab(errorTab)}>{errorTab.replace('_', ' & ')}</button> tab.
+                    </p>
+                )}
             </div>
 
             {isFaqModalOpen && <FaqModal isOpen={isFaqModalOpen} onClose={closeFaqModal} onSave={handleSaveFaq} faq={editingFaq}/>}
